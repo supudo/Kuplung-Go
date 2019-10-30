@@ -28,7 +28,18 @@ type OpenGL3 struct {
 
 // NewOpenGL3 attempts to initialize a renderer.
 // An OpenGL context has to be established before calling this function.
-func NewOpenGL3(io imgui.IO) (*OpenGL3, error) {
+func NewOpenGL3(io imgui.IO) *OpenGL3 {
+	renderer := &OpenGL3{
+		imguiIO:     io,
+		glslVersion: "#version 150",
+	}
+	renderer.createDeviceObjects()
+	return renderer
+}
+
+// NewOpenGL32 attempts to initialize a renderer.
+// An OpenGL context has to be established before calling this function.
+func NewOpenGL32(io imgui.IO) (*OpenGL3, error) {
 	err := gl.Init()
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize OpenGL: %v", err)

@@ -22,6 +22,9 @@ type ApplicationSettings struct {
 	AppGui struct {
 		GUIClearColor string `yaml:"guiClearColor"`
 	} `yaml:"AppGui"`
+	MemSettings struct {
+		QuitApplication bool
+	}
 }
 
 var instantiated *ApplicationSettings
@@ -56,6 +59,7 @@ func InitSettings() ApplicationSettings {
 	}
 
 	appSettings.App.CurrentPath = dir
+	appSettings.MemSettings.QuitApplication = false
 
 	return appSettings
 }

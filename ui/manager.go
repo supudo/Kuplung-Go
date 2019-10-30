@@ -1,31 +1,31 @@
 package gui
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/inkyblackness/imgui-go"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
-// RenderGUIStart handles GUI rendering
-func RenderGUIStart() {
-	context := imgui.CreateContext(nil)
-	defer context.Destroy()
-	io := imgui.CurrentIO()
-
-	platform, err := NewSDL(io)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(-1)
-	}
+// InitGUIManagerPlatform will initialize imgui and all other components
+func InitGUIManagerPlatform(window *sdl.Window, io imgui.IO) *SDL {
+	//platform := NewSDL(io, window)
+	platform, _ := NewSDL2(io)
 	defer platform.Dispose()
+	return platform
+}
 
-	renderer, err := NewOpenGL3(io)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(-1)
-	}
+// InitGUIManagerRenderer will initialize imgui and all other components
+func InitGUIManagerRenderer(io imgui.IO) *OpenGL3 {
+	renderer := NewOpenGL3(io)
 	defer renderer.Dispose()
+	return renderer
+}
 
-	Run(platform, renderer)
+// RenderGUIStart handles GUI rendering
+func RenderGUIStart(platform *SDL, renderer *OpenGL3) {
+	UIRenderStart(platform, renderer)
+}
+
+// RenderGUIEnd handles GUI rendering
+func RenderGUIEnd(platform *SDL, renderer *OpenGL3) {
+	UIRenderEnd(platform, renderer)
 }

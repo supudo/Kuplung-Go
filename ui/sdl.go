@@ -23,7 +23,17 @@ type SDL struct {
 }
 
 // NewSDL attempts to initialize an SDL context.
-func NewSDL(io imgui.IO) (*SDL, error) {
+func NewSDL(io imgui.IO, window *sdl.Window) *SDL {
+	platform := &SDL{
+		imguiIO: io,
+		window:  window,
+	}
+	platform.setKeyMapping()
+	return platform
+}
+
+// NewSDL2 attempts to initialize an SDL context.
+func NewSDL2(io imgui.IO) (*SDL, error) {
 	runtime.LockOSThread()
 
 	err := sdl.Init(sdl.INIT_VIDEO)

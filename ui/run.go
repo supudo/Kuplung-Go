@@ -56,9 +56,9 @@ type WindowVariables struct {
 	showMetrics      bool
 }
 
-// Run implements the main program loop of the demo. It returns when the platform signals to stop.
+// UIRenderStart implements the main program loop of the demo. It returns when the platform signals to stop.
 // This demo application shows some basic features of ImGui, as well as exposing the standard demo window.
-func Run(p Platform, r Renderer) {
+func UIRenderStart(p Platform, r Renderer) {
 	imgui.CurrentIO().SetClipboard(clipboard{platform: p})
 
 	clearColor := [4]float32{70.0 / 255.0, 70.0 / 255.0, 70.0 / 255.0, 1.0}
@@ -145,6 +145,16 @@ func Run(p Platform, r Renderer) {
 		// sleep to avoid 100% CPU usage for this demo
 		<-time.After(time.Millisecond * 25)
 	}
+}
+
+// UIRenderEnd implements the main program loop of the demo. It returns when the platform signals to stop.
+// This demo application shows some basic features of ImGui, as well as exposing the standard demo window.
+func UIRenderEnd(p Platform, r Renderer) {
+	r.Render(p.DisplaySize(), p.FramebufferSize(), imgui.RenderedDrawData())
+	p.PostRender()
+
+	// sleep to avoid 100% CPU usage for this demo
+	<-time.After(time.Millisecond * 25)
 }
 
 // ShowAboutImGui show ImGui About screen
