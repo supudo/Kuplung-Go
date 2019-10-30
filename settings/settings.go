@@ -55,6 +55,8 @@ func InitSettings() ApplicationSettings {
 		log.Fatalf("Settings error: %v", err)
 	}
 
+	appSettings.App.CurrentPath = dir
+
 	return appSettings
 }
 
