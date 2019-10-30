@@ -3,6 +3,7 @@ package settings
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"sync"
 
 	"gopkg.in/yaml.v2"
@@ -39,7 +40,12 @@ func GetSettings() *ApplicationSettings {
 func InitSettings() ApplicationSettings {
 	var appSettings ApplicationSettings
 
-	appConfig, err := ioutil.ReadFile("../resources/Kuplung_Settings.yaml")
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Settings error: %v", err)
+	}
+
+	appConfig, err := ioutil.ReadFile(dir + "/../Resources/resources/Kuplung_Settings.yaml")
 	if err != nil {
 		log.Fatalf("Settings error: %v", err)
 	}
@@ -56,12 +62,17 @@ func InitSettings() ApplicationSettings {
 func SaveSettings() {
 	var sett = GetSettings()
 
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Settings error: %v", err)
+	}
+
 	data, err := yaml.Marshal(&sett)
 	if err != nil {
 		log.Fatalf("Settings save error: %v", err)
 	}
 
-	err = ioutil.WriteFile("../resources/Kuplung_Settings.yaml", data, 0644)
+	err = ioutil.WriteFile(dir+"/../Resources/resources/Kuplung_Settings.yaml", data, 0644)
 	if err != nil {
 		log.Fatalf("Settings save error: %v", err)
 	}
