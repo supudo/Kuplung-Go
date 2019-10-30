@@ -1,0 +1,15 @@
+# Kuplung Settings file
+
+# App settings
+App:
+  appVersion: 1.0 d
+  currentFolder: 
+
+# SDL & Window Settings
+AppWindow:
+  SDL_Window_Width: 1200
+  SDL_Window_Height: 800
+
+# GUI - clear color
+AppGui:
+  guiClearColor: '{70.0 / 255.0, 70.0 / 255.0, 70.0 / 255.0, 255.0 / 255.0}'

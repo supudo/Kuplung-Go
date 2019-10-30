@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/inkyblackness/imgui-go"
-	settings "github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/settings"
 )
 
 // Platform covers mouse/keyboard/gamepad inputs, cursor shape, timing, windowing.
@@ -124,8 +124,8 @@ func Run(p Platform, r Renderer) {
 			ShowAboutKuplung(&guiVars.showAboutKuplung)
 		}
 
-		if guiVars.showAboutImGui {
-			imgui.ShowDemoWindow(&guiVars.showAboutImGui)
+		if guiVars.showDemoWindow {
+			imgui.ShowDemoWindow(&guiVars.showDemoWindow)
 		}
 
 		if guiVars.showMetrics {
@@ -165,7 +165,7 @@ func ShowAboutImGui(open *bool) {
 func ShowAboutKuplung(open *bool) {
 	var sett = settings.GetSettings()
 	if imgui.BeginV("About Kuplung", open, imgui.WindowFlagsAlwaysAutoResize) {
-		imgui.Text("Kuplung " + sett.ApplicationVersion)
+		imgui.Text("Kuplung " + sett.App.ApplicationVersion)
 		imgui.Separator()
 		imgui.Text("By supudo.net + github.com/supudo")
 		imgui.Text("Whatever license...")
