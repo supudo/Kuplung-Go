@@ -82,7 +82,7 @@ func Run(p Platform, r Renderer) {
 
 			if imgui.BeginMenu("File") {
 				imgui.Separator()
-				if imgui.MenuItem("Quit") {
+				if imgui.MenuItemV("Quit", "Cmd+Q", false, true) {
 					os.Exit(3)
 				}
 				imgui.EndMenu()
