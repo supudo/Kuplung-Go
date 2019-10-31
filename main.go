@@ -25,6 +25,10 @@ func main() {
 		}
 
 		gui.UIRenderStart(platform, renderer)
+
+		// render scene
+
+		gui.UIRenderEnd(platform, renderer)
 	}
 }
 
