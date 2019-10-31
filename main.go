@@ -24,7 +24,7 @@ func main() {
 			}
 		}
 
-		gui.RenderGUIStart(platform, renderer)
+		gui.UIRenderStart(platform, renderer)
 	}
 }
 
@@ -49,7 +49,8 @@ func InitKuplung() (p *gui.SDL, r *gui.OpenGL3) {
 	}
 	defer window.Destroy()
 
-	platform := gui.InitGUIManagerPlatform(window, io)
+	var platform = gui.InitGUIManagerPlatform(window, io)
+	gui.InitGUIManager(io, platform)
 
 	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, 4)
 	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MINOR_VERSION, 1)
@@ -82,7 +83,7 @@ func InitKuplung() (p *gui.SDL, r *gui.OpenGL3) {
 		settings.LogError("[main] Failed to initialize OpenGL: %v", err)
 	}
 
-	renderer := gui.InitGUIManagerRenderer(io)
+	var renderer = gui.InitGUIManagerRenderer(io)
 
 	return platform, renderer
 }

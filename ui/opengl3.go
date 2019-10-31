@@ -28,8 +28,8 @@ type OpenGL3 struct {
 
 // NewOpenGL3 attempts to initialize a renderer.
 // An OpenGL context has to be established before calling this function.
-func NewOpenGL3(io imgui.IO) *OpenGL3 {
-	renderer := &OpenGL3{
+func NewOpenGL3(io imgui.IO) (renderer *OpenGL3) {
+	renderer = &OpenGL3{
 		imguiIO:     io,
 		glslVersion: "#version 150",
 	}
