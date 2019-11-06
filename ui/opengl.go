@@ -3,12 +3,12 @@ package gui
 import (
 	"unsafe"
 
-	"github.com/go-gl/gl/v3.2-core/gl"
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/inkyblackness/imgui-go"
 )
 
-// OpenGL3 implements a renderer based on github.com/go-gl/gl (v3.2-core).
-type OpenGL3 struct {
+// OpenGL implements a renderer based on github.com/go-gl/gl (v3.2-core).
+type OpenGL struct {
 	imguiIO imgui.IO
 
 	glslVersion            string
@@ -25,16 +25,10 @@ type OpenGL3 struct {
 	elementsHandle         uint32
 }
 
-// NewOpenGL3 attempts to initialize a renderer.
+// NewOpenGL attempts to initialize a renderer.
 // An OpenGL context has to be established before calling this function.
-func NewOpenGL3(io imgui.IO) (renderer *OpenGL3) {
-	// err := gl.Init()
-	// if err != nil {
-	// 	log.Fatalf("failed to initialize OpenGL: %v", err)
-	// 	return nil
-	// }
-
-	renderer = &OpenGL3{
+func NewOpenGL(io imgui.IO) (renderer *OpenGL) {
+	renderer = &OpenGL{
 		imguiIO:     io,
 		glslVersion: "#version 150",
 	}
@@ -43,18 +37,18 @@ func NewOpenGL3(io imgui.IO) (renderer *OpenGL3) {
 }
 
 // Dispose cleans up the resources.
-func (renderer *OpenGL3) Dispose() {
+func (renderer *OpenGL) Dispose() {
 	renderer.invalidateDeviceObjects()
 }
 
 // PreRender clears the framebuffer.
-func (renderer *OpenGL3) PreRender(clearColor [4]float32) {
+func (renderer *OpenGL) PreRender(clearColor [4]float32) {
 	gl.ClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3])
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 }
 
 // Render translates the ImGui draw data to OpenGL3 commands.
-func (renderer *OpenGL3) Render(displaySize [2]float32, framebufferSize [2]float32, drawData imgui.DrawData) {
+func (renderer *OpenGL) Render(displaySize [2]float32, framebufferSize [2]float32, drawData imgui.DrawData) {
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
 	displayWidth, displayHeight := displaySize[0], displaySize[1]
 	// TODO(supudo): fix size
@@ -211,7 +205,7 @@ func (renderer *OpenGL3) Render(displaySize [2]float32, framebufferSize [2]float
 	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
 }
 
-func (renderer *OpenGL3) createDeviceObjects() {
+func (renderer *OpenGL) createDeviceObjects() {
 	// Backup GL state
 	var lastTexture int32
 	var lastArrayBuffer int32
@@ -280,7 +274,7 @@ void main()
 	gl.BindVertexArray(uint32(lastVertexArray))
 }
 
-func (renderer *OpenGL3) createFontsTexture() {
+func (renderer *OpenGL) createFontsTexture() {
 	// Build texture atlas
 	io := imgui.CurrentIO()
 	image := io.Fonts().TextureDataAlpha8()
@@ -303,7 +297,7 @@ func (renderer *OpenGL3) createFontsTexture() {
 	gl.BindTexture(gl.TEXTURE_2D, uint32(lastTexture))
 }
 
-func (renderer *OpenGL3) invalidateDeviceObjects() {
+func (renderer *OpenGL) invalidateDeviceObjects() {
 	if renderer.vboHandle != 0 {
 		gl.DeleteBuffers(1, &renderer.vboHandle)
 	}

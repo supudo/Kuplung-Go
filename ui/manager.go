@@ -80,8 +80,8 @@ func InitGUIManagerPlatform(window *sdl.Window, io imgui.IO) (platform *SDL) {
 }
 
 // InitGUIManagerRenderer will initialize imgui and all other components
-func InitGUIManagerRenderer(io imgui.IO) (renderer *OpenGL3) {
-	renderer = NewOpenGL3(io)
+func InitGUIManagerRenderer(io imgui.IO) (renderer *OpenGL) {
+	renderer = NewOpenGL(io)
 	defer renderer.Dispose()
 	return renderer
 }

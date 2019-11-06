@@ -3,7 +3,7 @@ package main
 import (
 	"runtime"
 
-	"github.com/go-gl/gl/v2.1/gl"
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/inkyblackness/imgui-go"
 	"github.com/supudo/Kuplung-Go/settings"
 	gui "github.com/supudo/Kuplung-Go/ui"
@@ -106,7 +106,7 @@ func SetupOpenGL(window *sdl.Window) error {
 }
 
 // SetupEnvironment will setup the platform and the renderer
-func SetupEnvironment(window *sdl.Window) (platform *gui.SDL, renderer *gui.OpenGL3) {
+func SetupEnvironment(window *sdl.Window) (platform *gui.SDL, renderer *gui.OpenGL) {
 	context := imgui.CreateContext(nil)
 	defer context.Destroy()
 	io := imgui.CurrentIO()
