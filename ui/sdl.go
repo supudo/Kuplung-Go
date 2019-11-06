@@ -1,9 +1,6 @@
 package gui
 
 import (
-	"fmt"
-	"runtime"
-
 	"github.com/inkyblackness/imgui-go"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -30,59 +27,6 @@ func NewSDL(io imgui.IO, window *sdl.Window) (platform *SDL) {
 	}
 	platform.setKeyMapping()
 	return platform
-}
-
-// NewSDL2 attempts to initialize an SDL context.
-func NewSDL2(io imgui.IO) (*SDL, error) {
-	runtime.LockOSThread()
-
-	err := sdl.Init(sdl.INIT_VIDEO)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize SDL2: %v", err)
-	}
-
-	window, err := sdl.CreateWindow("Kuplung", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, 1280, 720, sdl.WINDOW_OPENGL)
-	if err != nil {
-		sdl.Quit()
-		return nil, fmt.Errorf("failed to create window: %v", err)
-	}
-
-	platform := &SDL{
-		imguiIO: io,
-		window:  window,
-	}
-	platform.setKeyMapping()
-
-	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, 4)
-	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MINOR_VERSION, 1)
-	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_FLAGS, sdl.GL_CONTEXT_FORWARD_COMPATIBLE_FLAG)
-	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_PROFILE_MASK, sdl.GL_CONTEXT_PROFILE_CORE)
-	_ = sdl.GLSetAttribute(sdl.GL_DOUBLEBUFFER, 1)
-	_ = sdl.GLSetAttribute(sdl.GL_DEPTH_SIZE, 24)
-	_ = sdl.GLSetAttribute(sdl.GL_STENCIL_SIZE, 8)
-	_ = sdl.GLSetAttribute(sdl.GL_ACCELERATED_VISUAL, 1)
-	_ = sdl.GLSetAttribute(sdl.GL_MULTISAMPLEBUFFERS, 1)
-	_ = sdl.GLSetAttribute(sdl.GL_MULTISAMPLESAMPLES, 4)
-
-	_ = sdl.SetHint(sdl.HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK, "1")
-	_ = sdl.SetHint(sdl.HINT_VIDEO_HIGHDPI_DISABLED, "0")
-
-	glContext, err := window.GLCreateContext()
-	if err != nil {
-		platform.Dispose()
-		return nil, fmt.Errorf("failed to create OpenGL context: %v", err)
-	}
-	err = window.GLMakeCurrent(glContext)
-	if err != nil {
-		platform.Dispose()
-		return nil, fmt.Errorf("failed to set current OpenGL context: %v", err)
-	}
-
-	_ = sdl.GLSetSwapInterval(1)
-
-	// SDL_Drawable_Width, SDL_Drawable_Height := window.GLGetDrawableSize()
-
-	return platform, nil
 }
 
 // Dispose cleans up the resources.

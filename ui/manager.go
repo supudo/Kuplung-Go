@@ -96,44 +96,42 @@ func UIRenderStart(p Platform, r Renderer) {
 	imgui.NewFrame()
 
 	// Main Menu
-	{
-		imgui.BeginMainMenuBar()
+	imgui.BeginMainMenuBar()
 
-		if imgui.BeginMenu("File") {
-			imgui.Separator()
-			if imgui.MenuItemV("Quit", "Cmd+Q", false, true) {
-				os.Exit(3)
-			}
-			imgui.EndMenu()
+	if imgui.BeginMenu("File") {
+		imgui.Separator()
+		if imgui.MenuItemV("Quit", "Cmd+Q", false, true) {
+			os.Exit(3)
 		}
-
-		if imgui.BeginMenu("Scene") {
-			imgui.EndMenu()
-		}
-
-		if imgui.BeginMenu("View") {
-			imgui.EndMenu()
-		}
-
-		if imgui.BeginMenu("Help") {
-			if imgui.MenuItem("Metrics") {
-				guiVars.showMetrics = true
-			}
-			if imgui.MenuItem("About ImGui") {
-				guiVars.showAboutImGui = true
-			}
-			if imgui.MenuItem("About Kuplung") {
-				guiVars.showAboutKuplung = true
-			}
-			imgui.Separator()
-			if imgui.MenuItem("ImGui Demo Window") {
-				guiVars.showDemoWindow = true
-			}
-			imgui.EndMenu()
-		}
-
-		imgui.EndMainMenuBar()
+		imgui.EndMenu()
 	}
+
+	if imgui.BeginMenu("Scene") {
+		imgui.EndMenu()
+	}
+
+	if imgui.BeginMenu("View") {
+		imgui.EndMenu()
+	}
+
+	if imgui.BeginMenu("Help") {
+		if imgui.MenuItem("Metrics") {
+			guiVars.showMetrics = true
+		}
+		if imgui.MenuItem("About ImGui") {
+			guiVars.showAboutImGui = true
+		}
+		if imgui.MenuItem("About Kuplung") {
+			guiVars.showAboutKuplung = true
+		}
+		imgui.Separator()
+		if imgui.MenuItem("ImGui Demo Window") {
+			guiVars.showDemoWindow = true
+		}
+		imgui.EndMenu()
+	}
+
+	imgui.EndMainMenuBar()
 
 	if guiVars.showAboutImGui {
 		ShowAboutImGui(&guiVars.showAboutImGui)

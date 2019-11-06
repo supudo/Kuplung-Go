@@ -11,7 +11,31 @@ import (
 )
 
 func main() {
-	platform, renderer := InitKuplung()
+	window, err := InitSDL()
+	if err != nil {
+		settings.LogError("[main] InitSDL error: %v", err)
+	}
+	defer window.Destroy()
+	defer sdl.Quit()
+
+	SetSDLFlags()
+
+	errOpenGL := SetupOpenGL(window)
+	if errOpenGL != nil {
+		settings.LogError("[main] SetupOpenGL : %v", errOpenGL)
+	}
+
+	platform, renderer := SetupEnvironment(window)
+
+	// surface, err := window.GetSurface()
+	// if err != nil {
+	// 	settings.LogError("[main] window.GetSurface error: %v", err)
+	// }
+	// surface.FillRect(nil, 0)
+
+	// rect := sdl.Rect{0, 0, 200, 200}
+	// surface.FillRect(&rect, 0xffff0000)
+	// window.UpdateSurface()
 
 	running := true
 	for running {
@@ -23,39 +47,26 @@ func main() {
 				break
 			}
 		}
-
 		gui.UIRenderStart(platform, renderer)
-
-		// render scene
-
 		gui.UIRenderEnd(platform, renderer)
 	}
 }
 
-// InitKuplung will initialize SDL and all components
-func InitKuplung() (p *gui.SDL, r *gui.OpenGL3) {
-	sett := settings.GetSettings()
-
-	context := imgui.CreateContext(nil)
-	defer context.Destroy()
-	io := imgui.CurrentIO()
-
-	runtime.LockOSThread()
-
+// InitSDL will initialize SDL window
+func InitSDL() (*sdl.Window, error) {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
-		settings.LogError("[main] Failed to initialize SDL2: %v", err)
+		return nil, err
 	}
-	defer sdl.Quit()
-
+	sett := settings.GetSettings()
 	window, err := sdl.CreateWindow("Kuplung "+sett.App.ApplicationVersion, sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN)
 	if err != nil {
 		settings.LogError("[main] Failed to create window: %v", err)
 	}
-	defer window.Destroy()
+	return window, nil
+}
 
-	var platform = gui.InitGUIManagerPlatform(window, io)
-	gui.InitGUIManager(io, platform)
-
+// SetSDLFlags will setup all SDL flags
+func SetSDLFlags() {
 	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, 4)
 	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MINOR_VERSION, 1)
 	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_FLAGS, sdl.GL_CONTEXT_FORWARD_COMPATIBLE_FLAG)
@@ -66,28 +77,46 @@ func InitKuplung() (p *gui.SDL, r *gui.OpenGL3) {
 	_ = sdl.GLSetAttribute(sdl.GL_ACCELERATED_VISUAL, 1)
 	_ = sdl.GLSetAttribute(sdl.GL_MULTISAMPLEBUFFERS, 1)
 	_ = sdl.GLSetAttribute(sdl.GL_MULTISAMPLESAMPLES, 4)
+}
 
-	_ = sdl.SetHint(sdl.HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK, "1")
-	_ = sdl.SetHint(sdl.HINT_VIDEO_HIGHDPI_DISABLED, "0")
-
+// SetupOpenGL will setup OpenGL context
+func SetupOpenGL(window *sdl.Window) error {
 	glContext, err := window.GLCreateContext()
 	if err != nil {
-		settings.LogError("[main] Failed to create OpenGL context: %v", err)
+		settings.LogWarn("[SetupEnvironment] Failed to create OpenGL context: %v", err)
+		return err
 	}
+	defer sdl.GLDeleteContext(glContext)
 
 	err = window.GLMakeCurrent(glContext)
 	if err != nil {
-		settings.LogError("[main] Failed to set current OpenGL context: %v", err)
+		settings.LogWarn("[SetupEnvironment] Failed to set current OpenGL context: %v", err)
+		return err
 	}
 
 	_ = sdl.GLSetSwapInterval(1)
 
 	err = gl.Init()
 	if err != nil {
-		settings.LogError("[main] Failed to initialize OpenGL: %v", err)
+		settings.LogWarn("[SetupEnvironment] Failed to initialize OpenGL: %v", err)
+		return err
 	}
 
-	var renderer = gui.InitGUIManagerRenderer(io)
+	return nil
+}
+
+// SetupEnvironment will setup the platform and the renderer
+func SetupEnvironment(window *sdl.Window) (platform *gui.SDL, renderer *gui.OpenGL3) {
+	context := imgui.CreateContext(nil)
+	defer context.Destroy()
+	io := imgui.CurrentIO()
+
+	runtime.LockOSThread()
+
+	platform = gui.InitGUIManagerPlatform(window, io)
+	gui.InitGUIManager(io, platform)
+
+	renderer = gui.InitGUIManagerRenderer(io)
 
 	return platform, renderer
 }
