@@ -27,8 +27,8 @@ type OpenGL struct {
 
 // NewOpenGL attempts to initialize a renderer.
 // An OpenGL context has to be established before calling this function.
-func NewOpenGL(io imgui.IO) (renderer *OpenGL) {
-	renderer = &OpenGL{
+func NewOpenGL(io imgui.IO) (*OpenGL) {
+	renderer := &OpenGL{
 		imguiIO:     io,
 		glslVersion: "#version 150",
 	}
