@@ -26,11 +26,8 @@ func NewGUI(kuplung *Kuplung) *Gui {
 	}
 	io := imgui.CurrentIO()
 
-	platform := gui.NewSDL(io, kuplung.window.Window)
-	g.platform = platform
-
-	renderer := gui.NewOpenGL(io)
-	g.renderer = renderer
+	g.platform = gui.NewSDL(io, kuplung.window.Window)
+	g.renderer = gui.NewOpenGL(io)
 
 	imgui.CurrentIO().SetClipboard(clipboard{platform: g.platform})
 

@@ -15,24 +15,24 @@ func KuplungRun(kuplung *Kuplung) {
 	window := NewKuplungWindow()
 	defer window.Window.Destroy()
 
-	setupOpenGL(window.Window)
+	window.setupOpenGL()
 
 	kuplung.NewKuplung(window)
 }
 
-func setupOpenGL(window *sdl.Window) {
+func (window *KuplungWindow) setupOpenGL() {
 	err := gl.Init()
 	if err != nil {
 		settings.LogError("[setupOpenGL] Failed to initialize OpenGL: %v", err)
 	}
 
-	glContext, err := window.GLCreateContext()
+	glContext, err := window.Window.GLCreateContext()
 	if err != nil {
 		settings.LogError("[setupOpenGL] Failed to create OpenGL context: %v", err)
 	}
 	defer sdl.GLDeleteContext(glContext)
 
-	err = window.GLMakeCurrent(glContext)
+	err = window.Window.GLMakeCurrent(glContext)
 	if err != nil {
 		settings.LogError("[setupOpenGL] Failed to set current OpenGL context: %v", err)
 	}
