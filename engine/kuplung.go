@@ -15,6 +15,8 @@ func (k *Kuplung) NewKuplung(window *KuplungWindow) {
 	k.window = window
 	k.gui = NewGUI(k)
 
+	cube := CubeInit()
+
 	running := true
 	for running {
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
@@ -25,7 +27,11 @@ func (k *Kuplung) NewKuplung(window *KuplungWindow) {
 				break
 			}
 		}
+
 		k.gui.UIRenderStart()
+
+		cube.CubeRender()
+
 		k.gui.UIRenderEnd()
 	}
 }

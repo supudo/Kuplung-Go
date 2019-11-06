@@ -19,12 +19,7 @@ func NewKuplungWindow() *KuplungWindow {
 
 func initSDL() *sdl.Window {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
-		settings.LogError("[KuplungWindow] initSDL Failed to create window: %v", err)
-	}
-	sett := settings.GetSettings()
-	window, err := sdl.CreateWindow("Kuplung "+sett.App.ApplicationVersion, sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN)
-	if err != nil {
-		settings.LogError("[KuplungWindow] initSDL Failed to create window: %v", err)
+		settings.LogError("[initSDL] Failed to create window: %v", err)
 	}
 
 	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, 4)
@@ -37,6 +32,12 @@ func initSDL() *sdl.Window {
 	_ = sdl.GLSetAttribute(sdl.GL_ACCELERATED_VISUAL, 1)
 	_ = sdl.GLSetAttribute(sdl.GL_MULTISAMPLEBUFFERS, 1)
 	_ = sdl.GLSetAttribute(sdl.GL_MULTISAMPLESAMPLES, 4)
+
+	sett := settings.GetSettings()
+	window, err := sdl.CreateWindow("Kuplung "+sett.App.ApplicationVersion, sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN)
+	if err != nil {
+		settings.LogError("[initSDL] Failed to create window: %v", err)
+	}
 
 	return window
 }

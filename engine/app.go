@@ -21,21 +21,24 @@ func KuplungRun(kuplung *Kuplung) {
 }
 
 func setupOpenGL(window *sdl.Window) {
+	err := gl.Init()
+	if err != nil {
+		settings.LogError("[setupOpenGL] Failed to initialize OpenGL: %v", err)
+	}
+
 	glContext, err := window.GLCreateContext()
 	if err != nil {
-		settings.LogError("[SetupEnvironment] Failed to create OpenGL context: %v", err)
+		settings.LogError("[setupOpenGL] Failed to create OpenGL context: %v", err)
 	}
 	defer sdl.GLDeleteContext(glContext)
 
 	err = window.GLMakeCurrent(glContext)
 	if err != nil {
-		settings.LogError("[SetupEnvironment] Failed to set current OpenGL context: %v", err)
+		settings.LogError("[setupOpenGL] Failed to set current OpenGL context: %v", err)
 	}
 
-	_ = sdl.GLSetSwapInterval(1)
-
-	err = gl.Init()
+	err = sdl.GLSetSwapInterval(1)
 	if err != nil {
-		settings.LogError("[SetupEnvironment] Failed to initialize OpenGL: %v", err)
+		settings.LogError("[setupOpenGL] Failed to set swap interval: %v", err)
 	}
 }
