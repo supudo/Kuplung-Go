@@ -20,8 +20,8 @@ type SDL struct {
 }
 
 // NewSDL attempts to initialize an SDL context.
-func NewSDL(io imgui.IO, window *sdl.Window) (platform *SDL) {
-	platform = &SDL{
+func NewSDL(io imgui.IO, window *sdl.Window) *SDL {
+	platform := &SDL{
 		imguiIO: io,
 		window:  window,
 	}
