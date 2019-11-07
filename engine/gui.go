@@ -210,5 +210,7 @@ func ShowMetrics(open *bool) {
 		// imgui.Text("Vendor: " + gl.GoStr(gl.GetString(gl.VENDOR)))
 		// imgui.Text("Renderer: " + gl.GoStr(gl.GetString(gl.RENDERER)))
 		imgui.End()
+		// version := gl.GoStr(gl.GetString(gl.VERSION))
+		// log.Fatalf("OpenGL version %v", version)
 	}
 }
