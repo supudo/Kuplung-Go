@@ -40,13 +40,7 @@ func initSDL() *sdl.Window {
 		settings.LogError("[initSDL] Failed to create window: %v", err)
 	}
 
-	setupOpenGL(window)
-
-	return window
-}
-
-func setupOpenGL(window *sdl.Window) {
-	err := gl.Init()
+	err = gl.Init()
 	if err != nil {
 		settings.LogError("[setupOpenGL] Failed to initialize OpenGL: %v", err)
 	}
@@ -66,4 +60,6 @@ func setupOpenGL(window *sdl.Window) {
 	if err != nil {
 		settings.LogError("[setupOpenGL] Failed to set swap interval: %v", err)
 	}
+
+	return window
 }
