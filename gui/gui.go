@@ -13,8 +13,8 @@ import (
 // GUI ...
 type GUI struct {
 	*imgui.Context
-	platform *platforms.SDL
-	renderer *platforms.OpenGL
+	Platform *platforms.SDL
+	Renderer *platforms.OpenGL
 }
 
 // NewGUI ...
@@ -24,10 +24,10 @@ func NewGUI(window *sdl.Window) *GUI {
 	}
 	io := imgui.CurrentIO()
 
-	g.platform = platforms.NewSDL(io, window)
-	g.renderer = platforms.NewOpenGL(io)
+	g.Platform = platforms.NewSDL(io, window)
+	g.Renderer = platforms.NewOpenGL(io)
 
-	imgui.CurrentIO().SetClipboard(clipboard{platform: g.platform})
+	imgui.CurrentIO().SetClipboard(clipboard{platform: g.Platform})
 
 	//clearColor = [4]float32{70.0 / 255.0, 70.0 / 255.0, 70.0 / 255.0, 1.0}
 	clearColor = [4]float32{1.0, 0.0, 0.0, 1.0}
@@ -42,7 +42,7 @@ func NewGUI(window *sdl.Window) *GUI {
 
 // Destroy ...
 func (gui *GUI) Destroy() {
-	gui.renderer.Dispose()
+	gui.Renderer.Dispose()
 	gui.Context.Destroy()
 }
 
@@ -91,8 +91,8 @@ func (board clipboard) SetText(text string) {
 
 // UIRenderStart ...
 func (gui *GUI) UIRenderStart() {
-	p := gui.platform
-	r := gui.renderer
+	p := gui.Platform
+	r := gui.Renderer
 
 	p.ProcessEvents()
 
@@ -160,8 +160,8 @@ func (gui *GUI) UIRenderStart() {
 
 // UIRenderEnd ...
 func (gui *GUI) UIRenderEnd() {
-	p := gui.platform
-	r := gui.renderer
+	p := gui.Platform
+	r := gui.Renderer
 	r.Render(p.DisplaySize(), p.FramebufferSize(), imgui.RenderedDrawData())
 	p.PostRender()
 
