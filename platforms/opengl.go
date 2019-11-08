@@ -1,4 +1,4 @@
-package gui
+package platforms
 
 import (
 	"unsafe"

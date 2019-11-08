@@ -1,33 +1,31 @@
-package engine
+package gui
 
 import (
 	"os"
 	"time"
 
 	"github.com/inkyblackness/imgui-go"
-	"github.com/supudo/Kuplung-Go/gui"
+	"github.com/supudo/Kuplung-Go/platforms"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
-// Gui ...
-type Gui struct {
+// GUI ...
+type GUI struct {
 	*imgui.Context
-	platform *gui.SDL
-	renderer *gui.OpenGL
-
-	kuplung *Kuplung
+	platform *platforms.SDL
+	renderer *platforms.OpenGL
 }
 
 // NewGUI ...
-func NewGUI(kuplung *Kuplung) *Gui {
-	g := &Gui{
+func NewGUI(window *sdl.Window) *GUI {
+	g := &GUI{
 		Context: imgui.CreateContext(nil),
-		kuplung: kuplung,
 	}
 	io := imgui.CurrentIO()
 
-	g.platform = gui.NewSDL(io, kuplung.window.Window)
-	g.renderer = gui.NewOpenGL(io)
+	g.platform = platforms.NewSDL(io, window)
+	g.renderer = platforms.NewOpenGL(io)
 
 	imgui.CurrentIO().SetClipboard(clipboard{platform: g.platform})
 
@@ -43,7 +41,7 @@ func NewGUI(kuplung *Kuplung) *Gui {
 }
 
 // Destroy ...
-func (gui *Gui) Destroy() {
+func (gui *GUI) Destroy() {
 	gui.renderer.Dispose()
 	gui.Context.Destroy()
 }
@@ -92,7 +90,7 @@ func (board clipboard) SetText(text string) {
 }
 
 // UIRenderStart ...
-func (gui *Gui) UIRenderStart() {
+func (gui *GUI) UIRenderStart() {
 	p := gui.platform
 	r := gui.renderer
 
@@ -161,7 +159,7 @@ func (gui *Gui) UIRenderStart() {
 }
 
 // UIRenderEnd ...
-func (gui *Gui) UIRenderEnd() {
+func (gui *GUI) UIRenderEnd() {
 	p := gui.platform
 	r := gui.renderer
 	r.Render(p.DisplaySize(), p.FramebufferSize(), imgui.RenderedDrawData())
