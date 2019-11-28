@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/supudo/Kuplung-Go/engine"
-)
+import "github.com/supudo/Kuplung-Go/app"
 
 func main() {
-	engine.KuplungRun(&engine.Kuplung{})
+	app.KuplungRun()
 }

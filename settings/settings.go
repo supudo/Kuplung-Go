@@ -16,9 +16,12 @@ type ApplicationSettings struct {
 		CurrentPath        string `yaml:"currentFolder"`
 	} `yaml:"App"`
 	AppWindow struct {
-		SDLWindowWidth  int `yaml:"SDL_Window_Width"`
-		SDLWindowHeight int `yaml:"SDL_Window_Height"`
+		SDLWindowWidth  int32 `yaml:"SDL_Window_Width"`
+		SDLWindowHeight int32 `yaml:"SDL_Window_Height"`
 	} `yaml:"AppWindow"`
+	Rendering struct {
+		FramesPerSecond float64 `yaml:"FramesPerSecond"`
+	} `yaml:"Rendering"`
 	AppGui struct {
 		GUIClearColor string `yaml:"guiClearColor"`
 	} `yaml:"AppGui"`
@@ -60,6 +63,10 @@ func InitSettings() ApplicationSettings {
 
 	appSettings.App.CurrentPath = dir
 	appSettings.MemSettings.QuitApplication = false
+
+	if appSettings.Rendering.FramesPerSecond == 0.0 {
+		appSettings.Rendering.FramesPerSecond = 30.0
+	}
 
 	return appSettings
 }

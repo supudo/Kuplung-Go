@@ -1,336 +1,325 @@
 package platforms
 
 import (
+	"strings"
 	"unsafe"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
-	"github.com/inkyblackness/imgui-go"
+	"github.com/supudo/Kuplung-Go/settings"
 )
 
-// OpenGL implements a renderer based on github.com/go-gl/gl (v3.2-core).
+// OpenGL wraps the native GL API into a common interface.
 type OpenGL struct {
-	imguiIO imgui.IO
-
-	glslVersion            string
-	fontTexture            uint32
-	shaderHandle           uint32
-	vertHandle             uint32
-	fragHandle             uint32
-	attribLocationTex      int32
-	attribLocationProjMtx  int32
-	attribLocationPosition int32
-	attribLocationUV       int32
-	attribLocationColor    int32
-	vboHandle              uint32
-	elementsHandle         uint32
 }
 
-// NewOpenGL attempts to initialize a renderer.
-// An OpenGL context has to be established before calling this function.
-func NewOpenGL(io imgui.IO) *OpenGL {
-	renderer := &OpenGL{
-		imguiIO:     io,
-		glslVersion: "#version 150",
+// NewOpenGL initializes the Gl bindings and returns an OpenGL instance.
+func NewOpenGL() *OpenGL {
+	opengl := &OpenGL{}
+
+	if err := gl.Init(); err != nil {
+		settings.LogError("[NewOpenGL] Error in intializer : %v", err)
 	}
-	renderer.createDeviceObjects()
-	return renderer
+
+	return opengl
 }
 
-// Dispose cleans up the resources.
-func (renderer *OpenGL) Dispose() {
-	renderer.invalidateDeviceObjects()
+// ActiveTexture implements the opengl.OpenGL interface.
+func (native *OpenGL) ActiveTexture(texture uint32) {
+	gl.ActiveTexture(texture)
 }
 
-// PreRender clears the framebuffer.
-func (renderer *OpenGL) PreRender(clearColor [4]float32) {
-	gl.ClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3])
-	gl.Clear(gl.COLOR_BUFFER_BIT)
+// AttachShader implements the opengl.OpenGL interface.
+func (native *OpenGL) AttachShader(program uint32, shader uint32) {
+	gl.AttachShader(program, shader)
 }
 
-// Render translates the ImGui draw data to OpenGL3 commands.
-func (renderer *OpenGL) Render(displaySize [2]float32, framebufferSize [2]float32, drawData imgui.DrawData) {
-	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-	displayWidth, displayHeight := displaySize[0], displaySize[1]
-	// TODO(supudo): fix size
-	fbWidth, fbHeight := framebufferSize[0]*2, framebufferSize[1]*2
-	if (fbWidth <= 0) || (fbHeight <= 0) {
-		return
-	}
-	drawData.ScaleClipRects(imgui.Vec2{
-		X: fbWidth / displayWidth,
-		Y: fbHeight / displayHeight,
-	})
+// BindAttribLocation implements the opengl.OpenGL interface.
+func (native *OpenGL) BindAttribLocation(program uint32, index uint32, name string) {
+	gl.BindAttribLocation(program, index, gl.Str(name+"\x00"))
+}
 
-	// Backup GL state
-	var lastActiveTexture int32
-	gl.GetIntegerv(gl.ACTIVE_TEXTURE, &lastActiveTexture)
-	gl.ActiveTexture(gl.TEXTURE0)
-	var lastProgram int32
-	gl.GetIntegerv(gl.CURRENT_PROGRAM, &lastProgram)
-	var lastTexture int32
-	gl.GetIntegerv(gl.TEXTURE_BINDING_2D, &lastTexture)
-	var lastSampler int32
-	gl.GetIntegerv(gl.SAMPLER_BINDING, &lastSampler)
-	var lastArrayBuffer int32
-	gl.GetIntegerv(gl.ARRAY_BUFFER_BINDING, &lastArrayBuffer)
-	var lastElementArrayBuffer int32
-	gl.GetIntegerv(gl.ELEMENT_ARRAY_BUFFER_BINDING, &lastElementArrayBuffer)
-	var lastVertexArray int32
-	gl.GetIntegerv(gl.VERTEX_ARRAY_BINDING, &lastVertexArray)
-	var lastPolygonMode [2]int32
-	gl.GetIntegerv(gl.POLYGON_MODE, &lastPolygonMode[0])
-	var lastViewport [4]int32
-	gl.GetIntegerv(gl.VIEWPORT, &lastViewport[0])
-	var lastScissorBox [4]int32
-	gl.GetIntegerv(gl.SCISSOR_BOX, &lastScissorBox[0])
-	var lastBlendSrcRgb int32
-	gl.GetIntegerv(gl.BLEND_SRC_RGB, &lastBlendSrcRgb)
-	var lastBlendDstRgb int32
-	gl.GetIntegerv(gl.BLEND_DST_RGB, &lastBlendDstRgb)
-	var lastBlendSrcAlpha int32
-	gl.GetIntegerv(gl.BLEND_SRC_ALPHA, &lastBlendSrcAlpha)
-	var lastBlendDstAlpha int32
-	gl.GetIntegerv(gl.BLEND_DST_ALPHA, &lastBlendDstAlpha)
-	var lastBlendEquationRgb int32
-	gl.GetIntegerv(gl.BLEND_EQUATION_RGB, &lastBlendEquationRgb)
-	var lastBlendEquationAlpha int32
-	gl.GetIntegerv(gl.BLEND_EQUATION_ALPHA, &lastBlendEquationAlpha)
-	lastEnableBlend := gl.IsEnabled(gl.BLEND)
-	lastEnableCullFace := gl.IsEnabled(gl.CULL_FACE)
-	lastEnableDepthTest := gl.IsEnabled(gl.DEPTH_TEST)
-	lastEnableScissorTest := gl.IsEnabled(gl.SCISSOR_TEST)
+// BindBuffer implements the opengl.OpenGL interface.
+func (native *OpenGL) BindBuffer(target uint32, buffer uint32) {
+	gl.BindBuffer(target, buffer)
+}
 
-	// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
-	gl.Enable(gl.BLEND)
-	gl.BlendEquation(gl.FUNC_ADD)
-	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-	gl.Disable(gl.CULL_FACE)
-	gl.Disable(gl.DEPTH_TEST)
-	gl.Enable(gl.SCISSOR_TEST)
-	gl.PolygonMode(gl.FRONT_AND_BACK, gl.FILL)
+// BindSampler implements the opengl.OpenGL interface.
+func (native *OpenGL) BindSampler(unit uint32, sampler uint32) {
+	gl.BindSampler(unit, sampler)
+}
 
-	// Setup viewport, orthographic projection matrix
-	// Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right).
-	// DisplayMin is typically (0,0) for single viewport apps.
-	gl.Viewport(0, 0, int32(fbWidth), int32(fbHeight))
-	orthoProjection := [4][4]float32{
-		{2.0 / displayWidth, 0.0, 0.0, 0.0},
-		{0.0, 2.0 / -displayHeight, 0.0, 0.0},
-		{0.0, 0.0, -1.0, 0.0},
-		{-1.0, 1.0, 0.0, 1.0},
-	}
-	gl.UseProgram(renderer.shaderHandle)
-	gl.Uniform1i(renderer.attribLocationTex, 0)
-	gl.UniformMatrix4fv(renderer.attribLocationProjMtx, 1, false, &orthoProjection[0][0])
-	gl.BindSampler(0, 0) // Rely on combined texture/sampler state.
+// BindTexture implements the opengl.OpenGL interface.
+func (native *OpenGL) BindTexture(target uint32, texture uint32) {
+	gl.BindTexture(target, texture)
+}
 
-	// Recreate the VAO every time
-	// (This is to easily allow multiple GL contexts. VAO are not shared among GL contexts, and
-	// we don't track creation/deletion of windows so we don't have an obvious key to use to cache them.)
-	var vaoHandle uint32
-	gl.GenVertexArrays(1, &vaoHandle)
-	gl.BindVertexArray(vaoHandle)
-	gl.BindBuffer(gl.ARRAY_BUFFER, renderer.vboHandle)
-	gl.EnableVertexAttribArray(uint32(renderer.attribLocationPosition))
-	gl.EnableVertexAttribArray(uint32(renderer.attribLocationUV))
-	gl.EnableVertexAttribArray(uint32(renderer.attribLocationColor))
-	vertexSize, vertexOffsetPos, vertexOffsetUv, vertexOffsetCol := imgui.VertexBufferLayout()
-	gl.VertexAttribPointer(uint32(renderer.attribLocationPosition), 2, gl.FLOAT, false, int32(vertexSize), unsafe.Pointer(uintptr(vertexOffsetPos)))
-	gl.VertexAttribPointer(uint32(renderer.attribLocationUV), 2, gl.FLOAT, false, int32(vertexSize), unsafe.Pointer(uintptr(vertexOffsetUv)))
-	gl.VertexAttribPointer(uint32(renderer.attribLocationColor), 4, gl.UNSIGNED_BYTE, true, int32(vertexSize), unsafe.Pointer(uintptr(vertexOffsetCol)))
-	indexSize := imgui.IndexBufferLayout()
-	drawType := gl.UNSIGNED_SHORT
-	if indexSize == 4 {
-		drawType = gl.UNSIGNED_INT
-	}
+// BindVertexArray implements the opengl.OpenGL interface.
+func (native *OpenGL) BindVertexArray(array uint32) {
+	gl.BindVertexArray(array)
+}
 
-	// Draw
-	for _, list := range drawData.CommandLists() {
-		var indexBufferOffset uintptr
+// BlendEquation implements the opengl.OpenGL interface.
+func (native *OpenGL) BlendEquation(mode uint32) {
+	gl.BlendEquation(mode)
+}
 
-		vertexBuffer, vertexBufferSize := list.VertexBuffer()
-		gl.BindBuffer(gl.ARRAY_BUFFER, renderer.vboHandle)
-		gl.BufferData(gl.ARRAY_BUFFER, vertexBufferSize, vertexBuffer, gl.STREAM_DRAW)
+// BlendEquationSeparate implements the opengl.OpenGL interface.
+func (native *OpenGL) BlendEquationSeparate(modeRGB uint32, modeAlpha uint32) {
+	gl.BlendEquationSeparate(modeRGB, modeAlpha)
+}
 
-		indexBuffer, indexBufferSize := list.IndexBuffer()
-		gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, renderer.elementsHandle)
-		gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, indexBufferSize, indexBuffer, gl.STREAM_DRAW)
+// BlendFunc implements the opengl.OpenGL interface.
+func (native *OpenGL) BlendFunc(sfactor uint32, dfactor uint32) {
+	gl.BlendFunc(sfactor, dfactor)
+}
 
-		for _, cmd := range list.Commands() {
-			if cmd.HasUserCallback() {
-				cmd.CallUserCallback(list)
-			} else {
-				gl.BindTexture(gl.TEXTURE_2D, uint32(cmd.TextureID()))
-				clipRect := cmd.ClipRect()
-				gl.Scissor(int32(clipRect.X), int32(fbHeight)-int32(clipRect.W), int32(clipRect.Z-clipRect.X), int32(clipRect.W-clipRect.Y))
-				gl.DrawElements(gl.TRIANGLES, int32(cmd.ElementCount()), uint32(drawType), unsafe.Pointer(indexBufferOffset))
-			}
-			indexBufferOffset += uintptr(cmd.ElementCount() * indexSize)
-		}
-	}
-	gl.DeleteVertexArrays(1, &vaoHandle)
+// BlendFuncSeparate implements the opengl.OpenGL interface.
+func (native *OpenGL) BlendFuncSeparate(srcRGB uint32, dstRGB uint32, srcAlpha uint32, dstAlpha uint32) {
+	gl.BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha)
+}
 
-	// Restore modified GL state
-	gl.UseProgram(uint32(lastProgram))
-	gl.BindTexture(gl.TEXTURE_2D, uint32(lastTexture))
-	gl.BindSampler(0, uint32(lastSampler))
-	gl.ActiveTexture(uint32(lastActiveTexture))
-	gl.BindVertexArray(uint32(lastVertexArray))
-	gl.BindBuffer(gl.ARRAY_BUFFER, uint32(lastArrayBuffer))
-	gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, uint32(lastElementArrayBuffer))
-	gl.BlendEquationSeparate(uint32(lastBlendEquationRgb), uint32(lastBlendEquationAlpha))
-	gl.BlendFuncSeparate(uint32(lastBlendSrcRgb), uint32(lastBlendDstRgb), uint32(lastBlendSrcAlpha), uint32(lastBlendDstAlpha))
-	if lastEnableBlend {
-		gl.Enable(gl.BLEND)
+// BufferData implements the opengl.OpenGL interface.
+func (native *OpenGL) BufferData(target uint32, size int, data interface{}, usage uint32) {
+	dataPtr, isPtr := data.(unsafe.Pointer)
+	if isPtr {
+		gl.BufferData(target, size, dataPtr, usage)
 	} else {
-		gl.Disable(gl.BLEND)
+		gl.BufferData(target, size, gl.Ptr(data), usage)
 	}
-	if lastEnableCullFace {
-		gl.Enable(gl.CULL_FACE)
+}
+
+// Clear implements the opengl.OpenGL interface.
+func (native *OpenGL) Clear(mask uint32) {
+	gl.Clear(mask)
+}
+
+// ClearColor implements the opengl.OpenGL interface.
+func (native *OpenGL) ClearColor(red float32, green float32, blue float32, alpha float32) {
+	gl.ClearColor(red, green, blue, alpha)
+}
+
+// CompileShader implements the opengl.OpenGL interface.
+func (native *OpenGL) CompileShader(shader uint32) {
+	gl.CompileShader(shader)
+}
+
+// CreateProgram implements the opengl.OpenGL interface.
+func (native *OpenGL) CreateProgram() uint32 {
+	return gl.CreateProgram()
+}
+
+// CreateShader implements the opengl.OpenGL interface.
+func (native *OpenGL) CreateShader(shaderType uint32) uint32 {
+	return gl.CreateShader(shaderType)
+}
+
+// DeleteBuffers implements the opengl.OpenGL interface.
+func (native *OpenGL) DeleteBuffers(buffers []uint32) {
+	gl.DeleteBuffers(int32(len(buffers)), &buffers[0])
+}
+
+// DeleteProgram implements the opengl.OpenGL interface.
+func (native *OpenGL) DeleteProgram(program uint32) {
+	gl.DeleteProgram(program)
+}
+
+// DeleteShader implements the opengl.OpenGL interface.
+func (native *OpenGL) DeleteShader(shader uint32) {
+	gl.DeleteShader(shader)
+}
+
+// DeleteTextures implements the opengl.OpenGL interface.
+func (native *OpenGL) DeleteTextures(textures []uint32) {
+	gl.DeleteTextures(int32(len(textures)), &textures[0])
+}
+
+// DeleteVertexArrays implements the opengl.OpenGL interface.
+func (native *OpenGL) DeleteVertexArrays(arrays []uint32) {
+	gl.DeleteVertexArrays(int32(len(arrays)), &arrays[0])
+}
+
+// Disable implements the opengl.OpenGL interface.
+func (native *OpenGL) Disable(capability uint32) {
+	gl.Disable(capability)
+}
+
+// DrawArrays implements the opengl.OpenGL interface.
+func (native *OpenGL) DrawArrays(mode uint32, first int32, count int32) {
+	gl.DrawArrays(mode, first, count)
+}
+
+// DrawElements implements the opengl.OpenGL interface.
+func (native *OpenGL) DrawElements(mode uint32, count int32, elementType uint32, indices uintptr) {
+	gl.DrawElements(mode, count, elementType, unsafe.Pointer(indices)) // nolint: govet,gas
+}
+
+// Enable implements the opengl.OpenGL interface.
+func (native *OpenGL) Enable(capability uint32) {
+	gl.Enable(capability)
+}
+
+// EnableVertexAttribArray implements the opengl.OpenGL interface.
+func (native *OpenGL) EnableVertexAttribArray(index uint32) {
+	gl.EnableVertexAttribArray(index)
+}
+
+// GenerateMipmap implements the opengl.OpenGL interface.
+func (native *OpenGL) GenerateMipmap(target uint32) {
+	gl.GenerateMipmap(target)
+}
+
+// GenBuffers implements the opengl.OpenGL interface.
+func (native *OpenGL) GenBuffers(n int32) []uint32 {
+	buffers := make([]uint32, n)
+	gl.GenBuffers(n, &buffers[0])
+	return buffers
+}
+
+// GenTextures implements the opengl.OpenGL interface.
+func (native *OpenGL) GenTextures(n int32) []uint32 {
+	ids := make([]uint32, n)
+	gl.GenTextures(n, &ids[0])
+	return ids
+}
+
+// GenVertexArrays implements the opengl.OpenGL interface.
+func (native *OpenGL) GenVertexArrays(n int32) []uint32 {
+	ids := make([]uint32, n)
+	gl.GenVertexArrays(n, &ids[0])
+	return ids
+}
+
+// GetAttribLocation implements the opengl.OpenGL interface.
+func (native *OpenGL) GetAttribLocation(program uint32, name string) int32 {
+	return gl.GetAttribLocation(program, gl.Str(name+"\x00"))
+}
+
+// GetError implements the opengl.OpenGL interface.
+func (native *OpenGL) GetError() uint32 {
+	return gl.GetError()
+}
+
+// GetIntegerv implements the opengl.OpenGL interface.
+func (native *OpenGL) GetIntegerv(name uint32, data *int32) {
+	gl.GetIntegerv(name, data)
+}
+
+// GetProgramInfoLog implements the opengl.OpenGL interface.
+func (native *OpenGL) GetProgramInfoLog(program uint32) string {
+	logLength := native.GetProgramParameter(program, gl.INFO_LOG_LENGTH)
+	log := strings.Repeat("\x00", int(logLength+1))
+	gl.GetProgramInfoLog(program, logLength, nil, gl.Str(log))
+	return log
+}
+
+// GetProgramParameter implements the opengl.OpenGL interface.
+func (native *OpenGL) GetProgramParameter(program uint32, param uint32) int32 {
+	result := int32(0)
+	gl.GetProgramiv(program, param, &result)
+	return result
+}
+
+// GetShaderInfoLog implements the opengl.OpenGL interface.
+func (native *OpenGL) GetShaderInfoLog(shader uint32) string {
+	logLength := native.GetShaderParameter(shader, gl.INFO_LOG_LENGTH)
+	log := strings.Repeat("\x00", int(logLength+1))
+	gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(log))
+	return log
+}
+
+// GetShaderParameter implements the opengl.OpenGL interface.
+func (native *OpenGL) GetShaderParameter(shader uint32, param uint32) int32 {
+	result := int32(0)
+	gl.GetShaderiv(shader, param, &result)
+	return result
+}
+
+// GetUniformLocation implements the opengl.OpenGL interface.
+func (native *OpenGL) GetUniformLocation(program uint32, name string) int32 {
+	return gl.GetUniformLocation(program, gl.Str(name+"\x00"))
+}
+
+// IsEnabled implements the OpenGL interface.
+func (native *OpenGL) IsEnabled(capability uint32) bool {
+	return gl.IsEnabled(capability)
+}
+
+// LinkProgram implements the opengl.OpenGL interface.
+func (native *OpenGL) LinkProgram(program uint32) {
+	gl.LinkProgram(program)
+}
+
+// PixelStorei implements the OpenGL interface.
+func (native *OpenGL) PixelStorei(name uint32, param int32) {
+	gl.PixelStorei(name, param)
+}
+
+// PolygonMode implements the opengl.OpenGL interface.
+func (native *OpenGL) PolygonMode(face uint32, mode uint32) {
+	gl.PolygonMode(face, mode)
+}
+
+// ReadPixels implements the opengl.OpenGL interface.
+func (native *OpenGL) ReadPixels(x int32, y int32, width int32, height int32, format uint32, pixelType uint32, pixels interface{}) {
+	gl.ReadPixels(x, y, width, height, format, pixelType, gl.Ptr(pixels))
+}
+
+// Scissor implements the opengl.OpenGL interface.
+func (native *OpenGL) Scissor(x, y int32, width, height int32) {
+	gl.Scissor(x, y, width, height)
+}
+
+// ShaderSource implements the opengl.OpenGL interface.
+func (native *OpenGL) ShaderSource(shader uint32, source string) {
+	csources, free := gl.Strs(source + "\x00")
+	defer free()
+
+	gl.ShaderSource(shader, 1, csources, nil)
+}
+
+// TexImage2D implements the opengl.OpenGL interface.
+func (native *OpenGL) TexImage2D(target uint32, level int32, internalFormat uint32, width int32, height int32,
+	border int32, format uint32, xtype uint32, pixels interface{}) {
+	ptr, isPointer := pixels.(unsafe.Pointer)
+	if isPointer {
+		gl.TexImage2D(target, level, int32(internalFormat), width, height, border, format, xtype, ptr)
 	} else {
-		gl.Disable(gl.CULL_FACE)
+		gl.TexImage2D(target, level, int32(internalFormat), width, height, border, format, xtype, gl.Ptr(pixels))
 	}
-	if lastEnableDepthTest {
-		gl.Enable(gl.DEPTH_TEST)
-	} else {
-		gl.Disable(gl.DEPTH_TEST)
-	}
-	if lastEnableScissorTest {
-		gl.Enable(gl.SCISSOR_TEST)
-	} else {
-		gl.Disable(gl.SCISSOR_TEST)
-	}
-	gl.PolygonMode(gl.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
-	gl.Viewport(lastViewport[0], lastViewport[1], lastViewport[2], lastViewport[3])
-	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
 }
 
-func (renderer *OpenGL) createDeviceObjects() {
-	// Backup GL state
-	var lastTexture int32
-	var lastArrayBuffer int32
-	var lastVertexArray int32
-	gl.GetIntegerv(gl.TEXTURE_BINDING_2D, &lastTexture)
-	gl.GetIntegerv(gl.ARRAY_BUFFER_BINDING, &lastArrayBuffer)
-	gl.GetIntegerv(gl.VERTEX_ARRAY_BINDING, &lastVertexArray)
-
-	vertexShader := renderer.glslVersion + `
-uniform mat4 ProjMtx;
-in vec2 Position;
-in vec2 UV;
-in vec4 Color;
-out vec2 Frag_UV;
-out vec4 Frag_Color;
-void main()
-{
-	Frag_UV = UV;
-	Frag_Color = Color;
-	gl_Position = ProjMtx * vec4(Position.xy,0,1);
-}
-`
-	fragmentShader := renderer.glslVersion + `
-uniform sampler2D Texture;
-in vec2 Frag_UV;
-in vec4 Frag_Color;
-out vec4 Out_Color;
-void main()
-{
-	Out_Color = vec4(Frag_Color.rgb, Frag_Color.a * texture( Texture, Frag_UV.st).r);
-}
-`
-	renderer.shaderHandle = gl.CreateProgram()
-	renderer.vertHandle = gl.CreateShader(gl.VERTEX_SHADER)
-	renderer.fragHandle = gl.CreateShader(gl.FRAGMENT_SHADER)
-
-	glShaderSource := func(handle uint32, source string) {
-		csource, free := gl.Strs(source + "\x00")
-		defer free()
-
-		gl.ShaderSource(handle, 1, csource, nil)
-	}
-
-	glShaderSource(renderer.vertHandle, vertexShader)
-	glShaderSource(renderer.fragHandle, fragmentShader)
-	gl.CompileShader(renderer.vertHandle)
-	gl.CompileShader(renderer.fragHandle)
-	gl.AttachShader(renderer.shaderHandle, renderer.vertHandle)
-	gl.AttachShader(renderer.shaderHandle, renderer.fragHandle)
-	gl.LinkProgram(renderer.shaderHandle)
-
-	renderer.attribLocationTex = gl.GetUniformLocation(renderer.shaderHandle, gl.Str("Texture"+"\x00"))
-	renderer.attribLocationProjMtx = gl.GetUniformLocation(renderer.shaderHandle, gl.Str("ProjMtx"+"\x00"))
-	renderer.attribLocationPosition = gl.GetAttribLocation(renderer.shaderHandle, gl.Str("Position"+"\x00"))
-	renderer.attribLocationUV = gl.GetAttribLocation(renderer.shaderHandle, gl.Str("UV"+"\x00"))
-	renderer.attribLocationColor = gl.GetAttribLocation(renderer.shaderHandle, gl.Str("Color"+"\x00"))
-
-	gl.GenBuffers(1, &renderer.vboHandle)
-	gl.GenBuffers(1, &renderer.elementsHandle)
-
-	renderer.createFontsTexture()
-
-	// Restore modified GL state
-	gl.BindTexture(gl.TEXTURE_2D, uint32(lastTexture))
-	gl.BindBuffer(gl.ARRAY_BUFFER, uint32(lastArrayBuffer))
-	gl.BindVertexArray(uint32(lastVertexArray))
+// TexParameteri implements the opengl.OpenGL interface.
+func (native *OpenGL) TexParameteri(target uint32, pname uint32, param int32) {
+	gl.TexParameteri(target, pname, param)
 }
 
-func (renderer *OpenGL) createFontsTexture() {
-	// Build texture atlas
-	io := imgui.CurrentIO()
-	image := io.Fonts().TextureDataAlpha8()
-
-	// Upload texture to graphics system
-	var lastTexture int32
-	gl.GetIntegerv(gl.TEXTURE_BINDING_2D, &lastTexture)
-	gl.GenTextures(1, &renderer.fontTexture)
-	gl.BindTexture(gl.TEXTURE_2D, renderer.fontTexture)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	gl.PixelStorei(gl.UNPACK_ROW_LENGTH, 0)
-	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RED, int32(image.Width), int32(image.Height),
-		0, gl.RED, gl.UNSIGNED_BYTE, image.Pixels)
-
-	// Store our identifier
-	io.Fonts().SetTextureID(imgui.TextureID(renderer.fontTexture))
-
-	// Restore state
-	gl.BindTexture(gl.TEXTURE_2D, uint32(lastTexture))
+// Uniform1i implements the opengl.OpenGL interface.
+func (native *OpenGL) Uniform1i(location int32, value int32) {
+	gl.Uniform1i(location, value)
 }
 
-func (renderer *OpenGL) invalidateDeviceObjects() {
-	if renderer.vboHandle != 0 {
-		gl.DeleteBuffers(1, &renderer.vboHandle)
-	}
-	renderer.vboHandle = 0
-	if renderer.elementsHandle != 0 {
-		gl.DeleteBuffers(1, &renderer.elementsHandle)
-	}
-	renderer.elementsHandle = 0
+// Uniform4fv implements the opengl.OpenGL interface.
+func (native *OpenGL) Uniform4fv(location int32, value *[4]float32) {
+	gl.Uniform4fv(location, 1, &value[0])
+}
 
-	if (renderer.shaderHandle != 0) && (renderer.vertHandle != 0) {
-		gl.DetachShader(renderer.shaderHandle, renderer.vertHandle)
-	}
-	if renderer.vertHandle != 0 {
-		gl.DeleteShader(renderer.vertHandle)
-	}
-	renderer.vertHandle = 0
+// UniformMatrix4fv implements the opengl.OpenGL interface.
+func (native *OpenGL) UniformMatrix4fv(location int32, transpose bool, value *[16]float32) {
+	count := int32(1)
+	gl.UniformMatrix4fv(location, count, transpose, &value[0])
+}
 
-	if (renderer.shaderHandle != 0) && (renderer.fragHandle != 0) {
-		gl.DetachShader(renderer.shaderHandle, renderer.fragHandle)
-	}
-	if renderer.fragHandle != 0 {
-		gl.DeleteShader(renderer.fragHandle)
-	}
-	renderer.fragHandle = 0
+// UseProgram implements the opengl.OpenGL interface.
+func (native *OpenGL) UseProgram(program uint32) {
+	gl.UseProgram(program)
+}
 
-	if renderer.shaderHandle != 0 {
-		gl.DeleteProgram(renderer.shaderHandle)
-	}
-	renderer.shaderHandle = 0
+// VertexAttribOffset implements the opengl.OpenGL interface.
+func (native *OpenGL) VertexAttribOffset(index uint32, size int32, attribType uint32, normalized bool, stride int32, offset int) {
+	gl.VertexAttribPointer(index, size, attribType, normalized, stride, gl.PtrOffset(offset))
+}
 
-	if renderer.fontTexture != 0 {
-		gl.DeleteTextures(1, &renderer.fontTexture)
-		imgui.CurrentIO().Fonts().SetTextureID(0)
-		renderer.fontTexture = 0
-	}
+// Viewport implements the opengl.OpenGL interface.
+func (native *OpenGL) Viewport(x int32, y int32, width int32, height int32) {
+	gl.Viewport(x, y, width, height)
 }
