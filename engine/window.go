@@ -235,3 +235,11 @@ func (window *KuplungWindow) SetFullScreen(on bool) {
 		window.sdlWindow.SetSize(sett.AppWindow.SDLWindowWidth, sett.AppWindow.SDLWindowHeight)
 	}
 }
+
+// OnClosed registers a callback function which shall be called when the window is being closed.
+func (window *KuplungWindow) OnClosed(callback interfaces.ClosedCallback) {
+}
+
+// OnRender registers a callback function which shall be called to update the scene.
+func (window *KuplungWindow) OnRender(callback interfaces.RenderCallback) {
+}

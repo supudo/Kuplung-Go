@@ -71,9 +71,9 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 
 	err := context.createDeviceObjects(param)
 	if err != nil {
-		settings.LogError("[gui context] Error initialized ImGui Context: %v", err)
 		context.Destroy()
 		context = nil
+		settings.LogError("[gui context] Error initialized ImGui Context: %v", err)
 	}
 
 	return context

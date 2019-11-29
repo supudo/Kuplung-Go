@@ -12,6 +12,7 @@ type KuplungApp struct {
 
 	window     interfaces.Window
 	gl         interfaces.OpenGL
+	clipboard  engine.ClipboardAdapter
 	guiContext *gui.Context
 
 	FontFile string
@@ -22,8 +23,10 @@ type KuplungApp struct {
 // InitializeKuplungWindow ...
 func (kapp *KuplungApp) InitializeKuplungWindow(window interfaces.Window) {
 	kapp.window = window
+	kapp.clipboard.Window = window
 	kapp.gl = window.OpenGL()
 	kapp.initOpenGL()
+	kapp.initWindowCallbacks()
 	kapp.initGui()
 }
 
@@ -127,4 +130,23 @@ func (kapp *KuplungApp) initGuiStyle() {
 	// style.SetColor(imgui.StyleColorButtonActive, colorDoubleFull(1.0))
 	// style.SetColor(imgui.StyleColorSeparatorHovered, colorDoubleFull(0.78))
 	// style.SetColor(imgui.StyleColorSeparatorActive, colorTripleLight(1.0))
+}
+
+func (kapp *KuplungApp) initWindowCallbacks() {
+	kapp.window.OnClosed(kapp.onWindowClosed)
+	kapp.window.OnRender(kapp.render)
+}
+
+func (kapp *KuplungApp) onWindowClosed() {
+	if kapp.guiContext != nil {
+		kapp.guiContext.Destroy()
+		kapp.guiContext = nil
+	}
+}
+
+func (kapp *KuplungApp) render() {
+	kapp.guiContext.NewFrame()
+	kapp.gl.Clear(engine.COLOR_BUFFER_BIT)
+	//kapp.renderMainMenu()
+	//kapp.guiContext.Render(kapp.bitmapTextureForUI)
 }
