@@ -176,6 +176,7 @@ void main()
 	}
 }
 `
+
 	context.shaderHandle, err = engine.LinkNewStandardProgram(gl, vertexShaderSource, fragmentShaderSource)
 	if err != nil {
 		return
@@ -462,11 +463,11 @@ func (context *Context) DrawMainMenu() {
 	imgui.EndMainMenuBar()
 
 	if context.guiVars.showAboutImGui {
-		showAboutImGui(&context.guiVars.showAboutImGui)
+		context.ShowAboutImGui(&context.guiVars.showAboutImGui)
 	}
 
 	if context.guiVars.showAboutKuplung {
-		showAboutKuplung(&context.guiVars.showAboutKuplung)
+		context.ShowAboutKuplung(&context.guiVars.showAboutKuplung)
 	}
 
 	if context.guiVars.showDemoWindow {
@@ -474,11 +475,12 @@ func (context *Context) DrawMainMenu() {
 	}
 
 	if context.guiVars.showMetrics {
-		showMetrics(&context.guiVars.showMetrics)
+		context.ShowMetrics(&context.guiVars.showMetrics)
 	}
 }
 
-func showAboutImGui(open *bool) {
+// ShowAboutImGui ...
+func (context *Context) ShowAboutImGui(open *bool) {
 	if imgui.BeginV("About ImGui", open, imgui.WindowFlagsAlwaysAutoResize) {
 		imgui.Text("ImGui " + imgui.Version())
 		imgui.Separator()
@@ -491,7 +493,8 @@ func showAboutImGui(open *bool) {
 	}
 }
 
-func showAboutKuplung(open *bool) {
+// ShowAboutKuplung ...
+func (context *Context) ShowAboutKuplung(open *bool) {
 	var sett = settings.GetSettings()
 	if imgui.BeginV("About Kuplung", open, imgui.WindowFlagsAlwaysAutoResize) {
 		imgui.Text("Kuplung " + sett.App.ApplicationVersion)
@@ -507,14 +510,14 @@ func showAboutKuplung(open *bool) {
 	}
 }
 
-func showMetrics(open *bool) {
+// ShowMetrics ...
+func (context *Context) ShowMetrics(open *bool) {
 	if imgui.BeginV("Scene stats", open, imgui.WindowFlagsAlwaysAutoResize|imgui.WindowFlagsNoTitleBar|imgui.WindowFlagsNoResize|imgui.WindowFlagsNoSavedSettings) {
-		// imgui.Text("OpenGL version: 4.1 (" + gl.GoStr(gl.GetString(gl.VERSION)) + ")")
-		// imgui.Text("GLSL version: 4.10 (" + gl.GoStr(gl.GetString(gl.SHADING_LANGUAGE_VERSION)) + ")")
-		// imgui.Text("Vendor: " + gl.GoStr(gl.GetString(gl.VENDOR)))
-		// imgui.Text("Renderer: " + gl.GoStr(gl.GetString(gl.RENDERER)))
+		gl := context.window.OpenGL()
+		imgui.Text("OpenGL version: 4.1 (" + gl.GetOpenGLVersion() + ")")
+		imgui.Text("GLSL version: 4.10 (" + gl.GetShadingLanguageVersion() + ")")
+		imgui.Text("Vendor: " + gl.GetVendorName())
+		imgui.Text("Renderer: " + gl.GetRendererName())
 		imgui.End()
-		// version := gl.GoStr(gl.GetString(gl.VERSION))
-		// log.Fatalf("OpenGL version %v", version)
 	}
 }

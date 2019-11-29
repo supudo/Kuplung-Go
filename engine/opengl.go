@@ -20,6 +20,8 @@ func NewOpenGL() *OpenGL {
 		settings.LogError("[NewOpenGL] Error in intializer : %v", err)
 	}
 
+	settings.LogError("OpenGL Version : %v", opengl.GetOpenGLVersion())
+
 	return opengl
 }
 
@@ -322,4 +324,24 @@ func (native *OpenGL) VertexAttribOffset(index uint32, size int32, attribType ui
 // Viewport implements the opengl.OpenGL interface.
 func (native *OpenGL) Viewport(x int32, y int32, width int32, height int32) {
 	gl.Viewport(x, y, width, height)
+}
+
+// GetOpenGLVersion will return the OpenGL version
+func (native *OpenGL) GetOpenGLVersion() string {
+	return gl.GoStr(gl.GetString(gl.VERSION))
+}
+
+// GetShadingLanguageVersion will return the shading language version
+func (native *OpenGL) GetShadingLanguageVersion() string {
+	return gl.GoStr(gl.GetString(gl.SHADING_LANGUAGE_VERSION))
+}
+
+// GetVendorName will return the shading language version
+func (native *OpenGL) GetVendorName() string {
+	return gl.GoStr(gl.GetString(gl.VENDOR))
+}
+
+// GetRendererName will return the shading language version
+func (native *OpenGL) GetRendererName() string {
+	return gl.GoStr(gl.GetString(gl.RENDERER))
 }

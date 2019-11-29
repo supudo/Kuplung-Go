@@ -63,8 +63,7 @@ type OpenGL interface {
 	Scissor(x, y int32, width, height int32)
 	ShaderSource(shader uint32, source string)
 
-	TexImage2D(target uint32, level int32, internalFormat uint32, width int32, height int32,
-		border int32, format uint32, xtype uint32, pixels interface{})
+	TexImage2D(target uint32, level int32, internalFormat uint32, width int32, height int32, border int32, format uint32, xtype uint32, pixels interface{})
 	TexParameteri(target uint32, pname uint32, param int32)
 
 	Uniform1i(location int32, value int32)
@@ -74,4 +73,9 @@ type OpenGL interface {
 
 	VertexAttribOffset(index uint32, size int32, attribType uint32, normalized bool, stride int32, offset int)
 	Viewport(x int32, y int32, width int32, height int32)
+
+	GetOpenGLVersion() string
+	GetShadingLanguageVersion() string
+	GetVendorName() string
+	GetRendererName() string
 }
