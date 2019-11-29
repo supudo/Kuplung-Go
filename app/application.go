@@ -1,19 +1,15 @@
 package app
 
 import (
-	"time"
-	"runtime"
-
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/gui"
 	"github.com/supudo/Kuplung-Go/interfaces"
-	"github.com/supudo/Kuplung-Go/platforms"
-	"github.com/supudo/Kuplung-Go/settings"
-	"github.com/veandco/go-sdl2/sdl"
 )
 
 // KuplungApp ...
 type KuplungApp struct {
+	Version string
+
 	window     interfaces.Window
 	gl         interfaces.OpenGL
 	guiContext *gui.Context
@@ -23,48 +19,43 @@ type KuplungApp struct {
 	GuiScale float32
 }
 
-// KuplungRun ...
-func KuplungRun() {
-	runtime.LockOSThread()
-
-	var kapp = &KuplungApp{}
-
-	var kawindow *engine.KuplungWindow
-	kawindow = engine.NewKuplungWindow()
-	defer kawindow.Close()
-	kapp.window = kawindow
-	kapp.gl = kapp.window.OpenGL()
+// InitializeKuplungWindow ...
+func (kapp *KuplungApp) InitializeKuplungWindow(window interfaces.Window) {
+	kapp.window = window
+	kapp.gl = window.OpenGL()
 	kapp.initOpenGL()
 	kapp.initGui()
+}
 
+func runKuplung() {
 	// cube := CubeInit()
 
-	var sett = settings.GetSettings()
-	for !sett.MemSettings.QuitApplication {
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
-			case *sdl.QuitEvent:
-				println("Quit")
-				sett.MemSettings.QuitApplication = true
-				break
-			}
-		}
+	// var sett = settings.GetSettings()
+	// for !sett.MemSettings.QuitApplication {
+	// 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+	// 		switch event.(type) {
+	// 		case *sdl.QuitEvent:
+	// 			println("Quit")
+	// 			sett.MemSettings.QuitApplication = true
+	// 			break
+	// 		}
+	// 	}
 
-		kapp.guiContext.NewFrame()
+	// 	kapp.guiContext.NewFrame()
 
-		// cube.CubeRender()
+	// 	// cube.CubeRender()
 
-		kapp.guiContext.Render()
+	// 	kapp.guiContext.Render()
 
-		// sleep to avoid 100% CPU usage for this demo
-		<-time.After(time.Millisecond * 25)
-	}
+	// 	// sleep to avoid 100% CPU usage for this demo
+	// 	<-time.After(time.Millisecond * 25)
+	// }
 }
 
 func (kapp *KuplungApp) initOpenGL() {
-	kapp.gl.Disable(platforms.DEPTH_TEST)
-	kapp.gl.Enable(platforms.BLEND)
-	kapp.gl.BlendFunc(platforms.SRC_ALPHA, platforms.ONE_MINUS_SRC_ALPHA)
+	kapp.gl.Disable(engine.DEPTH_TEST)
+	kapp.gl.Enable(engine.BLEND)
+	kapp.gl.BlendFunc(engine.SRC_ALPHA, engine.ONE_MINUS_SRC_ALPHA)
 	kapp.gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 }
 
@@ -76,8 +67,6 @@ func (kapp *KuplungApp) initGui() {
 	}
 	kapp.guiContext = gui.NewContext(kapp.window, param)
 	kapp.initGuiStyle()
-
-	return
 }
 
 func (kapp *KuplungApp) initGuiSizes() {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/inkyblackness/imgui-go"
 	"github.com/supudo/Kuplung-Go/interfaces"
-	"github.com/supudo/Kuplung-Go/platforms"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -14,7 +13,7 @@ import (
 type KuplungWindow struct {
 	sdlWindow *sdl.Window
 	glContext sdl.GLContext
-	glWrapper *platforms.OpenGL
+	glWrapper *OpenGL
 
 	framesPerSecond float64
 	frameTime       time.Duration
@@ -22,13 +21,13 @@ type KuplungWindow struct {
 }
 
 // NewKuplungWindow ...
-func NewKuplungWindow() *KuplungWindow {
+func NewKuplungWindow(title string) *KuplungWindow {
 	var sett = settings.GetSettings()
 	w, g := initSDL()
 	window := &KuplungWindow{
 		sdlWindow:       w,
 		glContext:       g,
-		glWrapper:       platforms.NewOpenGL(),
+		glWrapper:       NewOpenGL(),
 		framesPerSecond: sett.Rendering.FramesPerSecond,
 		frameTime:       time.Duration(int64(float64(time.Second) / sett.Rendering.FramesPerSecond)),
 		nextRenderTick:  time.Now(),
