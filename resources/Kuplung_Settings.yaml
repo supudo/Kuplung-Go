@@ -15,4 +15,4 @@ Rendering:
 
 # GUI - clear color
 AppGui:
-  guiClearColor: '{70.0 / 255.0, 70.0 / 255.0, 70.0 / 255.0, 255.0 / 255.0}'
+  guiClearColor: [70.0, 70.0, 70.0, 255.0]

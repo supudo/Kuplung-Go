@@ -257,8 +257,162 @@ func (context *Context) destroyDeviceObjects(gl interfaces.OpenGL) {
 		context.fontTexture = 0
 	}
 }
-
 func (context *Context) renderDrawData(drawData imgui.DrawData) {
+	gl := context.window.OpenGL()
+	sett := settings.GetSettings()
+	displayWidth, displayHeight := int(sett.AppWindow.SDLWindowWidth), int(sett.AppWindow.SDLWindowHeight)
+
+	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+	fbWidth, fbHeight := context.window.Size()
+	if (fbWidth <= 0) || (fbHeight <= 0) {
+		return
+	}
+	drawData.ScaleClipRects(imgui.Vec2{
+		X: float32(fbWidth / displayWidth),
+		Y: float32(fbHeight / displayHeight),
+	})
+
+	// Backup GL state
+	var lastActiveTexture int32
+	gl.GetIntegerv(engine.ACTIVE_TEXTURE, &lastActiveTexture)
+	gl.ActiveTexture(engine.TEXTURE0)
+	var lastProgram int32
+	gl.GetIntegerv(engine.CURRENT_PROGRAM, &lastProgram)
+	var lastTexture int32
+	gl.GetIntegerv(engine.TEXTURE_BINDING_2D, &lastTexture)
+	var lastSampler int32
+	gl.GetIntegerv(engine.SAMPLER_BINDING, &lastSampler)
+	var lastArrayBuffer int32
+	gl.GetIntegerv(engine.ARRAY_BUFFER_BINDING, &lastArrayBuffer)
+	var lastElementArrayBuffer int32
+	gl.GetIntegerv(engine.ELEMENT_ARRAY_BUFFER_BINDING, &lastElementArrayBuffer)
+	var lastVertexArray int32
+	gl.GetIntegerv(engine.VERTEX_ARRAY_BINDING, &lastVertexArray)
+	var lastPolygonMode [2]int32
+	gl.GetIntegerv(engine.POLYGON_MODE, &lastPolygonMode[0])
+	var lastViewport [4]int32
+	gl.GetIntegerv(engine.VIEWPORT, &lastViewport[0])
+	var lastScissorBox [4]int32
+	gl.GetIntegerv(engine.SCISSOR_BOX, &lastScissorBox[0])
+	var lastBlendSrcRgb int32
+	gl.GetIntegerv(engine.BLEND_SRC_RGB, &lastBlendSrcRgb)
+	var lastBlendDstRgb int32
+	gl.GetIntegerv(engine.BLEND_DST_RGB, &lastBlendDstRgb)
+	var lastBlendSrcAlpha int32
+	gl.GetIntegerv(engine.BLEND_SRC_ALPHA, &lastBlendSrcAlpha)
+	var lastBlendDstAlpha int32
+	gl.GetIntegerv(engine.BLEND_DST_ALPHA, &lastBlendDstAlpha)
+	var lastBlendEquationRgb int32
+	gl.GetIntegerv(engine.BLEND_EQUATION_RGB, &lastBlendEquationRgb)
+	var lastBlendEquationAlpha int32
+	gl.GetIntegerv(engine.BLEND_EQUATION_ALPHA, &lastBlendEquationAlpha)
+	lastEnableBlend := gl.IsEnabled(engine.BLEND)
+	lastEnableCullFace := gl.IsEnabled(engine.CULL_FACE)
+	lastEnableDepthTest := gl.IsEnabled(engine.DEPTH_TEST)
+	lastEnableScissorTest := gl.IsEnabled(engine.SCISSOR_TEST)
+
+	// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
+	gl.Enable(engine.BLEND)
+	gl.BlendEquation(engine.FUNC_ADD)
+	gl.BlendFunc(engine.SRC_ALPHA, engine.ONE_MINUS_SRC_ALPHA)
+	gl.Disable(engine.CULL_FACE)
+	gl.Disable(engine.DEPTH_TEST)
+	gl.Enable(engine.SCISSOR_TEST)
+	gl.PolygonMode(engine.FRONT_AND_BACK, engine.FILL)
+
+	// Setup viewport, orthographic projection matrix
+	// Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right).
+	// DisplayMin is typically (0,0) for single viewport apps.
+	gl.Viewport(0, 0, int32(fbWidth), int32(fbHeight))
+	orthoProjection := [16]float32{
+		2.0 / float32(displayWidth), 0.0, 0.0, 0.0,
+		0.0, 2.0 / float32(-displayHeight), 0.0, 0.0,
+		0.0, 0.0, -1.0, 0.0,
+		-1.0, 1.0, 0.0, 1.0,
+	}
+	gl.UseProgram(context.shaderHandle)
+	gl.Uniform1i(context.attribLocationTex, 0)
+	gl.UniformMatrix4fv(context.attribLocationProjMtx, false, &orthoProjection)
+	gl.BindSampler(0, 0) // Rely on combined texture/sampler state.
+
+	vaoHandle := gl.GenVertexArrays(1)[0]
+	gl.BindVertexArray(vaoHandle)
+	gl.BindBuffer(engine.ARRAY_BUFFER, context.vboHandle)
+	gl.EnableVertexAttribArray(uint32(context.attribLocationPosition))
+	gl.EnableVertexAttribArray(uint32(context.attribLocationUV))
+	gl.EnableVertexAttribArray(uint32(context.attribLocationColor))
+	vertexSize, vertexOffsetPos, vertexOffsetUv, vertexOffsetCol := imgui.VertexBufferLayout()
+	gl.VertexAttribOffset(uint32(context.attribLocationPosition), 2, engine.FLOAT, false, int32(vertexSize), vertexOffsetPos)
+	gl.VertexAttribOffset(uint32(context.attribLocationUV), 2, engine.FLOAT, false, int32(vertexSize), vertexOffsetUv)
+	gl.VertexAttribOffset(uint32(context.attribLocationColor), 4, engine.UNSIGNED_BYTE, true, int32(vertexSize), vertexOffsetCol)
+	indexSize := imgui.IndexBufferLayout()
+	drawType := engine.UNSIGNED_SHORT
+	if indexSize == 4 {
+		drawType = engine.UNSIGNED_INT
+	}
+
+	// Draw
+	for _, list := range drawData.CommandLists() {
+		var indexBufferOffset uintptr
+
+		vertexBuffer, vertexBufferSize := list.VertexBuffer()
+		gl.BindBuffer(engine.ARRAY_BUFFER, context.vboHandle)
+		gl.BufferData(engine.ARRAY_BUFFER, vertexBufferSize, vertexBuffer, engine.STREAM_DRAW)
+
+		indexBuffer, indexBufferSize := list.IndexBuffer()
+		gl.BindBuffer(engine.ELEMENT_ARRAY_BUFFER, context.elementsHandle)
+		gl.BufferData(engine.ELEMENT_ARRAY_BUFFER, indexBufferSize, indexBuffer, engine.STREAM_DRAW)
+
+		for _, cmd := range list.Commands() {
+			if cmd.HasUserCallback() {
+				cmd.CallUserCallback(list)
+			} else {
+				gl.BindTexture(engine.TEXTURE_2D, uint32(cmd.TextureID()))
+				clipRect := cmd.ClipRect()
+				gl.Scissor(int32(clipRect.X), int32(fbHeight)-int32(clipRect.W), int32(clipRect.Z-clipRect.X), int32(clipRect.W-clipRect.Y))
+				gl.DrawElements(engine.TRIANGLES, int32(cmd.ElementCount()), uint32(drawType), indexBufferOffset)
+			}
+			indexBufferOffset += uintptr(cmd.ElementCount() * indexSize)
+		}
+	}
+	gl.DeleteVertexArrays([]uint32{vaoHandle})
+
+	// Restore modified GL state
+	gl.UseProgram(uint32(lastProgram))
+	gl.BindTexture(engine.TEXTURE_2D, uint32(lastTexture))
+	gl.BindSampler(0, uint32(lastSampler))
+	gl.ActiveTexture(uint32(lastActiveTexture))
+	gl.BindVertexArray(uint32(lastVertexArray))
+	gl.BindBuffer(engine.ARRAY_BUFFER, uint32(lastArrayBuffer))
+	gl.BindBuffer(engine.ELEMENT_ARRAY_BUFFER, uint32(lastElementArrayBuffer))
+	gl.BlendEquationSeparate(uint32(lastBlendEquationRgb), uint32(lastBlendEquationAlpha))
+	gl.BlendFuncSeparate(uint32(lastBlendSrcRgb), uint32(lastBlendDstRgb), uint32(lastBlendSrcAlpha), uint32(lastBlendDstAlpha))
+	if lastEnableBlend {
+		gl.Enable(engine.BLEND)
+	} else {
+		gl.Disable(engine.BLEND)
+	}
+	if lastEnableCullFace {
+		gl.Enable(engine.CULL_FACE)
+	} else {
+		gl.Disable(engine.CULL_FACE)
+	}
+	if lastEnableDepthTest {
+		gl.Enable(engine.DEPTH_TEST)
+	} else {
+		gl.Disable(engine.DEPTH_TEST)
+	}
+	if lastEnableScissorTest {
+		gl.Enable(engine.SCISSOR_TEST)
+	} else {
+		gl.Disable(engine.SCISSOR_TEST)
+	}
+	gl.PolygonMode(engine.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
+	gl.Viewport(lastViewport[0], lastViewport[1], lastViewport[2], lastViewport[3])
+	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
+}
+
+func (context *Context) renderDrawData2(drawData imgui.DrawData) {
 	gl := context.window.OpenGL()
 
 	displayWidth, displayHeight := context.window.Size()

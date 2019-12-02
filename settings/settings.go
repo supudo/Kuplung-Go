@@ -23,7 +23,7 @@ type ApplicationSettings struct {
 		FramesPerSecond float64 `yaml:"FramesPerSecond"`
 	} `yaml:"Rendering"`
 	AppGui struct {
-		GUIClearColor string `yaml:"guiClearColor"`
+		GUIClearColor []float32 `yaml:"guiClearColor"`
 	} `yaml:"AppGui"`
 	MemSettings struct {
 		QuitApplication bool
@@ -66,6 +66,10 @@ func InitSettings() ApplicationSettings {
 
 	if appSettings.Rendering.FramesPerSecond == 0.0 {
 		appSettings.Rendering.FramesPerSecond = 30.0
+	}
+
+	for idx, num := range appSettings.AppGui.GUIClearColor {
+		appSettings.AppGui.GUIClearColor[idx] = num / 255.0
 	}
 
 	return appSettings
