@@ -11,6 +11,8 @@ import (
 
 // KuplungWindow ...
 type KuplungWindow struct {
+	WindowEventDispatcher
+
 	sdlWindow *sdl.Window
 	glContext sdl.GLContext
 	glWrapper *OpenGL
@@ -26,12 +28,13 @@ func NewKuplungWindow(title string) *KuplungWindow {
 	fps := sett.Rendering.FramesPerSecond
 	w, g := initSDL()
 	window := &KuplungWindow{
-		sdlWindow:       w,
-		glContext:       g,
-		glWrapper:       NewOpenGL(),
-		framesPerSecond: fps,
-		frameTime:       time.Duration(int64(float64(time.Second) / fps)),
-		nextRenderTick:  time.Now(),
+		WindowEventDispatcher: NullWindowEventDispatcher(),
+		sdlWindow:             w,
+		glContext:             g,
+		glWrapper:             NewOpenGL(),
+		framesPerSecond:       fps,
+		frameTime:             time.Duration(int64(float64(time.Second) / fps)),
+		nextRenderTick:        time.Now(),
 	}
 	window.setKeyMapping()
 	return window
@@ -66,10 +69,10 @@ func initSDL() (sdlWindow *sdl.Window, glContext sdl.GLContext) {
 	if err != nil {
 		settings.LogError("[initSDL] Failed to create OpenGL context: %v", err)
 	}
-	//defer sdl.GLDeleteContext(glContext)
 
 	err = window.GLMakeCurrent(glContext)
 	if err != nil {
+		sdl.GLDeleteContext(glContext)
 		settings.LogError("[initSDL] Failed to set current OpenGL context: %v", err)
 	}
 
@@ -211,6 +214,7 @@ func (window *KuplungWindow) Update() {
 
 	if delta.Nanoseconds() >= window.frameTime.Nanoseconds() {
 		window.sdlWindow.GLMakeCurrent(window.glContext)
+		window.CallRender()
 		window.sdlWindow.GLSwap()
 		framesCovered := delta.Nanoseconds() / window.frameTime.Nanoseconds()
 		window.nextRenderTick = window.nextRenderTick.Add(time.Duration(framesCovered * window.frameTime.Nanoseconds()))

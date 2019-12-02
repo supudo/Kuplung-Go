@@ -1,11 +1,21 @@
 package engine
 
-import "github.com/supudo/Kuplung-Go/interfaces"
+import (
+	"github.com/supudo/Kuplung-Go/interfaces"
+)
 
 // WindowEventDispatcher ...
 type WindowEventDispatcher struct {
 	CallClosed interfaces.ClosedCallback
 	CallRender interfaces.RenderCallback
+}
+
+// NullWindowEventDispatcher returns an initialized instance with empty callbacks.
+func NullWindowEventDispatcher() WindowEventDispatcher {
+	return WindowEventDispatcher{
+		CallClosed: func() {},
+		CallRender: func() {},
+	}
 }
 
 // OnClosed implements the WindowEventDispatcher interface.
