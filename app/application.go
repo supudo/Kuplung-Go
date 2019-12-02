@@ -1,6 +1,8 @@
 package app
 
 import (
+	"time"
+
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/gui"
 	"github.com/supudo/Kuplung-Go/interfaces"
@@ -14,6 +16,8 @@ type KuplungApp struct {
 	gl         interfaces.OpenGL
 	clipboard  engine.ClipboardAdapter
 	guiContext *gui.Context
+
+	cube engine.Cube
 
 	FontFile string
 	FontSize float32
@@ -29,6 +33,7 @@ func (kapp *KuplungApp) InitializeKuplungWindow(window interfaces.Window) {
 	kapp.initWindowCallbacks()
 	kapp.initOpenGL()
 	kapp.initGui()
+	kapp.initCube()
 }
 
 func (kapp *KuplungApp) initWindowCallbacks() {
@@ -46,39 +51,24 @@ func (kapp *KuplungApp) onWindowClosed() {
 func (kapp *KuplungApp) render() {
 	kapp.guiContext.NewFrame()
 	kapp.gl.Clear(engine.COLOR_BUFFER_BIT)
+	kapp.guiContext.DrawMainMenu()
+
+	kapp.cube.CubeRender()
+
 	kapp.guiContext.Render()
+	// sleep to avoid 100% CPU usage for this demo
+	<-time.After(time.Millisecond * 25)
 }
 
-func runKuplung() {
-	// cube := CubeInit()
-
-	// var sett = settings.GetSettings()
-	// for !sett.MemSettings.QuitApplication {
-	// 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-	// 		switch event.(type) {
-	// 		case *sdl.QuitEvent:
-	// 			println("Quit")
-	// 			sett.MemSettings.QuitApplication = true
-	// 			break
-	// 		}
-	// 	}
-
-	// 	kapp.guiContext.NewFrame()
-
-	// 	// cube.CubeRender()
-
-	// 	kapp.guiContext.Render()
-
-	// 	// sleep to avoid 100% CPU usage for this demo
-	// 	<-time.After(time.Millisecond * 25)
-	// }
+func (kapp *KuplungApp) initCube() {
+	kapp.cube = *engine.CubeInit()
 }
 
 func (kapp *KuplungApp) initOpenGL() {
 	kapp.gl.Disable(engine.DEPTH_TEST)
 	kapp.gl.Enable(engine.BLEND)
 	kapp.gl.BlendFunc(engine.SRC_ALPHA, engine.ONE_MINUS_SRC_ALPHA)
-	kapp.gl.ClearColor(0.0, 0.0, 0.0, 1.0)
+	kapp.gl.ClearColor(1.0, 0.0, 0.0, 1.0)
 }
 
 func (kapp *KuplungApp) initGui() {

@@ -2,13 +2,13 @@ package gui
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/inkyblackness/imgui-go"
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 // ContextParameters describes how to create the context.
@@ -76,7 +76,41 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 		settings.LogError("[gui context] Error initialized ImGui Context: %v", err)
 	}
 
+	context.setKeyMapping()
+
 	return context
+}
+
+func (context *Context) setKeyMapping() {
+	keys := map[int]int{
+		imgui.KeyTab:        sdl.SCANCODE_TAB,
+		imgui.KeyLeftArrow:  sdl.SCANCODE_LEFT,
+		imgui.KeyRightArrow: sdl.SCANCODE_RIGHT,
+		imgui.KeyUpArrow:    sdl.SCANCODE_UP,
+		imgui.KeyDownArrow:  sdl.SCANCODE_DOWN,
+		imgui.KeyPageUp:     sdl.SCANCODE_PAGEUP,
+		imgui.KeyPageDown:   sdl.SCANCODE_PAGEDOWN,
+		imgui.KeyHome:       sdl.SCANCODE_HOME,
+		imgui.KeyEnd:        sdl.SCANCODE_END,
+		imgui.KeyInsert:     sdl.SCANCODE_INSERT,
+		imgui.KeyDelete:     sdl.SCANCODE_DELETE,
+		imgui.KeyBackspace:  sdl.SCANCODE_BACKSPACE,
+		imgui.KeySpace:      sdl.SCANCODE_BACKSPACE,
+		imgui.KeyEnter:      sdl.SCANCODE_RETURN,
+		imgui.KeyEscape:     sdl.SCANCODE_ESCAPE,
+		imgui.KeyA:          sdl.SCANCODE_A,
+		imgui.KeyC:          sdl.SCANCODE_C,
+		imgui.KeyV:          sdl.SCANCODE_V,
+		imgui.KeyX:          sdl.SCANCODE_X,
+		imgui.KeyY:          sdl.SCANCODE_Y,
+		imgui.KeyZ:          sdl.SCANCODE_Z,
+	}
+
+	// Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
+	io := imgui.CurrentIO()
+	for imguiKey, nativeKey := range keys {
+		io.KeyMap(imguiKey, nativeKey)
+	}
 }
 
 // Destroy cleans up the resources of the graphical user interface.
@@ -386,106 +420,4 @@ func (context *Context) renderDrawData(drawData imgui.DrawData) {
 	gl.PolygonMode(engine.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
 	gl.Viewport(lastViewport[0], lastViewport[1], lastViewport[2], lastViewport[3])
 	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
-}
-
-// GUI elements
-
-// DrawMainMenu ...
-func (context *Context) DrawMainMenu() {
-	// Main Menu
-	imgui.BeginMainMenuBar()
-
-	if imgui.BeginMenu("File") {
-		imgui.Separator()
-		if imgui.MenuItemV("Quit", "Cmd+Q", false, true) {
-			os.Exit(3)
-		}
-		imgui.EndMenu()
-	}
-
-	if imgui.BeginMenu("Scene") {
-		imgui.EndMenu()
-	}
-
-	if imgui.BeginMenu("View") {
-		imgui.EndMenu()
-	}
-
-	if imgui.BeginMenu("Help") {
-		if imgui.MenuItem("Metrics") {
-			context.guiVars.showMetrics = true
-		}
-		if imgui.MenuItem("About ImGui") {
-			context.guiVars.showAboutImGui = true
-		}
-		if imgui.MenuItem("About Kuplung") {
-			context.guiVars.showAboutKuplung = true
-		}
-		imgui.Separator()
-		if imgui.MenuItem("ImGui Demo Window") {
-			context.guiVars.showDemoWindow = true
-		}
-		imgui.EndMenu()
-	}
-
-	imgui.EndMainMenuBar()
-
-	if context.guiVars.showAboutImGui {
-		context.ShowAboutImGui(&context.guiVars.showAboutImGui)
-	}
-
-	if context.guiVars.showAboutKuplung {
-		context.ShowAboutKuplung(&context.guiVars.showAboutKuplung)
-	}
-
-	if context.guiVars.showDemoWindow {
-		imgui.ShowDemoWindow(&context.guiVars.showDemoWindow)
-	}
-
-	if context.guiVars.showMetrics {
-		context.ShowMetrics(&context.guiVars.showMetrics)
-	}
-}
-
-// ShowAboutImGui ...
-func (context *Context) ShowAboutImGui(open *bool) {
-	if imgui.BeginV("About ImGui", open, imgui.WindowFlagsAlwaysAutoResize) {
-		imgui.Text("ImGui " + imgui.Version())
-		imgui.Separator()
-		imgui.Text("By Omar Cornut and all github contributors.")
-		imgui.Text("ImGui is licensed under the MIT License, see LICENSE for more information.")
-		imgui.Separator()
-		imgui.Text("Go binding by Inky Blackness")
-		imgui.Text("https://github.com/inkyblackness/imgui-go/")
-		imgui.End()
-	}
-}
-
-// ShowAboutKuplung ...
-func (context *Context) ShowAboutKuplung(open *bool) {
-	var sett = settings.GetSettings()
-	if imgui.BeginV("About Kuplung", open, imgui.WindowFlagsAlwaysAutoResize) {
-		imgui.Text("Kuplung " + sett.App.ApplicationVersion)
-		imgui.Separator()
-		imgui.Text("By supudo.net + github.com/supudo")
-		imgui.Text("Whatever license...")
-		imgui.Separator()
-		imgui.Text("Hold mouse wheel to rotate around")
-		imgui.Text("Left Alt + Mouse wheel to increase/decrease the FOV")
-		imgui.Text("Left Shift + Mouse wheel to increase/decrease the FOV")
-		imgui.Text("By supudo.net + github.com/supudo")
-		imgui.End()
-	}
-}
-
-// ShowMetrics ...
-func (context *Context) ShowMetrics(open *bool) {
-	if imgui.BeginV("Scene stats", open, imgui.WindowFlagsAlwaysAutoResize|imgui.WindowFlagsNoTitleBar|imgui.WindowFlagsNoResize|imgui.WindowFlagsNoSavedSettings) {
-		gl := context.window.OpenGL()
-		imgui.Text("OpenGL version: 4.1 (" + gl.GetOpenGLVersion() + ")")
-		imgui.Text("GLSL version: 4.10 (" + gl.GetShadingLanguageVersion() + ")")
-		imgui.Text("Vendor: " + gl.GetVendorName())
-		imgui.Text("Renderer: " + gl.GetRendererName())
-		imgui.End()
-	}
 }

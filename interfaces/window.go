@@ -23,7 +23,7 @@ type Window interface {
 	OnRender(callback RenderCallback)
 
 	// Size returns the dimensions of the window display area in pixel.
-	Size() (width int32, height int32)
+	Size() (width int, height int)
 	// SetFullScreen sets the full screen state of the window.
 	SetFullScreen(on bool)
 }

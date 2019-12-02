@@ -36,7 +36,7 @@ func NewKuplungWindow(title string) *KuplungWindow {
 		frameTime:             time.Duration(int64(float64(time.Second) / fps)),
 		nextRenderTick:        time.Now(),
 	}
-	window.setKeyMapping()
+	//window.SetKeyMapping()
 	return window
 }
 
@@ -67,52 +67,28 @@ func initSDL() (sdlWindow *sdl.Window, glContext sdl.GLContext) {
 
 	glContext, err = window.GLCreateContext()
 	if err != nil {
+		window.Destroy()
+		sdl.Quit()
 		settings.LogError("[initSDL] Failed to create OpenGL context: %v", err)
 	}
 
 	err = window.GLMakeCurrent(glContext)
 	if err != nil {
 		sdl.GLDeleteContext(glContext)
+		window.Destroy()
+		sdl.Quit()
 		settings.LogError("[initSDL] Failed to set current OpenGL context: %v", err)
 	}
 
 	err = sdl.GLSetSwapInterval(1)
 	if err != nil {
+		sdl.GLDeleteContext(glContext)
+		window.Destroy()
+		sdl.Quit()
 		settings.LogError("[initSDL] Failed to set swap interval: %v", err)
 	}
 
 	return sdlWindow, glContext
-}
-
-func (window *KuplungWindow) setKeyMapping() {
-	// keys := map[int]int{
-	// 	imgui.KeyTab:        sdl.SCANCODE_TAB,
-	// 	imgui.KeyLeftArrow:  sdl.SCANCODE_LEFT,
-	// 	imgui.KeyRightArrow: sdl.SCANCODE_RIGHT,
-	// 	imgui.KeyUpArrow:    sdl.SCANCODE_UP,
-	// 	imgui.KeyDownArrow:  sdl.SCANCODE_DOWN,
-	// 	imgui.KeyPageUp:     sdl.SCANCODE_PAGEUP,
-	// 	imgui.KeyPageDown:   sdl.SCANCODE_PAGEDOWN,
-	// 	imgui.KeyHome:       sdl.SCANCODE_HOME,
-	// 	imgui.KeyEnd:        sdl.SCANCODE_END,
-	// 	imgui.KeyInsert:     sdl.SCANCODE_INSERT,
-	// 	imgui.KeyDelete:     sdl.SCANCODE_DELETE,
-	// 	imgui.KeyBackspace:  sdl.SCANCODE_BACKSPACE,
-	// 	imgui.KeySpace:      sdl.SCANCODE_BACKSPACE,
-	// 	imgui.KeyEnter:      sdl.SCANCODE_RETURN,
-	// 	imgui.KeyEscape:     sdl.SCANCODE_ESCAPE,
-	// 	imgui.KeyA:          sdl.SCANCODE_A,
-	// 	imgui.KeyC:          sdl.SCANCODE_C,
-	// 	imgui.KeyV:          sdl.SCANCODE_V,
-	// 	imgui.KeyX:          sdl.SCANCODE_X,
-	// 	imgui.KeyY:          sdl.SCANCODE_Y,
-	// 	imgui.KeyZ:          sdl.SCANCODE_Z,
-	// }
-
-	// // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
-	// for imguiKey, nativeKey := range keys {
-	// 	platform.imguiIO.KeyMap(imguiKey, nativeKey)
-	// }
 }
 
 func (window *KuplungWindow) processEvent(event sdl.Event) {
@@ -146,16 +122,16 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 			//platform.buttonsDown[2] = true
 		}
 	case sdl.TEXTINPUT:
-		//inputEvent := event.(*sdl.TextInputEvent)
-		//io.AddInputCharacters(string(inputEvent.Text[:]))
+		inputEvent := event.(*sdl.TextInputEvent)
+		io.AddInputCharacters(string(inputEvent.Text[:]))
 	case sdl.KEYDOWN:
-		//keyEvent := event.(*sdl.KeyboardEvent)
-		//io.KeyPress(int(keyEvent.Keysym.Scancode))
-		//platform.updateKeyModifier()
+		keyEvent := event.(*sdl.KeyboardEvent)
+		io.KeyPress(int(keyEvent.Keysym.Scancode))
+		window.updateKeyModifier()
 	case sdl.KEYUP:
-		//keyEvent := event.(*sdl.KeyboardEvent)
-		//io.KeyRelease(int(keyEvent.Keysym.Scancode))
-		//platform.updateKeyModifier()
+		keyEvent := event.(*sdl.KeyboardEvent)
+		io.KeyRelease(int(keyEvent.Keysym.Scancode))
+		window.updateKeyModifier()
 	}
 }
 
@@ -227,9 +203,10 @@ func (window *KuplungWindow) OpenGL() interfaces.OpenGL {
 }
 
 // Size returns the dimension of the frame buffer of this window.
-func (window *KuplungWindow) Size() (width int32, height int32) {
+func (window *KuplungWindow) Size() (width int, height int) {
 	w, h := window.sdlWindow.GLGetDrawableSize()
-	return w, h
+	settings.LogWarn("%v ---- %v", w, h)
+	return int(w), int(h)
 }
 
 // SetFullScreen toggles the windowed mode.
