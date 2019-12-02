@@ -20,8 +20,6 @@ func NewOpenGL() *OpenGL {
 		settings.LogError("[NewOpenGL] Error in intializer : %v", err)
 	}
 
-	settings.LogError("OpenGL Version : %v", opengl.GetOpenGLVersion())
-
 	return opengl
 }
 
