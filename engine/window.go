@@ -23,27 +23,8 @@ type KuplungWindow struct {
 }
 
 // NewKuplungWindow ...
-func NewKuplungWindow(title string) *KuplungWindow {
-	var sett = settings.GetSettings()
-	fps := sett.Rendering.FramesPerSecond
-	w, g := initSDL()
-	window := &KuplungWindow{
-		WindowEventDispatcher: NullWindowEventDispatcher(),
-		sdlWindow:             w,
-		glContext:             g,
-		glWrapper:             NewOpenGL(),
-		framesPerSecond:       fps,
-		frameTime:             time.Duration(int64(float64(time.Second) / fps)),
-		nextRenderTick:        time.Now(),
-	}
-	//window.SetKeyMapping()
-	return window
-}
-
-func initSDL() (sdlWindow *sdl.Window, glContext sdl.GLContext) {
-	var err error
-
-	if err = sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+func NewKuplungWindow(title string) (window *KuplungWindow) {
+	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		settings.LogError("[initSDL] Failed to create window: %v", err)
 	}
 
@@ -58,37 +39,44 @@ func initSDL() (sdlWindow *sdl.Window, glContext sdl.GLContext) {
 	_ = sdl.GLSetAttribute(sdl.GL_MULTISAMPLEBUFFERS, 1)
 	_ = sdl.GLSetAttribute(sdl.GL_MULTISAMPLESAMPLES, 4)
 
-	sett := settings.GetSettings()
-	window, err := sdl.CreateWindow("Kuplung "+sett.App.ApplicationVersion, sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN)
+	_ = sdl.SetHint(sdl.HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK, "1")
+	_ = sdl.SetHint(sdl.HINT_VIDEO_HIGHDPI_DISABLED, "0")
+
+	var sett = settings.GetSettings()
+	wWidth, wHeight := sett.AppWindow.SDLWindowWidth, sett.AppWindow.SDLWindowHeight
+	win, err := sdl.CreateWindow("Kuplung", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, wWidth, wHeight, sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN|sdl.WINDOW_ALLOW_HIGHDPI)
 	if err != nil {
 		sdl.Quit()
 		settings.LogError("[initSDL] Failed to create window: %v", err)
 	}
 
-	glContext, err = window.GLCreateContext()
+	glContext, err := win.GLCreateContext()
 	if err != nil {
-		window.Destroy()
-		sdl.Quit()
 		settings.LogError("[initSDL] Failed to create OpenGL context: %v", err)
 	}
 
-	err = window.GLMakeCurrent(glContext)
+	err = win.GLMakeCurrent(glContext)
 	if err != nil {
-		sdl.GLDeleteContext(glContext)
-		window.Destroy()
-		sdl.Quit()
 		settings.LogError("[initSDL] Failed to set current OpenGL context: %v", err)
 	}
 
 	err = sdl.GLSetSwapInterval(1)
 	if err != nil {
-		sdl.GLDeleteContext(glContext)
-		window.Destroy()
-		sdl.Quit()
 		settings.LogError("[initSDL] Failed to set swap interval: %v", err)
 	}
 
-	return sdlWindow, glContext
+	fps := sett.Rendering.FramesPerSecond
+	window = &KuplungWindow{
+		WindowEventDispatcher: NullWindowEventDispatcher(),
+		sdlWindow:             win,
+		glContext:             glContext,
+		glWrapper:             NewOpenGL(),
+		framesPerSecond:       fps,
+		frameTime:             time.Duration(int64(float64(time.Second) / fps)),
+		nextRenderTick:        time.Now(),
+	}
+
+	return
 }
 
 func (window *KuplungWindow) processEvent(event sdl.Event) {
@@ -205,7 +193,9 @@ func (window *KuplungWindow) OpenGL() interfaces.OpenGL {
 // Size returns the dimension of the frame buffer of this window.
 func (window *KuplungWindow) Size() (width int, height int) {
 	w, h := window.sdlWindow.GLGetDrawableSize()
-	settings.LogWarn("%v ---- %v", w, h)
+	if w == 0 || h == 0 {
+		settings.LogError("[Size] Window size is 0 : %v x %v", w, h)
+	}
 	return int(w), int(h)
 }
 

@@ -144,8 +144,6 @@ func (context *Context) NewFrame() {
 
 // Render must be called at the end of rendering.
 func (context *Context) Render() {
-	context.DrawMainMenu()
-
 	imgui.Render()
 	context.renderDrawData(imgui.RenderedDrawData())
 }
