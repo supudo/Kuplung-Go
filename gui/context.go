@@ -85,28 +85,6 @@ func (context *Context) Destroy() {
 	context.imguiContext.Destroy()
 }
 
-// MouseButtonChanged is called when the state of a button has changed.
-func (context *Context) MouseButtonChanged(buttonIndex int, down bool) {
-	if (buttonIndex >= 0) && (buttonIndex < len(context.mouseButtonIsDown)) {
-		context.mouseButtonIsDown[buttonIndex] = down
-		if down {
-			context.mouseButtonWasDown[buttonIndex] = down
-		}
-	}
-}
-
-// IsUsingMouse returns true if the UI is using the mouse.
-// The application should not process mouse events in this case.
-func (context Context) IsUsingMouse() bool {
-	return imgui.CurrentIO().WantCaptureMouse()
-}
-
-// IsUsingKeyboard returns true if the UI is currently capturing keyboard input.
-// The application should not process keyboard input events in this case.
-func (context Context) IsUsingKeyboard() bool {
-	return imgui.CurrentIO().WantTextInput()
-}
-
 // NewFrame must be called at the start of rendering.
 func (context *Context) NewFrame() {
 	io := imgui.CurrentIO()
@@ -408,16 +386,6 @@ func (context *Context) renderDrawData(drawData imgui.DrawData) {
 	gl.PolygonMode(engine.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
 	gl.Viewport(lastViewport[0], lastViewport[1], lastViewport[2], lastViewport[3])
 	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
-}
-
-// SetMousePosition must be called to report the current mouse position.
-func (context *Context) SetMousePosition(x, y float32) {
-	imgui.CurrentIO().SetMousePosition(imgui.Vec2{X: x, Y: y})
-}
-
-// MouseScroll must be
-func (context *Context) MouseScroll(dx, dy float32) {
-	imgui.CurrentIO().AddMouseWheelDelta(dx, dy)
 }
 
 // GUI elements

@@ -8,10 +8,7 @@ import (
 	"github.com/supudo/Kuplung-Go/interfaces"
 )
 
-// Run creates a native OpenGL window, initializes it with the given function and
-// then runs the event loop until the window shall be closed.
-// The provided deferrer is a channel of tasks that can be injected into the event loop.
-// When the channel is closed, the loop is stopped and the window is closed.
+// Run ...
 func Run(initializer func(interfaces.Window), title string, framesPerSecond float64, deferrer <-chan func()) (err error) {
 	runtime.LockOSThread()
 

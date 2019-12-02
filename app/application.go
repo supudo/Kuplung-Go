@@ -25,6 +25,7 @@ func (kapp *KuplungApp) InitializeKuplungWindow(window interfaces.Window) {
 	kapp.window = window
 	kapp.clipboard.Window = window
 	kapp.gl = window.OpenGL()
+
 	kapp.initOpenGL()
 	kapp.initWindowCallbacks()
 	kapp.initGui()
@@ -147,6 +148,5 @@ func (kapp *KuplungApp) onWindowClosed() {
 func (kapp *KuplungApp) render() {
 	kapp.guiContext.NewFrame()
 	kapp.gl.Clear(engine.COLOR_BUFFER_BIT)
-	//kapp.renderMainMenu()
-	//kapp.guiContext.Render(kapp.bitmapTextureForUI)
+	kapp.guiContext.Render()
 }

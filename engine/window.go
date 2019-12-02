@@ -23,13 +23,14 @@ type KuplungWindow struct {
 // NewKuplungWindow ...
 func NewKuplungWindow(title string) *KuplungWindow {
 	var sett = settings.GetSettings()
+	fps := sett.Rendering.FramesPerSecond
 	w, g := initSDL()
 	window := &KuplungWindow{
 		sdlWindow:       w,
 		glContext:       g,
 		glWrapper:       NewOpenGL(),
-		framesPerSecond: sett.Rendering.FramesPerSecond,
-		frameTime:       time.Duration(int64(float64(time.Second) / sett.Rendering.FramesPerSecond)),
+		framesPerSecond: fps,
+		frameTime:       time.Duration(int64(float64(time.Second) / fps)),
 		nextRenderTick:  time.Now(),
 	}
 	window.setKeyMapping()
@@ -57,23 +58,24 @@ func initSDL() (sdlWindow *sdl.Window, glContext sdl.GLContext) {
 	sett := settings.GetSettings()
 	window, err := sdl.CreateWindow("Kuplung "+sett.App.ApplicationVersion, sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN)
 	if err != nil {
+		sdl.Quit()
 		settings.LogError("[initSDL] Failed to create window: %v", err)
 	}
 
 	glContext, err = window.GLCreateContext()
 	if err != nil {
-		settings.LogError("[setupOpenGL] Failed to create OpenGL context: %v", err)
+		settings.LogError("[initSDL] Failed to create OpenGL context: %v", err)
 	}
-	defer sdl.GLDeleteContext(glContext)
+	//defer sdl.GLDeleteContext(glContext)
 
 	err = window.GLMakeCurrent(glContext)
 	if err != nil {
-		settings.LogError("[setupOpenGL] Failed to set current OpenGL context: %v", err)
+		settings.LogError("[initSDL] Failed to set current OpenGL context: %v", err)
 	}
 
 	err = sdl.GLSetSwapInterval(1)
 	if err != nil {
-		settings.LogError("[setupOpenGL] Failed to set swap interval: %v", err)
+		settings.LogError("[initSDL] Failed to set swap interval: %v", err)
 	}
 
 	return sdlWindow, glContext
