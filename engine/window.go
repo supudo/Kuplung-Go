@@ -47,7 +47,7 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 
 	var sett = settings.GetSettings()
 	wWidth, wHeight := sett.AppWindow.SDLWindowWidth, sett.AppWindow.SDLWindowHeight
-	win, err := sdl.CreateWindow("Kuplung", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, wWidth, wHeight, sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN|sdl.WINDOW_ALLOW_HIGHDPI|sdl.WINDOW_RESIZABLE)
+	win, err := sdl.CreateWindow(title, sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, wWidth, wHeight, sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN|sdl.WINDOW_ALLOW_HIGHDPI|sdl.WINDOW_RESIZABLE)
 	if err != nil {
 		sdl.Quit()
 		settings.LogError("[initSDL] Failed to create window: %v", err)

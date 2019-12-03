@@ -1,8 +1,6 @@
 package app
 
 import (
-	"time"
-
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/input"
 	"github.com/supudo/Kuplung-Go/gui"
@@ -71,8 +69,6 @@ func (kapp *KuplungApp) render() {
 	kapp.cube.Render()
 
 	kapp.guiContext.Render()
-	// sleep to avoid 100% CPU usage for this demo
-	<-time.After(time.Millisecond * 25)
 }
 
 func (kapp *KuplungApp) initCube() {
