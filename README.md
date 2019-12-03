@@ -4,7 +4,7 @@ Go port of https://github.com/supudo/kuplung
 
 #### Using/Including
 
-- [ImGui Go bindings by InkyBlackness](https://github.com/inkyblackness/imgui-go)
+- [dear imgui Go bindings by InkyBlackness](https://github.com/inkyblackness/imgui-go)
 - [SDL2 Go bindings by veandco](github.com/veandco/go-sdl2)
 
 #### License
