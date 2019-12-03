@@ -6,8 +6,8 @@ import (
 )
 
 // ShowAboutImGui ...
-func (context *Context) ShowAboutImGui() {
-	if imgui.BeginV("About ImGui", &context.guiVars.showAboutImGui, imgui.WindowFlagsAlwaysAutoResize) {
+func (context *Context) ShowAboutImGui(open *bool) {
+	if imgui.BeginV("About ImGui", open, imgui.WindowFlagsAlwaysAutoResize) {
 		imgui.Text("ImGui " + imgui.Version())
 		imgui.Separator()
 		imgui.Text("By Omar Cornut and all github contributors.")
@@ -20,9 +20,9 @@ func (context *Context) ShowAboutImGui() {
 }
 
 // ShowAboutKuplung ...
-func (context *Context) ShowAboutKuplung() {
+func (context *Context) ShowAboutKuplung(open *bool) {
 	var sett = settings.GetSettings()
-	if imgui.BeginV("About Kuplung", &context.guiVars.showAboutKuplung, imgui.WindowFlagsAlwaysAutoResize) {
+	if imgui.BeginV("About Kuplung", open, imgui.WindowFlagsAlwaysAutoResize) {
 		imgui.Text("Kuplung " + sett.App.ApplicationVersion)
 		imgui.Separator()
 		imgui.Text("By supudo.net + github.com/supudo")
@@ -37,8 +37,8 @@ func (context *Context) ShowAboutKuplung() {
 }
 
 // ShowMetrics ...
-func (context *Context) ShowMetrics() {
-	if imgui.BeginV("Scene stats", &context.guiVars.showMetrics, imgui.WindowFlagsAlwaysAutoResize|imgui.WindowFlagsNoTitleBar|imgui.WindowFlagsNoResize|imgui.WindowFlagsNoSavedSettings) {
+func (context *Context) ShowMetrics(open *bool) {
+	if imgui.BeginV("Scene stats", open, imgui.WindowFlagsAlwaysAutoResize|imgui.WindowFlagsNoTitleBar|imgui.WindowFlagsNoResize|imgui.WindowFlagsNoSavedSettings) {
 		gl := context.window.OpenGL()
 		imgui.Text("OpenGL version: 4.1 (" + gl.GetOpenGLVersion() + ")")
 		imgui.Text("GLSL version: 4.10 (" + gl.GetShadingLanguageVersion() + ")")

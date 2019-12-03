@@ -66,7 +66,7 @@ func (kapp *KuplungApp) onWindowClosed() {
 func (kapp *KuplungApp) render() {
 	kapp.guiContext.NewFrame()
 	kapp.gl.Clear(constants.COLOR_BUFFER_BIT)
-	kapp.guiContext.DrawMainMenu()
+	kapp.guiContext.DrawGUI()
 
 	kapp.cube.Render()
 

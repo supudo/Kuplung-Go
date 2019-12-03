@@ -7,6 +7,7 @@ import (
 	"github.com/inkyblackness/imgui-go"
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/constants"
+	"github.com/supudo/Kuplung-Go/gui/dialogs"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/veandco/go-sdl2/sdl"
@@ -44,10 +45,16 @@ type Context struct {
 	elementsHandle         uint32
 
 	guiVars WindowVariables
+
+	viewControls *dialogs.ViewControls
+	viewModels   *dialogs.ViewModels
 }
 
 // WindowVariables holds boolean variables for all the windows
 type WindowVariables struct {
+	showModels   bool
+	showControls bool
+
 	showDemoWindow   bool
 	showAboutImGui   bool
 	showAboutKuplung bool
@@ -60,8 +67,13 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 	context := &Context{
 		imguiContext: imgui.CreateContext(nil),
 		window:       window,
+
+		viewControls: dialogs.NewViewControls(),
+		viewModels:   dialogs.NewViewModels(),
 	}
 
+	context.guiVars.showModels = true
+	context.guiVars.showControls = true
 	context.guiVars.showDemoWindow = false
 	context.guiVars.showAboutImGui = false
 	context.guiVars.showAboutKuplung = false
@@ -138,6 +150,34 @@ func (context *Context) NewFrame() {
 func (context *Context) Render() {
 	imgui.Render()
 	context.renderDrawData(imgui.RenderedDrawData())
+}
+
+// DrawGUI ...
+func (context *Context) DrawGUI() {
+	context.DrawMainMenu()
+
+	if context.guiVars.showControls {
+		context.viewControls.Render(&context.guiVars.showControls)
+	}
+	if context.guiVars.showModels {
+		context.viewModels.Render(&context.guiVars.showModels)
+	}
+
+	if context.guiVars.showAboutImGui {
+		context.ShowAboutImGui(&context.guiVars.showAboutImGui)
+	}
+
+	if context.guiVars.showAboutKuplung {
+		context.ShowAboutKuplung(&context.guiVars.showAboutKuplung)
+	}
+
+	if context.guiVars.showDemoWindow {
+		imgui.ShowDemoWindow(&context.guiVars.showDemoWindow)
+	}
+
+	if context.guiVars.showMetrics {
+		context.ShowMetrics(&context.guiVars.showMetrics)
+	}
 }
 
 // IsUsingKeyboard returns true if the UI is currently capturing keyboard input.
