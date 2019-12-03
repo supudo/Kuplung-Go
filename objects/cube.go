@@ -1,4 +1,4 @@
-package engine
+package objects
 
 import (
 	"image"
@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/go-gl/mathgl/mgl32"
+	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/constants"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
@@ -189,9 +190,9 @@ func (cube *Cube) Render() {
 func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) {
 	gl := cube.glWrapper
 
-	p, err := LinkNewStandardProgram(gl, vertexShaderSource, fragmentShaderSource)
+	p, err := engine.LinkNewStandardProgram(gl, vertexShaderSource, fragmentShaderSource)
 	if err != nil {
-		settings.LogError("[Cube] - Can't initiate a new program: %v", err)
+		settings.LogError("[Cube] - Can't create a new program: %v", err)
 	}
 	cube.program = p
 }

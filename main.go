@@ -22,7 +22,7 @@ func main() {
 	}
 	deferrer := make(chan func(), 100)
 
-	versionInfo := "Kuplung-Go - " + kapp.Version
+	versionInfo := "Kuplung-Go " + kapp.Version
 
 	profileFin, err := initProfiling(mbv)
 	if err != nil {
@@ -34,7 +34,7 @@ func main() {
 }
 
 func initProfiling(mbv string) (func(), error) {
-	filename := "Kuplung_CPUProfile" + mbv + ".log"
+	filename := "Kuplung_CPUProfile_" + mbv + ".log"
 	f, err := os.Create(filename)
 	if err != nil {
 		return func() {}, err

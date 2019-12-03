@@ -6,6 +6,7 @@ import (
 	"github.com/supudo/Kuplung-Go/engine/input"
 	"github.com/supudo/Kuplung-Go/gui"
 	"github.com/supudo/Kuplung-Go/interfaces"
+	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/settings"
 )
 
@@ -22,7 +23,7 @@ type KuplungApp struct {
 	lastMouseX   float32
 	lastMouseY   float32
 
-	cube engine.Cube
+	cube objects.Cube
 
 	FontFile string
 	FontSize float32
@@ -73,7 +74,7 @@ func (kapp *KuplungApp) render() {
 }
 
 func (kapp *KuplungApp) initCube() {
-	kapp.cube = *engine.CubeInit(kapp.window.OpenGL())
+	kapp.cube = *objects.CubeInit(kapp.window.OpenGL())
 }
 
 func (kapp *KuplungApp) initOpenGL() {

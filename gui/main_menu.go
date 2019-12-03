@@ -47,11 +47,11 @@ func (context *Context) DrawMainMenu() {
 	imgui.EndMainMenuBar()
 
 	if context.guiVars.showAboutImGui {
-		context.ShowAboutImGui(&context.guiVars.showAboutImGui)
+		context.ShowAboutImGui()
 	}
 
 	if context.guiVars.showAboutKuplung {
-		context.ShowAboutKuplung(&context.guiVars.showAboutKuplung)
+		context.ShowAboutKuplung()
 	}
 
 	if context.guiVars.showDemoWindow {
@@ -59,6 +59,6 @@ func (context *Context) DrawMainMenu() {
 	}
 
 	if context.guiVars.showMetrics {
-		context.ShowMetrics(&context.guiVars.showMetrics)
+		context.ShowMetrics()
 	}
 }
