@@ -341,7 +341,7 @@ func (context *Context) renderDrawData(drawData imgui.DrawData) {
 	}
 	gl.UseProgram(context.shaderHandle)
 	gl.Uniform1i(context.attribLocationTex, 0)
-	gl.UniformMatrix4fv(context.attribLocationProjMtx, false, &orthoProjection)
+	gl.UniformMatrix4fvImgui(context.attribLocationProjMtx, false, &orthoProjection)
 	gl.BindSampler(0, 0) // Rely on combined texture/sampler state.
 
 	vaoHandle := gl.GenVertexArrays(1)[0]
@@ -485,7 +485,7 @@ func (context *Context) renderDrawData2(drawData imgui.DrawData) {
 	gl.UseProgram(context.shaderHandle)
 	gl.Uniform1i(context.attribLocationTex, 0)
 	gl.Uniform1i(context.attribLocationPal, 1)
-	gl.UniformMatrix4fv(context.attribLocationProjMtx, false, &orthoProjection)
+	gl.UniformMatrix4fvImgui(context.attribLocationProjMtx, false, &orthoProjection)
 	gl.BindSampler(0, 0) // Rely on combined texture/sampler state.
 
 	vaoHandle := gl.GenVertexArrays(1)[0]

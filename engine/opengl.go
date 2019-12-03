@@ -303,10 +303,16 @@ func (native *OpenGL) Uniform4fv(location int32, value *[4]float32) {
 	gl.Uniform4fv(location, 1, &value[0])
 }
 
-// UniformMatrix4fv implements the interfaces.OpenGL interface.
-func (native *OpenGL) UniformMatrix4fv(location int32, transpose bool, value *[16]float32) {
+// UniformMatrix4fvImgui implements the interfaces.OpenGL interface.
+func (native *OpenGL) UniformMatrix4fvImgui(location int32, transpose bool, value *[16]float32) {
 	count := int32(1)
 	gl.UniformMatrix4fv(location, count, transpose, &value[0])
+}
+
+// UniformMatrix4fv implements the interfaces.OpenGL interface.
+func (native *OpenGL) UniformMatrix4fv(location int32, transpose bool, value *float32) {
+	count := int32(1)
+	gl.UniformMatrix4fv(location, count, transpose, value)
 }
 
 // UseProgram implements the interfaces.OpenGL interface.
@@ -342,4 +348,9 @@ func (native *OpenGL) GetVendorName() string {
 // GetRendererName will return the shading language version
 func (native *OpenGL) GetRendererName() string {
 	return gl.GoStr(gl.GetString(gl.RENDERER))
+}
+
+// BindFragDataLocation binds a user-defined varying out variable to a fragment shader color number
+func (native *OpenGL) BindFragDataLocation(program uint32, color uint32, name string) {
+	gl.BindFragDataLocation(program, color, gl.Str(name+"\x00"))
 }

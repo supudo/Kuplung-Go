@@ -68,7 +68,7 @@ func (kapp *KuplungApp) render() {
 	kapp.gl.Clear(engine.COLOR_BUFFER_BIT)
 	kapp.guiContext.DrawMainMenu()
 
-	//kapp.cube.CubeRender()
+	kapp.cube.Render()
 
 	kapp.guiContext.Render()
 	// sleep to avoid 100% CPU usage for this demo
@@ -76,7 +76,7 @@ func (kapp *KuplungApp) render() {
 }
 
 func (kapp *KuplungApp) initCube() {
-	kapp.cube = *engine.CubeInit()
+	kapp.cube = *engine.CubeInit(kapp.window.OpenGL())
 }
 
 func (kapp *KuplungApp) initOpenGL() {
