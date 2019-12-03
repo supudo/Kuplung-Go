@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/supudo/Kuplung-Go/engine"
+	"github.com/supudo/Kuplung-Go/engine/constants"
 	"github.com/supudo/Kuplung-Go/engine/input"
 	"github.com/supudo/Kuplung-Go/gui"
 	"github.com/supudo/Kuplung-Go/interfaces"
@@ -63,7 +64,7 @@ func (kapp *KuplungApp) onWindowClosed() {
 
 func (kapp *KuplungApp) render() {
 	kapp.guiContext.NewFrame()
-	kapp.gl.Clear(engine.COLOR_BUFFER_BIT)
+	kapp.gl.Clear(constants.COLOR_BUFFER_BIT)
 	kapp.guiContext.DrawMainMenu()
 
 	kapp.cube.Render()
@@ -76,9 +77,9 @@ func (kapp *KuplungApp) initCube() {
 }
 
 func (kapp *KuplungApp) initOpenGL() {
-	kapp.gl.Enable(engine.DEPTH_TEST)
-	kapp.gl.Enable(engine.BLEND)
-	kapp.gl.BlendFunc(engine.SRC_ALPHA, engine.ONE_MINUS_SRC_ALPHA)
+	kapp.gl.Enable(constants.DEPTH_TEST)
+	kapp.gl.Enable(constants.BLEND)
+	kapp.gl.BlendFunc(constants.SRC_ALPHA, constants.ONE_MINUS_SRC_ALPHA)
 	sett := settings.GetSettings()
 	kapp.gl.ClearColor(sett.AppGui.GUIClearColor[0], sett.AppGui.GUIClearColor[1], sett.AppGui.GUIClearColor[2], sett.AppGui.GUIClearColor[3])
 }

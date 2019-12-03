@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 
+	"github.com/supudo/Kuplung-Go/engine/constants"
 	"github.com/supudo/Kuplung-Go/interfaces"
 )
 
@@ -15,7 +16,7 @@ func LinkNewProgram(gl interfaces.OpenGL, shaders ...uint32) (program uint32, er
 	}
 	gl.LinkProgram(program)
 
-	if gl.GetProgramParameter(program, LINK_STATUS) == 0 {
+	if gl.GetProgramParameter(program, constants.LINK_STATUS) == 0 {
 		err = fmt.Errorf("%v", gl.GetProgramInfoLog(program))
 		gl.DeleteProgram(program)
 		program = 0
@@ -26,9 +27,9 @@ func LinkNewProgram(gl interfaces.OpenGL, shaders ...uint32) (program uint32, er
 
 // LinkNewStandardProgram creates a new shader based on two shader sources.
 func LinkNewStandardProgram(gl interfaces.OpenGL, vertexShaderSource, fragmentShaderSource string) (program uint32, err error) {
-	vertexShader, vertexErr := CompileNewShader(gl, VERTEX_SHADER, vertexShaderSource)
+	vertexShader, vertexErr := CompileNewShader(gl, constants.VERTEX_SHADER, vertexShaderSource)
 	defer gl.DeleteShader(vertexShader)
-	fragmentShader, fragmentErr := CompileNewShader(gl, FRAGMENT_SHADER, fragmentShaderSource)
+	fragmentShader, fragmentErr := CompileNewShader(gl, constants.FRAGMENT_SHADER, fragmentShaderSource)
 	defer gl.DeleteShader(fragmentShader)
 
 	if (vertexErr == nil) && (fragmentErr == nil) {
@@ -47,7 +48,7 @@ func CompileNewShader(gl interfaces.OpenGL, shaderType uint32, source string) (s
 	gl.ShaderSource(shader, source)
 	gl.CompileShader(shader)
 
-	compileStatus := gl.GetShaderParameter(shader, COMPILE_STATUS)
+	compileStatus := gl.GetShaderParameter(shader, constants.COMPILE_STATUS)
 	if compileStatus == 0 {
 		err = fmt.Errorf("%s", gl.GetShaderInfoLog(shader))
 		gl.DeleteShader(shader)

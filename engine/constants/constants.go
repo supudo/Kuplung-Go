@@ -1,4 +1,4 @@
-package engine
+package constants
 
 // Buffer Bits
 // nolint: golint,megacheck

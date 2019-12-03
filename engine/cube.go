@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/go-gl/mathgl/mgl32"
+	"github.com/supudo/Kuplung-Go/engine/constants"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/veandco/go-sdl2/sdl"
@@ -142,16 +143,16 @@ void main() {
 
 	var vbo uint32
 	vbo = gl.GenBuffers(1)[0]
-	gl.BindBuffer(ARRAY_BUFFER, vbo)
-	gl.BufferData(ARRAY_BUFFER, len(cubeVertices)*4, cubeVertices, STREAM_DRAW)
+	gl.BindBuffer(constants.ARRAY_BUFFER, vbo)
+	gl.BufferData(constants.ARRAY_BUFFER, len(cubeVertices)*4, cubeVertices, constants.STREAM_DRAW)
 
 	vertAttrib := uint32(gl.GetAttribLocation(cube.program, "vert"))
 	gl.EnableVertexAttribArray(vertAttrib)
-	gl.VertexAttribOffset(vertAttrib, 3, FLOAT, false, 5*4, 0)
+	gl.VertexAttribOffset(vertAttrib, 3, constants.FLOAT, false, 5*4, 0)
 
 	texCoordAttrib := uint32(gl.GetAttribLocation(cube.program, "vertTexCoord"))
 	gl.EnableVertexAttribArray(texCoordAttrib)
-	gl.VertexAttribOffset(texCoordAttrib, 2, FLOAT, false, 5*4, 3*4)
+	gl.VertexAttribOffset(texCoordAttrib, 2, constants.FLOAT, false, 5*4, 3*4)
 
 	// Configure global settings
 
@@ -179,10 +180,10 @@ func (cube *Cube) Render() {
 
 	gl.BindVertexArray(cube.vao)
 
-	gl.ActiveTexture(TEXTURE0)
-	gl.BindTexture(TEXTURE_2D, cube.texture)
+	gl.ActiveTexture(constants.TEXTURE0)
+	gl.BindTexture(constants.TEXTURE_2D, cube.texture)
 
-	gl.DrawArrays(TRIANGLES, 0, 6*2*3)
+	gl.DrawArrays(constants.TRIANGLES, 0, 6*2*3)
 }
 
 func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) {
@@ -215,11 +216,11 @@ func (cube *Cube) newTexture(file string) {
 
 	var texture uint32
 	texture = gl.GenTextures(1)[0]
-	gl.ActiveTexture(TEXTURE0)
-	gl.BindTexture(TEXTURE_2D, texture)
-	gl.TexParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, LINEAR)
-	gl.TexParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, LINEAR)
-	gl.TexParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE)
-	gl.TexParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE)
-	gl.TexImage2D(TEXTURE_2D, 0, RGBA, int32(rgba.Rect.Size().X), int32(rgba.Rect.Size().Y), 0, RGBA, UNSIGNED_BYTE, rgba.Pix)
+	gl.ActiveTexture(constants.TEXTURE0)
+	gl.BindTexture(constants.TEXTURE_2D, texture)
+	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_MIN_FILTER, constants.LINEAR)
+	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_MAG_FILTER, constants.LINEAR)
+	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_WRAP_S, constants.CLAMP_TO_EDGE)
+	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_WRAP_T, constants.CLAMP_TO_EDGE)
+	gl.TexImage2D(constants.TEXTURE_2D, 0, constants.RGBA, int32(rgba.Rect.Size().X), int32(rgba.Rect.Size().Y), 0, constants.RGBA, constants.UNSIGNED_BYTE, rgba.Pix)
 }
