@@ -30,9 +30,6 @@ type Context struct {
 
 	lastRenderTime time.Time
 
-	mouseButtonWasDown [3]bool
-	mouseButtonIsDown  [3]bool
-
 	fontTexture            uint32
 	shaderHandle           uint32
 	attribLocationType     int32
@@ -133,12 +130,6 @@ func (context *Context) NewFrame() {
 	}
 	context.lastRenderTime = now
 
-	for i := 0; i < len(context.mouseButtonWasDown); i++ {
-		down := context.mouseButtonWasDown[i] || context.mouseButtonIsDown[i]
-		io.SetMouseButtonDown(i, down)
-		context.mouseButtonWasDown[i] = false
-	}
-
 	imgui.NewFrame()
 }
 
@@ -146,6 +137,23 @@ func (context *Context) NewFrame() {
 func (context *Context) Render() {
 	imgui.Render()
 	context.renderDrawData(imgui.RenderedDrawData())
+}
+
+// IsUsingKeyboard returns true if the UI is currently capturing keyboard input.
+// The application should not process keyboard input events in this case.
+func (context Context) IsUsingKeyboard() bool {
+	return imgui.CurrentIO().WantTextInput()
+}
+
+// IsUsingMouse returns true if the UI is using the mouse.
+// The application should not process mouse events in this case.
+func (context Context) IsUsingMouse() bool {
+	return imgui.CurrentIO().WantCaptureMouse()
+}
+
+// MouseScroll must be
+func (context *Context) MouseScroll(dx, dy float32) {
+	imgui.CurrentIO().AddMouseWheelDelta(dx, dy)
 }
 
 func (context *Context) createDeviceObjects(param ContextParameters) (err error) {
@@ -257,6 +265,7 @@ func (context *Context) destroyDeviceObjects(gl interfaces.OpenGL) {
 		context.fontTexture = 0
 	}
 }
+
 func (context *Context) renderDrawData(drawData imgui.DrawData) {
 	gl := context.window.OpenGL()
 	sett := settings.GetSettings()

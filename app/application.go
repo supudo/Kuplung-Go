@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/supudo/Kuplung-Go/engine"
+	"github.com/supudo/Kuplung-Go/engine/input"
 	"github.com/supudo/Kuplung-Go/gui"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
@@ -17,6 +18,10 @@ type KuplungApp struct {
 	gl         interfaces.OpenGL
 	clipboard  engine.ClipboardAdapter
 	guiContext *gui.Context
+
+	lastModifier input.Modifier
+	lastMouseX   float32
+	lastMouseY   float32
 
 	cube engine.Cube
 
@@ -40,6 +45,15 @@ func (kapp *KuplungApp) InitializeKuplungWindow(window interfaces.Window) {
 func (kapp *KuplungApp) initWindowCallbacks() {
 	kapp.window.OnClosed(kapp.onWindowClosed)
 	kapp.window.OnRender(kapp.render)
+
+	kapp.window.OnMouseMove(kapp.onMouseMove)
+	kapp.window.OnMouseScroll(kapp.onMouseScroll)
+	kapp.window.OnMouseButtonDown(kapp.onMouseButtonDown)
+	kapp.window.OnMouseButtonUp(kapp.onMouseButtonUp)
+
+	kapp.window.OnKey(kapp.onKey)
+	kapp.window.OnCharCallback(kapp.onChar)
+	kapp.window.OnModifier(kapp.onModifier)
 }
 
 func (kapp *KuplungApp) onWindowClosed() {
@@ -141,4 +155,52 @@ func (kapp *KuplungApp) initGuiStyle() {
 	// style.SetColor(imgui.StyleColorButtonActive, colorDoubleFull(1.0))
 	// style.SetColor(imgui.StyleColorSeparatorHovered, colorDoubleFull(0.78))
 	// style.SetColor(imgui.StyleColorSeparatorActive, colorTripleLight(1.0))
+}
+
+func (kapp *KuplungApp) onKey(key input.Key, modifier input.Modifier) {
+	// kapp.lastModifier = modifier
+	// switch {
+	// case key == input.KeyEscape:
+	// 	kapp.modalState.SetState(nil)
+	// case key == input.KeyUndo:
+	// 	kapp.tryUndo()
+	// case key == input.KeyRedo:
+	// 	kapp.tryRedo()
+	// }
+}
+
+func (kapp *KuplungApp) onChar(char rune) {
+	if !kapp.guiContext.IsUsingKeyboard() {
+		switch char {
+		case 'v':
+			break
+		}
+	}
+}
+
+func (kapp *KuplungApp) onModifier(modifier input.Modifier) {
+	// kapp.lastModifier = modifier
+}
+
+func (kapp *KuplungApp) onMouseMove(x, y float32) {
+	kapp.lastMouseX = x
+	kapp.lastMouseY = y
+	if !kapp.guiContext.IsUsingMouse() {
+	}
+}
+
+func (kapp *KuplungApp) onMouseScroll(dx, dy float32) {
+	if !kapp.guiContext.IsUsingMouse() {
+	}
+	kapp.guiContext.MouseScroll(dx, dy)
+}
+
+func (kapp *KuplungApp) onMouseButtonDown(btn uint32, modifier input.Modifier) {
+	if !kapp.guiContext.IsUsingMouse() {
+	}
+}
+
+func (kapp *KuplungApp) onMouseButtonUp(btn uint32, modifier input.Modifier) {
+	if !kapp.guiContext.IsUsingMouse() {
+	}
 }
