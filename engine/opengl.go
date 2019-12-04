@@ -1,10 +1,12 @@
 package engine
 
 import (
+	"fmt"
 	"strings"
 	"unsafe"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/supudo/Kuplung-Go/engine/constants"
 	"github.com/supudo/Kuplung-Go/settings"
 )
 
@@ -425,4 +427,26 @@ func (native *OpenGL) GetProgramiv(program uint32, pname uint32, params *int32) 
 // GLGetProgramInfoLog Returns the information log for a program object
 func (native *OpenGL) GLGetProgramInfoLog(program uint32, bufSize int32, length *int32, infoLog *uint8) {
 	gl.GetProgramInfoLog(program, bufSize, length, infoLog)
+}
+
+// LogOpenGLReturn will return the OpenGL error
+func (native *OpenGL) LogOpenGLReturn() string {
+	if err := gl.GetError(); err != constants.NO_ERROR {
+		return fmt.Sprintf("[OpenGL Erorr] %v", err)
+	}
+	return ""
+}
+
+// LogOpenGLError will output the OpenGL error and exit the application
+func (native *OpenGL) LogOpenGLError() {
+	if err := gl.GetError(); err != constants.NO_ERROR {
+		settings.LogError("[OpenGL Error] Error occured: %v", err)
+	}
+}
+
+// LogOpenGLWarn will output the OpenGL error
+func (native *OpenGL) LogOpenGLWarn() {
+	if err := gl.GetError(); err != constants.NO_ERROR {
+		settings.LogWarn("[OpenGL Error] Error occured: %v", err)
+	}
 }

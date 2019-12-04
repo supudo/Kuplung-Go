@@ -98,4 +98,8 @@ type OpenGL interface {
 	GLGetShaderInfoLog(shader uint32, bufSize int32, length *int32, infoLog *uint8)
 	GetProgramiv(program uint32, pname uint32, params *int32)
 	GLGetProgramInfoLog(program uint32, bufSize int32, length *int32, infoLog *uint8)
+
+	LogOpenGLReturn() string
+	LogOpenGLError()
+	LogOpenGLWarn()
 }

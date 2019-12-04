@@ -1,7 +1,6 @@
 package objects
 
 import (
-	"fmt"
 	"image"
 	"image/draw"
 	_ "image/png"
@@ -114,12 +113,11 @@ void main() {
 	}
 
 	// Configure the vertex and fragment shaders
-	program, err := cube.newProgram(vertexShader, fragmentShader)
-	if err != nil {
-		settings.LogError("[Cube] New program error: %v", err)
-	}
+	program := cube.newProgram(vertexShader, fragmentShader)
 
 	gl.UseProgram(program)
+
+	gl.LogOpenGLError()
 
 	w, h := sett.AppWindow.SDLWindowWidth, sett.AppWindow.SDLWindowHeight
 
@@ -141,13 +139,11 @@ void main() {
 	gl.GLBindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
 
 	// Load the texture
-	cube.texture, err = cube.newTexture(sett.App.CurrentPath + "/../Resources/resources/textures/square.png")
-	if err != nil {
-		settings.LogError("[Cube] can't load texture: %v", err)
-	}
+	cube.texture = cube.newTexture(sett.App.CurrentPath + "/../Resources/resources/textures/square.png")
 
 	// Configure the vertex data
 	vao := gl.GenVertexArrays(1)[0]
+
 	gl.BindVertexArray(vao)
 
 	vbo := gl.GenBuffers(1)[0]
@@ -196,18 +192,11 @@ func (cube *Cube) Render() {
 	gl.DrawArrays(constants.TRIANGLES, 0, 6*2*3)
 }
 
-func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
+func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) uint32 {
 	gl := cube.glWrapper
 
-	vertexShader, err := cube.compileShader(vertexShaderSource, constants.VERTEX_SHADER)
-	if err != nil {
-		settings.LogError("[Cube] Compile shader error: %v", err)
-	}
-
-	fragmentShader, err := cube.compileShader(fragmentShaderSource, constants.FRAGMENT_SHADER)
-	if err != nil {
-		settings.LogError("[Cube] Compile shader error: %v", err)
-	}
+	vertexShader := cube.compileShader(vertexShaderSource, constants.VERTEX_SHADER)
+	fragmentShader := cube.compileShader(fragmentShaderSource, constants.FRAGMENT_SHADER)
 
 	program := gl.CreateProgram()
 
@@ -224,16 +213,16 @@ func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) (u
 		log := strings.Repeat("\x00", int(logLength+1))
 		gl.GLGetProgramInfoLog(program, logLength, nil, gl.Str(log))
 
-		return 0, fmt.Errorf("failed to link program: %v", log)
+		settings.LogError("[Cube] Failed to link program: %v", log)
 	}
 
 	gl.DeleteShader(vertexShader)
 	gl.DeleteShader(fragmentShader)
 
-	return program, nil
+	return program
 }
 
-func (cube *Cube) compileShader(source string, shaderType uint32) (uint32, error) {
+func (cube *Cube) compileShader(source string, shaderType uint32) uint32 {
 	gl := cube.glWrapper
 
 	shader := gl.CreateShader(shaderType)
@@ -252,13 +241,13 @@ func (cube *Cube) compileShader(source string, shaderType uint32) (uint32, error
 		log := strings.Repeat("\x00", int(logLength+1))
 		gl.GLGetShaderInfoLog(shader, logLength, nil, gl.Str(log))
 
-		return 0, fmt.Errorf("failed to compile %v: %v", source, log)
+		settings.LogError("[Cube] Failed to compile shader %v : %v", source, log)
 	}
 
-	return shader, nil
+	return shader
 }
 
-func (cube *Cube) newTexture(file string) (uint32, error) {
+func (cube *Cube) newTexture(file string) uint32 {
 	gl := cube.glWrapper
 
 	imgFile, err := os.Open(file)
@@ -295,5 +284,5 @@ func (cube *Cube) newTexture(file string) (uint32, error) {
 		constants.UNSIGNED_BYTE,
 		gl.Ptr(rgba.Pix))
 
-	return texture, nil
+	return texture
 }
