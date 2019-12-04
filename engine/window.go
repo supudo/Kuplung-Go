@@ -85,7 +85,10 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 }
 
 func (window *KuplungWindow) processEvent(event sdl.Event) {
-	var sett = settings.GetSettings()
+	sett := settings.GetSettings()
+	if sett.MemSettings.QuitApplication {
+		return
+	}
 	io := imgui.CurrentIO()
 
 	x, y, state := sdl.GetMouseState()
@@ -109,8 +112,10 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 		}
 		if ev.Y > 0 {
 			deltaY++
+			settings.LogWarn("zoom in ...")
 		} else if ev.Y < 0 {
 			deltaY--
+			settings.LogWarn("zoom out ...")
 		}
 		io.AddMouseWheelDelta(deltaX, deltaY)
 	case *sdl.TextInputEvent:

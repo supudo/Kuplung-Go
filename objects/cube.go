@@ -11,6 +11,7 @@ import (
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -32,12 +33,12 @@ type Cube struct {
 }
 
 // CubeInit ...
-func CubeInit(window interfaces.Window) *Cube {
+func CubeInit(window interfaces.Window, renderSettings types.RenderSettings) *Cube {
 	sett := settings.GetSettings()
 
 	cube := &Cube{}
 
-	cube.version = "#version 330"
+	cube.version = renderSettings.GLSLVersion
 	cube.window = window
 
 	vertexShader := cube.version + `
@@ -119,11 +120,7 @@ void main() {
 
 	gl.UseProgram(program)
 
-	gl.LogOpenGLError()
-
-	w, h := window.Size()
-
-	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(w/h), 0.1, 10.0)
+	projection := mgl32.Perspective(mgl32.DegToRad(renderSettings.Fov), renderSettings.RatioWidth/renderSettings.RatioHeight, renderSettings.PlaneClose, renderSettings.PlaneFar)
 	projectionUniform := gl.GLGetUniformLocation(program, gl.Str("projection\x00"))
 	gl.GLUniformMatrix4fv(projectionUniform, 1, false, &projection[0])
 

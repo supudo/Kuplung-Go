@@ -11,12 +11,22 @@ type RenderManager struct {
 	window interfaces.Window
 
 	cube *objects.Cube
+
+	Settings types.RenderSettings
 }
 
 // NewRenderManager will return an instance of the rendering manager
 func NewRenderManager(window interfaces.Window) *RenderManager {
 	rm := &RenderManager{}
 	rm.window = window
+
+	rm.Settings.GLSLVersion = "#version 410"
+
+	rm.Settings.Fov = 45.0
+	rm.Settings.RatioWidth = 4.0
+	rm.Settings.RatioHeight = 3.0
+	rm.Settings.PlaneClose = 1.0
+	rm.Settings.PlaneFar = 1000.0
 
 	rm.initCube()
 
@@ -36,5 +46,5 @@ func (rm *RenderManager) Dispose() {
 }
 
 func (rm *RenderManager) initCube() {
-	rm.cube = objects.CubeInit(rm.window)
+	rm.cube = objects.CubeInit(rm.window, rm.Settings)
 }
