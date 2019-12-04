@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-gl/mathgl/mgl32"
-	"github.com/supudo/Kuplung-Go/engine/constants"
+	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/veandco/go-sdl2/sdl"
@@ -147,16 +147,16 @@ void main() {
 	gl.BindVertexArray(vao)
 
 	vbo := gl.GenBuffers(1)[0]
-	gl.BindBuffer(constants.ARRAY_BUFFER, vbo)
-	gl.BufferData(constants.ARRAY_BUFFER, len(cubeVertices)*4, gl.Ptr(cubeVertices), constants.STATIC_DRAW)
+	gl.BindBuffer(oglconsts.ARRAY_BUFFER, vbo)
+	gl.BufferData(oglconsts.ARRAY_BUFFER, len(cubeVertices)*4, gl.Ptr(cubeVertices), oglconsts.STATIC_DRAW)
 
 	vertAttrib := uint32(gl.GLGetAttribLocation(program, gl.Str("vert\x00")))
 	gl.EnableVertexAttribArray(vertAttrib)
-	gl.VertexAttribPointer(vertAttrib, 3, constants.FLOAT, false, 5*4, gl.PtrOffset(0))
+	gl.VertexAttribPointer(vertAttrib, 3, oglconsts.FLOAT, false, 5*4, gl.PtrOffset(0))
 
 	texCoordAttrib := uint32(gl.GLGetAttribLocation(program, gl.Str("vertTexCoord\x00")))
 	gl.EnableVertexAttribArray(texCoordAttrib)
-	gl.VertexAttribPointer(texCoordAttrib, 2, constants.FLOAT, false, 5*4, gl.PtrOffset(3*4))
+	gl.VertexAttribPointer(texCoordAttrib, 2, oglconsts.FLOAT, false, 5*4, gl.PtrOffset(3*4))
 
 	cube.angle = 0.0
 	cube.previousTime = sdl.GetTicks()
@@ -168,9 +168,9 @@ void main() {
 func (cube *Cube) Render() {
 	gl := cube.glWrapper
 
-	gl.Enable(constants.DEPTH_TEST)
-	gl.DepthFunc(constants.LESS)
-	gl.Clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT)
+	gl.Enable(oglconsts.DEPTH_TEST)
+	gl.DepthFunc(oglconsts.LESS)
+	gl.Clear(oglconsts.COLOR_BUFFER_BIT | oglconsts.DEPTH_BUFFER_BIT)
 
 	// Update
 	time := sdl.GetTicks()
@@ -186,17 +186,17 @@ func (cube *Cube) Render() {
 
 	gl.BindVertexArray(cube.vao)
 
-	gl.ActiveTexture(constants.TEXTURE0)
-	gl.BindTexture(constants.TEXTURE_2D, cube.texture)
+	gl.ActiveTexture(oglconsts.TEXTURE0)
+	gl.BindTexture(oglconsts.TEXTURE_2D, cube.texture)
 
-	gl.DrawArrays(constants.TRIANGLES, 0, 6*2*3)
+	gl.DrawArrays(oglconsts.TRIANGLES, 0, 6*2*3)
 }
 
 func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) uint32 {
 	gl := cube.glWrapper
 
-	vertexShader := cube.compileShader(vertexShaderSource, constants.VERTEX_SHADER)
-	fragmentShader := cube.compileShader(fragmentShaderSource, constants.FRAGMENT_SHADER)
+	vertexShader := cube.compileShader(vertexShaderSource, oglconsts.VERTEX_SHADER)
+	fragmentShader := cube.compileShader(fragmentShaderSource, oglconsts.FRAGMENT_SHADER)
 
 	program := gl.CreateProgram()
 
@@ -205,10 +205,10 @@ func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) ui
 	gl.LinkProgram(program)
 
 	var status int32
-	gl.GetProgramiv(program, constants.LINK_STATUS, &status)
-	if status == constants.FALSE {
+	gl.GetProgramiv(program, oglconsts.LINK_STATUS, &status)
+	if status == oglconsts.FALSE {
 		var logLength int32
-		gl.GetProgramiv(program, constants.INFO_LOG_LENGTH, &logLength)
+		gl.GetProgramiv(program, oglconsts.INFO_LOG_LENGTH, &logLength)
 
 		log := strings.Repeat("\x00", int(logLength+1))
 		gl.GLGetProgramInfoLog(program, logLength, nil, gl.Str(log))
@@ -233,10 +233,10 @@ func (cube *Cube) compileShader(source string, shaderType uint32) uint32 {
 	gl.CompileShader(shader)
 
 	var status int32
-	gl.GLGetShaderiv(shader, constants.COMPILE_STATUS, &status)
-	if status == constants.FALSE {
+	gl.GLGetShaderiv(shader, oglconsts.COMPILE_STATUS, &status)
+	if status == oglconsts.FALSE {
 		var logLength int32
-		gl.GLGetShaderiv(shader, constants.INFO_LOG_LENGTH, &logLength)
+		gl.GLGetShaderiv(shader, oglconsts.INFO_LOG_LENGTH, &logLength)
 
 		log := strings.Repeat("\x00", int(logLength+1))
 		gl.GLGetShaderInfoLog(shader, logLength, nil, gl.Str(log))
@@ -267,21 +267,21 @@ func (cube *Cube) newTexture(file string) uint32 {
 
 	var texture uint32
 	cube.texture = gl.GenTextures(1)[0]
-	gl.ActiveTexture(constants.TEXTURE0)
-	gl.BindTexture(constants.TEXTURE_2D, texture)
-	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_MIN_FILTER, constants.LINEAR)
-	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_MAG_FILTER, constants.LINEAR)
-	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_WRAP_S, constants.CLAMP_TO_EDGE)
-	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_WRAP_T, constants.CLAMP_TO_EDGE)
+	gl.ActiveTexture(oglconsts.TEXTURE0)
+	gl.BindTexture(oglconsts.TEXTURE_2D, texture)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MIN_FILTER, oglconsts.LINEAR)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.LINEAR)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_S, oglconsts.CLAMP_TO_EDGE)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_T, oglconsts.CLAMP_TO_EDGE)
 	gl.TexImage2D(
-		constants.TEXTURE_2D,
+		oglconsts.TEXTURE_2D,
 		0,
-		constants.RGBA,
+		oglconsts.RGBA,
 		int32(rgba.Rect.Size().X),
 		int32(rgba.Rect.Size().Y),
 		0,
-		constants.RGBA,
-		constants.UNSIGNED_BYTE,
+		oglconsts.RGBA,
+		oglconsts.UNSIGNED_BYTE,
 		gl.Ptr(rgba.Pix))
 
 	return texture

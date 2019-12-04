@@ -6,7 +6,7 @@ import (
 
 	"github.com/inkyblackness/imgui-go"
 	"github.com/supudo/Kuplung-Go/engine"
-	"github.com/supudo/Kuplung-Go/engine/constants"
+	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/gui/dialogs"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
@@ -272,16 +272,16 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextPa
 	image := fontAtlas.TextureDataAlpha8()
 
 	context.fontTexture = gl.GenTextures(1)[0]
-	gl.BindTexture(constants.TEXTURE_2D, context.fontTexture)
-	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_MIN_FILTER, constants.LINEAR)
-	gl.TexParameteri(constants.TEXTURE_2D, constants.TEXTURE_MAG_FILTER, constants.LINEAR)
-	gl.PixelStorei(constants.UNPACK_ROW_LENGTH, 0)
-	gl.TexImage2D(constants.TEXTURE_2D, 0, constants.RED, int32(image.Width), int32(image.Height),
-		0, constants.RED, constants.UNSIGNED_BYTE, image.Pixels)
+	gl.BindTexture(oglconsts.TEXTURE_2D, context.fontTexture)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MIN_FILTER, oglconsts.LINEAR)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.LINEAR)
+	gl.PixelStorei(oglconsts.UNPACK_ROW_LENGTH, 0)
+	gl.TexImage2D(oglconsts.TEXTURE_2D, 0, oglconsts.RED, int32(image.Width), int32(image.Height),
+		0, oglconsts.RED, oglconsts.UNSIGNED_BYTE, image.Pixels)
 
 	io.Fonts().SetTextureID(TextureIDForSimpleTexture(context.fontTexture))
 
-	gl.BindTexture(constants.TEXTURE_2D, 0)
+	gl.BindTexture(oglconsts.TEXTURE_2D, 0)
 	return nil
 }
 
@@ -324,51 +324,51 @@ func (context *Context) renderDrawData(drawData imgui.DrawData) {
 
 	// Backup GL state
 	var lastActiveTexture int32
-	gl.GetIntegerv(constants.ACTIVE_TEXTURE, &lastActiveTexture)
-	gl.ActiveTexture(constants.TEXTURE0)
+	gl.GetIntegerv(oglconsts.ACTIVE_TEXTURE, &lastActiveTexture)
+	gl.ActiveTexture(oglconsts.TEXTURE0)
 	var lastProgram int32
-	gl.GetIntegerv(constants.CURRENT_PROGRAM, &lastProgram)
+	gl.GetIntegerv(oglconsts.CURRENT_PROGRAM, &lastProgram)
 	var lastTexture int32
-	gl.GetIntegerv(constants.TEXTURE_BINDING_2D, &lastTexture)
+	gl.GetIntegerv(oglconsts.TEXTURE_BINDING_2D, &lastTexture)
 	var lastSampler int32
-	gl.GetIntegerv(constants.SAMPLER_BINDING, &lastSampler)
+	gl.GetIntegerv(oglconsts.SAMPLER_BINDING, &lastSampler)
 	var lastArrayBuffer int32
-	gl.GetIntegerv(constants.ARRAY_BUFFER_BINDING, &lastArrayBuffer)
+	gl.GetIntegerv(oglconsts.ARRAY_BUFFER_BINDING, &lastArrayBuffer)
 	var lastElementArrayBuffer int32
-	gl.GetIntegerv(constants.ELEMENT_ARRAY_BUFFER_BINDING, &lastElementArrayBuffer)
+	gl.GetIntegerv(oglconsts.ELEMENT_ARRAY_BUFFER_BINDING, &lastElementArrayBuffer)
 	var lastVertexArray int32
-	gl.GetIntegerv(constants.VERTEX_ARRAY_BINDING, &lastVertexArray)
+	gl.GetIntegerv(oglconsts.VERTEX_ARRAY_BINDING, &lastVertexArray)
 	var lastPolygonMode [2]int32
-	gl.GetIntegerv(constants.POLYGON_MODE, &lastPolygonMode[0])
+	gl.GetIntegerv(oglconsts.POLYGON_MODE, &lastPolygonMode[0])
 	var lastViewport [4]int32
-	gl.GetIntegerv(constants.VIEWPORT, &lastViewport[0])
+	gl.GetIntegerv(oglconsts.VIEWPORT, &lastViewport[0])
 	var lastScissorBox [4]int32
-	gl.GetIntegerv(constants.SCISSOR_BOX, &lastScissorBox[0])
+	gl.GetIntegerv(oglconsts.SCISSOR_BOX, &lastScissorBox[0])
 	var lastBlendSrcRgb int32
-	gl.GetIntegerv(constants.BLEND_SRC_RGB, &lastBlendSrcRgb)
+	gl.GetIntegerv(oglconsts.BLEND_SRC_RGB, &lastBlendSrcRgb)
 	var lastBlendDstRgb int32
-	gl.GetIntegerv(constants.BLEND_DST_RGB, &lastBlendDstRgb)
+	gl.GetIntegerv(oglconsts.BLEND_DST_RGB, &lastBlendDstRgb)
 	var lastBlendSrcAlpha int32
-	gl.GetIntegerv(constants.BLEND_SRC_ALPHA, &lastBlendSrcAlpha)
+	gl.GetIntegerv(oglconsts.BLEND_SRC_ALPHA, &lastBlendSrcAlpha)
 	var lastBlendDstAlpha int32
-	gl.GetIntegerv(constants.BLEND_DST_ALPHA, &lastBlendDstAlpha)
+	gl.GetIntegerv(oglconsts.BLEND_DST_ALPHA, &lastBlendDstAlpha)
 	var lastBlendEquationRgb int32
-	gl.GetIntegerv(constants.BLEND_EQUATION_RGB, &lastBlendEquationRgb)
+	gl.GetIntegerv(oglconsts.BLEND_EQUATION_RGB, &lastBlendEquationRgb)
 	var lastBlendEquationAlpha int32
-	gl.GetIntegerv(constants.BLEND_EQUATION_ALPHA, &lastBlendEquationAlpha)
-	lastEnableBlend := gl.IsEnabled(constants.BLEND)
-	lastEnableCullFace := gl.IsEnabled(constants.CULL_FACE)
-	lastEnableDepthTest := gl.IsEnabled(constants.DEPTH_TEST)
-	lastEnableScissorTest := gl.IsEnabled(constants.SCISSOR_TEST)
+	gl.GetIntegerv(oglconsts.BLEND_EQUATION_ALPHA, &lastBlendEquationAlpha)
+	lastEnableBlend := gl.IsEnabled(oglconsts.BLEND)
+	lastEnableCullFace := gl.IsEnabled(oglconsts.CULL_FACE)
+	lastEnableDepthTest := gl.IsEnabled(oglconsts.DEPTH_TEST)
+	lastEnableScissorTest := gl.IsEnabled(oglconsts.SCISSOR_TEST)
 
 	// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
-	gl.Enable(constants.BLEND)
-	gl.BlendEquation(constants.FUNC_ADD)
-	gl.BlendFunc(constants.SRC_ALPHA, constants.ONE_MINUS_SRC_ALPHA)
-	gl.Disable(constants.CULL_FACE)
-	gl.Disable(constants.DEPTH_TEST)
-	gl.Enable(constants.SCISSOR_TEST)
-	gl.PolygonMode(constants.FRONT_AND_BACK, constants.FILL)
+	gl.Enable(oglconsts.BLEND)
+	gl.BlendEquation(oglconsts.FUNC_ADD)
+	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
+	gl.Disable(oglconsts.CULL_FACE)
+	gl.Disable(oglconsts.DEPTH_TEST)
+	gl.Enable(oglconsts.SCISSOR_TEST)
+	gl.PolygonMode(oglconsts.FRONT_AND_BACK, oglconsts.FILL)
 
 	// Setup viewport, orthographic projection matrix
 	// Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right).
@@ -387,18 +387,18 @@ func (context *Context) renderDrawData(drawData imgui.DrawData) {
 
 	vaoHandle := gl.GenVertexArrays(1)[0]
 	gl.BindVertexArray(vaoHandle)
-	gl.BindBuffer(constants.ARRAY_BUFFER, context.vboHandle)
+	gl.BindBuffer(oglconsts.ARRAY_BUFFER, context.vboHandle)
 	gl.EnableVertexAttribArray(uint32(context.attribLocationPosition))
 	gl.EnableVertexAttribArray(uint32(context.attribLocationUV))
 	gl.EnableVertexAttribArray(uint32(context.attribLocationColor))
 	vertexSize, vertexOffsetPos, vertexOffsetUv, vertexOffsetCol := imgui.VertexBufferLayout()
-	gl.VertexAttribOffset(uint32(context.attribLocationPosition), 2, constants.FLOAT, false, int32(vertexSize), vertexOffsetPos)
-	gl.VertexAttribOffset(uint32(context.attribLocationUV), 2, constants.FLOAT, false, int32(vertexSize), vertexOffsetUv)
-	gl.VertexAttribOffset(uint32(context.attribLocationColor), 4, constants.UNSIGNED_BYTE, true, int32(vertexSize), vertexOffsetCol)
+	gl.VertexAttribOffset(uint32(context.attribLocationPosition), 2, oglconsts.FLOAT, false, int32(vertexSize), vertexOffsetPos)
+	gl.VertexAttribOffset(uint32(context.attribLocationUV), 2, oglconsts.FLOAT, false, int32(vertexSize), vertexOffsetUv)
+	gl.VertexAttribOffset(uint32(context.attribLocationColor), 4, oglconsts.UNSIGNED_BYTE, true, int32(vertexSize), vertexOffsetCol)
 	indexSize := imgui.IndexBufferLayout()
-	drawType := constants.UNSIGNED_SHORT
+	drawType := oglconsts.UNSIGNED_SHORT
 	if indexSize == 4 {
-		drawType = constants.UNSIGNED_INT
+		drawType = oglconsts.UNSIGNED_INT
 	}
 
 	// Draw
@@ -406,21 +406,21 @@ func (context *Context) renderDrawData(drawData imgui.DrawData) {
 		var indexBufferOffset uintptr
 
 		vertexBuffer, vertexBufferSize := list.VertexBuffer()
-		gl.BindBuffer(constants.ARRAY_BUFFER, context.vboHandle)
-		gl.BufferData(constants.ARRAY_BUFFER, vertexBufferSize, vertexBuffer, constants.STREAM_DRAW)
+		gl.BindBuffer(oglconsts.ARRAY_BUFFER, context.vboHandle)
+		gl.BufferData(oglconsts.ARRAY_BUFFER, vertexBufferSize, vertexBuffer, oglconsts.STREAM_DRAW)
 
 		indexBuffer, indexBufferSize := list.IndexBuffer()
-		gl.BindBuffer(constants.ELEMENT_ARRAY_BUFFER, context.elementsHandle)
-		gl.BufferData(constants.ELEMENT_ARRAY_BUFFER, indexBufferSize, indexBuffer, constants.STREAM_DRAW)
+		gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, context.elementsHandle)
+		gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, indexBufferSize, indexBuffer, oglconsts.STREAM_DRAW)
 
 		for _, cmd := range list.Commands() {
 			if cmd.HasUserCallback() {
 				cmd.CallUserCallback(list)
 			} else {
-				gl.BindTexture(constants.TEXTURE_2D, uint32(cmd.TextureID()))
+				gl.BindTexture(oglconsts.TEXTURE_2D, uint32(cmd.TextureID()))
 				clipRect := cmd.ClipRect()
 				gl.Scissor(int32(clipRect.X), int32(fbHeight)-int32(clipRect.W), int32(clipRect.Z-clipRect.X), int32(clipRect.W-clipRect.Y))
-				gl.DrawElements(constants.TRIANGLES, int32(cmd.ElementCount()), uint32(drawType), indexBufferOffset)
+				gl.DrawElements(oglconsts.TRIANGLES, int32(cmd.ElementCount()), uint32(drawType), indexBufferOffset)
 			}
 			indexBufferOffset += uintptr(cmd.ElementCount() * indexSize)
 		}
@@ -429,35 +429,35 @@ func (context *Context) renderDrawData(drawData imgui.DrawData) {
 
 	// Restore modified GL state
 	gl.UseProgram(uint32(lastProgram))
-	gl.BindTexture(constants.TEXTURE_2D, uint32(lastTexture))
+	gl.BindTexture(oglconsts.TEXTURE_2D, uint32(lastTexture))
 	gl.BindSampler(0, uint32(lastSampler))
 	gl.ActiveTexture(uint32(lastActiveTexture))
 	gl.BindVertexArray(uint32(lastVertexArray))
-	gl.BindBuffer(constants.ARRAY_BUFFER, uint32(lastArrayBuffer))
-	gl.BindBuffer(constants.ELEMENT_ARRAY_BUFFER, uint32(lastElementArrayBuffer))
+	gl.BindBuffer(oglconsts.ARRAY_BUFFER, uint32(lastArrayBuffer))
+	gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, uint32(lastElementArrayBuffer))
 	gl.BlendEquationSeparate(uint32(lastBlendEquationRgb), uint32(lastBlendEquationAlpha))
 	gl.BlendFuncSeparate(uint32(lastBlendSrcRgb), uint32(lastBlendDstRgb), uint32(lastBlendSrcAlpha), uint32(lastBlendDstAlpha))
 	if lastEnableBlend {
-		gl.Enable(constants.BLEND)
+		gl.Enable(oglconsts.BLEND)
 	} else {
-		gl.Disable(constants.BLEND)
+		gl.Disable(oglconsts.BLEND)
 	}
 	if lastEnableCullFace {
-		gl.Enable(constants.CULL_FACE)
+		gl.Enable(oglconsts.CULL_FACE)
 	} else {
-		gl.Disable(constants.CULL_FACE)
+		gl.Disable(oglconsts.CULL_FACE)
 	}
 	if lastEnableDepthTest {
-		gl.Enable(constants.DEPTH_TEST)
+		gl.Enable(oglconsts.DEPTH_TEST)
 	} else {
-		gl.Disable(constants.DEPTH_TEST)
+		gl.Disable(oglconsts.DEPTH_TEST)
 	}
 	if lastEnableScissorTest {
-		gl.Enable(constants.SCISSOR_TEST)
+		gl.Enable(oglconsts.SCISSOR_TEST)
 	} else {
-		gl.Disable(constants.SCISSOR_TEST)
+		gl.Disable(oglconsts.SCISSOR_TEST)
 	}
-	gl.PolygonMode(constants.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
+	gl.PolygonMode(oglconsts.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
 	gl.Viewport(lastViewport[0], lastViewport[1], lastViewport[2], lastViewport[3])
 	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
 }
@@ -469,51 +469,51 @@ func (context *Context) renderDrawData2(drawData imgui.DrawData) {
 
 	// Backup GL state
 	var lastActiveTexture int32
-	gl.GetIntegerv(constants.ACTIVE_TEXTURE, &lastActiveTexture)
-	gl.ActiveTexture(constants.TEXTURE0)
+	gl.GetIntegerv(oglconsts.ACTIVE_TEXTURE, &lastActiveTexture)
+	gl.ActiveTexture(oglconsts.TEXTURE0)
 	var lastProgram int32
-	gl.GetIntegerv(constants.CURRENT_PROGRAM, &lastProgram)
+	gl.GetIntegerv(oglconsts.CURRENT_PROGRAM, &lastProgram)
 	var lastTexture int32
-	gl.GetIntegerv(constants.TEXTURE_BINDING_2D, &lastTexture)
+	gl.GetIntegerv(oglconsts.TEXTURE_BINDING_2D, &lastTexture)
 	var lastSampler int32
-	gl.GetIntegerv(constants.SAMPLER_BINDING, &lastSampler)
+	gl.GetIntegerv(oglconsts.SAMPLER_BINDING, &lastSampler)
 	var lastArrayBuffer int32
-	gl.GetIntegerv(constants.ARRAY_BUFFER_BINDING, &lastArrayBuffer)
+	gl.GetIntegerv(oglconsts.ARRAY_BUFFER_BINDING, &lastArrayBuffer)
 	var lastElementArrayBuffer int32
-	gl.GetIntegerv(constants.ELEMENT_ARRAY_BUFFER_BINDING, &lastElementArrayBuffer)
+	gl.GetIntegerv(oglconsts.ELEMENT_ARRAY_BUFFER_BINDING, &lastElementArrayBuffer)
 	var lastVertexArray int32
-	gl.GetIntegerv(constants.VERTEX_ARRAY_BINDING, &lastVertexArray)
+	gl.GetIntegerv(oglconsts.VERTEX_ARRAY_BINDING, &lastVertexArray)
 	var lastPolygonMode [2]int32
-	gl.GetIntegerv(constants.POLYGON_MODE, &lastPolygonMode[0])
+	gl.GetIntegerv(oglconsts.POLYGON_MODE, &lastPolygonMode[0])
 	var lastViewport [4]int32
-	gl.GetIntegerv(constants.VIEWPORT, &lastViewport[0])
+	gl.GetIntegerv(oglconsts.VIEWPORT, &lastViewport[0])
 	var lastScissorBox [4]int32
-	gl.GetIntegerv(constants.SCISSOR_BOX, &lastScissorBox[0])
+	gl.GetIntegerv(oglconsts.SCISSOR_BOX, &lastScissorBox[0])
 	var lastBlendSrcRgb int32
-	gl.GetIntegerv(constants.BLEND_SRC_RGB, &lastBlendSrcRgb)
+	gl.GetIntegerv(oglconsts.BLEND_SRC_RGB, &lastBlendSrcRgb)
 	var lastBlendDstRgb int32
-	gl.GetIntegerv(constants.BLEND_DST_RGB, &lastBlendDstRgb)
+	gl.GetIntegerv(oglconsts.BLEND_DST_RGB, &lastBlendDstRgb)
 	var lastBlendSrcAlpha int32
-	gl.GetIntegerv(constants.BLEND_SRC_ALPHA, &lastBlendSrcAlpha)
+	gl.GetIntegerv(oglconsts.BLEND_SRC_ALPHA, &lastBlendSrcAlpha)
 	var lastBlendDstAlpha int32
-	gl.GetIntegerv(constants.BLEND_DST_ALPHA, &lastBlendDstAlpha)
+	gl.GetIntegerv(oglconsts.BLEND_DST_ALPHA, &lastBlendDstAlpha)
 	var lastBlendEquationRgb int32
-	gl.GetIntegerv(constants.BLEND_EQUATION_RGB, &lastBlendEquationRgb)
+	gl.GetIntegerv(oglconsts.BLEND_EQUATION_RGB, &lastBlendEquationRgb)
 	var lastBlendEquationAlpha int32
-	gl.GetIntegerv(constants.BLEND_EQUATION_ALPHA, &lastBlendEquationAlpha)
-	lastEnableBlend := gl.IsEnabled(constants.BLEND)
-	lastEnableCullFace := gl.IsEnabled(constants.CULL_FACE)
-	lastEnableDepthTest := gl.IsEnabled(constants.DEPTH_TEST)
-	lastEnableScissorTest := gl.IsEnabled(constants.SCISSOR_TEST)
+	gl.GetIntegerv(oglconsts.BLEND_EQUATION_ALPHA, &lastBlendEquationAlpha)
+	lastEnableBlend := gl.IsEnabled(oglconsts.BLEND)
+	lastEnableCullFace := gl.IsEnabled(oglconsts.CULL_FACE)
+	lastEnableDepthTest := gl.IsEnabled(oglconsts.DEPTH_TEST)
+	lastEnableScissorTest := gl.IsEnabled(oglconsts.SCISSOR_TEST)
 
 	// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
-	gl.Enable(constants.BLEND)
-	gl.BlendEquation(constants.FUNC_ADD)
-	gl.BlendFunc(constants.SRC_ALPHA, constants.ONE_MINUS_SRC_ALPHA)
-	gl.Disable(constants.CULL_FACE)
-	gl.Disable(constants.DEPTH_TEST)
-	gl.Enable(constants.SCISSOR_TEST)
-	gl.PolygonMode(constants.FRONT_AND_BACK, constants.FILL)
+	gl.Enable(oglconsts.BLEND)
+	gl.BlendEquation(oglconsts.FUNC_ADD)
+	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
+	gl.Disable(oglconsts.CULL_FACE)
+	gl.Disable(oglconsts.DEPTH_TEST)
+	gl.Enable(oglconsts.SCISSOR_TEST)
+	gl.PolygonMode(oglconsts.FRONT_AND_BACK, oglconsts.FILL)
 
 	// Setup viewport, orthographic projection matrix
 	gl.Viewport(0, 0, int32(displayWidth), int32(displayHeight))
@@ -531,18 +531,18 @@ func (context *Context) renderDrawData2(drawData imgui.DrawData) {
 
 	vaoHandle := gl.GenVertexArrays(1)[0]
 	gl.BindVertexArray(vaoHandle)
-	gl.BindBuffer(constants.ARRAY_BUFFER, context.vboHandle)
+	gl.BindBuffer(oglconsts.ARRAY_BUFFER, context.vboHandle)
 	gl.EnableVertexAttribArray(uint32(context.attribLocationPosition))
 	gl.EnableVertexAttribArray(uint32(context.attribLocationUV))
 	gl.EnableVertexAttribArray(uint32(context.attribLocationColor))
 	vertexSize, vertexOffsetPos, vertexOffsetUv, vertexOffsetCol := imgui.VertexBufferLayout()
-	gl.VertexAttribOffset(uint32(context.attribLocationPosition), 2, constants.FLOAT, false, int32(vertexSize), vertexOffsetPos)
-	gl.VertexAttribOffset(uint32(context.attribLocationUV), 2, constants.FLOAT, false, int32(vertexSize), vertexOffsetUv)
-	gl.VertexAttribOffset(uint32(context.attribLocationColor), 4, constants.UNSIGNED_BYTE, true, int32(vertexSize), vertexOffsetCol)
+	gl.VertexAttribOffset(uint32(context.attribLocationPosition), 2, oglconsts.FLOAT, false, int32(vertexSize), vertexOffsetPos)
+	gl.VertexAttribOffset(uint32(context.attribLocationUV), 2, oglconsts.FLOAT, false, int32(vertexSize), vertexOffsetUv)
+	gl.VertexAttribOffset(uint32(context.attribLocationColor), 4, oglconsts.UNSIGNED_BYTE, true, int32(vertexSize), vertexOffsetCol)
 	indexSize := imgui.IndexBufferLayout()
-	drawType := constants.UNSIGNED_SHORT
+	drawType := oglconsts.UNSIGNED_SHORT
 	if indexSize == 4 {
-		drawType = constants.UNSIGNED_INT
+		drawType = oglconsts.UNSIGNED_INT
 	}
 
 	// Draw
@@ -550,12 +550,12 @@ func (context *Context) renderDrawData2(drawData imgui.DrawData) {
 		var indexBufferOffset uintptr
 
 		vertexBuffer, vertexBufferSize := list.VertexBuffer()
-		gl.BindBuffer(constants.ARRAY_BUFFER, context.vboHandle)
-		gl.BufferData(constants.ARRAY_BUFFER, vertexBufferSize, vertexBuffer, constants.STREAM_DRAW)
+		gl.BindBuffer(oglconsts.ARRAY_BUFFER, context.vboHandle)
+		gl.BufferData(oglconsts.ARRAY_BUFFER, vertexBufferSize, vertexBuffer, oglconsts.STREAM_DRAW)
 
 		indexBuffer, indexBufferSize := list.IndexBuffer()
-		gl.BindBuffer(constants.ELEMENT_ARRAY_BUFFER, context.elementsHandle)
-		gl.BufferData(constants.ELEMENT_ARRAY_BUFFER, indexBufferSize, indexBuffer, constants.STREAM_DRAW)
+		gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, context.elementsHandle)
+		gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, indexBufferSize, indexBuffer, oglconsts.STREAM_DRAW)
 
 		for _, cmd := range list.Commands() {
 			if cmd.HasUserCallback() {
@@ -566,23 +566,23 @@ func (context *Context) renderDrawData2(drawData imgui.DrawData) {
 				gl.Uniform1i(context.attribLocationType, int32(imageType))
 				switch imageType {
 				case ImageTypeSimpleTexture:
-					gl.ActiveTexture(constants.TEXTURE0 + uint32(0))
-					gl.BindTexture(constants.TEXTURE_2D, uint32(textureID))
+					gl.ActiveTexture(oglconsts.TEXTURE0 + uint32(0))
+					gl.BindTexture(oglconsts.TEXTURE_2D, uint32(textureID))
 				// case ImageTypeBitmapTexture:
 				// 	palette, bitmap := bitmapTextureQuery(textureID)
-				// 	gl.ActiveTexture(constants.TEXTURE0 + uint32(0))
-				// 	gl.BindTexture(constants.TEXTURE_2D, bitmap)
-				// 	gl.ActiveTexture(constants.TEXTURE0 + uint32(1))
-				// 	gl.BindTexture(constants.TEXTURE_2D, palette)
+				// 	gl.ActiveTexture(oglconsts.TEXTURE0 + uint32(0))
+				// 	gl.BindTexture(oglconsts.TEXTURE_2D, bitmap)
+				// 	gl.ActiveTexture(oglconsts.TEXTURE0 + uint32(1))
+				// 	gl.BindTexture(oglconsts.TEXTURE_2D, palette)
 				default:
-					gl.ActiveTexture(constants.TEXTURE0 + uint32(0))
-					gl.BindTexture(constants.TEXTURE_2D, 0)
-					gl.ActiveTexture(constants.TEXTURE0 + uint32(1))
-					gl.BindTexture(constants.TEXTURE_2D, 0)
+					gl.ActiveTexture(oglconsts.TEXTURE0 + uint32(0))
+					gl.BindTexture(oglconsts.TEXTURE_2D, 0)
+					gl.ActiveTexture(oglconsts.TEXTURE0 + uint32(1))
+					gl.BindTexture(oglconsts.TEXTURE_2D, 0)
 				}
 				clipRect := cmd.ClipRect()
 				gl.Scissor(int32(clipRect.X), int32(displayHeight)-int32(clipRect.W), int32(clipRect.Z-clipRect.X), int32(clipRect.W-clipRect.Y))
-				gl.DrawElements(constants.TRIANGLES, int32(cmd.ElementCount()), uint32(drawType), indexBufferOffset)
+				gl.DrawElements(oglconsts.TRIANGLES, int32(cmd.ElementCount()), uint32(drawType), indexBufferOffset)
 			}
 			indexBufferOffset += uintptr(cmd.ElementCount() * indexSize)
 		}
@@ -591,35 +591,35 @@ func (context *Context) renderDrawData2(drawData imgui.DrawData) {
 
 	// Restore modified GL state
 	gl.UseProgram(uint32(lastProgram))
-	gl.BindTexture(constants.TEXTURE_2D, uint32(lastTexture))
+	gl.BindTexture(oglconsts.TEXTURE_2D, uint32(lastTexture))
 	gl.BindSampler(0, uint32(lastSampler))
 	gl.ActiveTexture(uint32(lastActiveTexture))
 	gl.BindVertexArray(uint32(lastVertexArray))
-	gl.BindBuffer(constants.ARRAY_BUFFER, uint32(lastArrayBuffer))
-	gl.BindBuffer(constants.ELEMENT_ARRAY_BUFFER, uint32(lastElementArrayBuffer))
+	gl.BindBuffer(oglconsts.ARRAY_BUFFER, uint32(lastArrayBuffer))
+	gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, uint32(lastElementArrayBuffer))
 	gl.BlendEquationSeparate(uint32(lastBlendEquationRgb), uint32(lastBlendEquationAlpha))
 	gl.BlendFuncSeparate(uint32(lastBlendSrcRgb), uint32(lastBlendDstRgb), uint32(lastBlendSrcAlpha), uint32(lastBlendDstAlpha))
 	if lastEnableBlend {
-		gl.Enable(constants.BLEND)
+		gl.Enable(oglconsts.BLEND)
 	} else {
-		gl.Disable(constants.BLEND)
+		gl.Disable(oglconsts.BLEND)
 	}
 	if lastEnableCullFace {
-		gl.Enable(constants.CULL_FACE)
+		gl.Enable(oglconsts.CULL_FACE)
 	} else {
-		gl.Disable(constants.CULL_FACE)
+		gl.Disable(oglconsts.CULL_FACE)
 	}
 	if lastEnableDepthTest {
-		gl.Enable(constants.DEPTH_TEST)
+		gl.Enable(oglconsts.DEPTH_TEST)
 	} else {
-		gl.Disable(constants.DEPTH_TEST)
+		gl.Disable(oglconsts.DEPTH_TEST)
 	}
 	if lastEnableScissorTest {
-		gl.Enable(constants.SCISSOR_TEST)
+		gl.Enable(oglconsts.SCISSOR_TEST)
 	} else {
-		gl.Disable(constants.SCISSOR_TEST)
+		gl.Disable(oglconsts.SCISSOR_TEST)
 	}
-	gl.PolygonMode(constants.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
+	gl.PolygonMode(oglconsts.FRONT_AND_BACK, uint32(lastPolygonMode[0]))
 	gl.Viewport(lastViewport[0], lastViewport[1], lastViewport[2], lastViewport[3])
 	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
 }

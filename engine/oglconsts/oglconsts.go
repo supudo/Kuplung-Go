@@ -1,4 +1,4 @@
-package constants
+package oglconsts
 
 // Buffer Bits
 // nolint: golint,megacheck

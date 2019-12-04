@@ -6,7 +6,7 @@ import (
 	"unsafe"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
-	"github.com/supudo/Kuplung-Go/engine/constants"
+	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/settings"
 )
 
@@ -431,7 +431,7 @@ func (native *OpenGL) GLGetProgramInfoLog(program uint32, bufSize int32, length 
 
 // LogOpenGLReturn will return the OpenGL error
 func (native *OpenGL) LogOpenGLReturn() string {
-	if err := gl.GetError(); err != constants.NO_ERROR {
+	if err := gl.GetError(); err != oglconsts.NO_ERROR {
 		return fmt.Sprintf("[OpenGL Erorr] %v", err)
 	}
 	return ""
@@ -439,14 +439,14 @@ func (native *OpenGL) LogOpenGLReturn() string {
 
 // LogOpenGLError will output the OpenGL error and exit the application
 func (native *OpenGL) LogOpenGLError() {
-	if err := gl.GetError(); err != constants.NO_ERROR {
+	if err := gl.GetError(); err != oglconsts.NO_ERROR {
 		settings.LogError("[OpenGL Error] Error occured: %v", err)
 	}
 }
 
 // LogOpenGLWarn will output the OpenGL error
 func (native *OpenGL) LogOpenGLWarn() {
-	if err := gl.GetError(); err != constants.NO_ERROR {
+	if err := gl.GetError(); err != oglconsts.NO_ERROR {
 		settings.LogWarn("[OpenGL Error] Error occured: %v", err)
 	}
 }
