@@ -6,7 +6,7 @@ import (
 )
 
 // ShowAboutImGui ...
-func (context *Context) ShowAboutImGui(open *bool) {
+func (context *Context) showAboutImGui(open *bool) {
 	if imgui.BeginV("About ImGui", open, imgui.WindowFlagsAlwaysAutoResize) {
 		imgui.Text("ImGui " + imgui.Version())
 		imgui.Separator()
@@ -20,7 +20,7 @@ func (context *Context) ShowAboutImGui(open *bool) {
 }
 
 // ShowAboutKuplung ...
-func (context *Context) ShowAboutKuplung(open *bool) {
+func (context *Context) showAboutKuplung(open *bool) {
 	var sett = settings.GetSettings()
 	if imgui.BeginV("About Kuplung", open, imgui.WindowFlagsAlwaysAutoResize) {
 		imgui.Text("Kuplung " + sett.App.ApplicationVersion)
@@ -37,7 +37,7 @@ func (context *Context) ShowAboutKuplung(open *bool) {
 }
 
 // ShowMetrics ...
-func (context *Context) ShowMetrics(open *bool) {
+func (context *Context) showMetrics(open *bool) {
 	if imgui.BeginV("Scene stats", open, imgui.WindowFlagsAlwaysAutoResize|imgui.WindowFlagsNoTitleBar|imgui.WindowFlagsNoResize|imgui.WindowFlagsNoSavedSettings) {
 		gl := context.window.OpenGL()
 		imgui.Text("OpenGL version: 4.1 (" + gl.GetOpenGLVersion() + ")")

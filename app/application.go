@@ -62,7 +62,7 @@ func (kapp *KuplungApp) render() {
 		kapp.gl.Clear(oglconsts.COLOR_BUFFER_BIT)
 		kapp.guiContext.DrawGUI()
 
-		kapp.renderManager.Render()
+		kapp.renderManager.Render(kapp.guiContext.GuiVars.GlobalVars)
 
 		kapp.guiContext.Render()
 	}

@@ -3,6 +3,7 @@ package rendering
 import (
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/objects"
+	"github.com/supudo/Kuplung-Go/types"
 )
 
 // RenderManager is the main structure for rendering
@@ -23,8 +24,10 @@ func NewRenderManager(window interfaces.Window) *RenderManager {
 }
 
 // Render handles rendering of all scene objects
-func (rm *RenderManager) Render() {
-	rm.cube.Render()
+func (rm *RenderManager) Render(gvars types.ObjectVariables) {
+	if gvars.ShowCube {
+		rm.cube.Render()
+	}
 }
 
 // Dispose will cleanup everything

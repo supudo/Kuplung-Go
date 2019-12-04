@@ -27,27 +27,30 @@ func (context *Context) DrawMainMenu() {
 
 	if imgui.BeginMenu("View") {
 		if imgui.MenuItem("Models") {
-			context.guiVars.showModels = !context.guiVars.showModels
+			context.GuiVars.showModels = !context.GuiVars.showModels
 		}
 		if imgui.MenuItem("Controls") {
-			context.guiVars.showControls = !context.guiVars.showControls
+			context.GuiVars.showControls = !context.GuiVars.showControls
+		}
+		if imgui.MenuItem("Cube") {
+			context.GuiVars.GlobalVars.ShowCube = !context.GuiVars.GlobalVars.ShowCube
 		}
 		imgui.EndMenu()
 	}
 
 	if imgui.BeginMenu("Help") {
 		if imgui.MenuItem("Metrics") {
-			context.guiVars.showMetrics = !context.guiVars.showMetrics
+			context.GuiVars.showMetrics = !context.GuiVars.showMetrics
 		}
 		if imgui.MenuItem("About ImGui") {
-			context.guiVars.showAboutImGui = !context.guiVars.showAboutImGui
+			context.GuiVars.showAboutImGui = !context.GuiVars.showAboutImGui
 		}
 		if imgui.MenuItem("About Kuplung") {
-			context.guiVars.showAboutKuplung = !context.guiVars.showAboutKuplung
+			context.GuiVars.showAboutKuplung = !context.GuiVars.showAboutKuplung
 		}
 		imgui.Separator()
 		if imgui.MenuItem("ImGui Demo Window") {
-			context.guiVars.showDemoWindow = !context.guiVars.showDemoWindow
+			context.GuiVars.showDemoWindow = !context.GuiVars.showDemoWindow
 		}
 		imgui.EndMenu()
 	}

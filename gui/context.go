@@ -10,6 +10,7 @@ import (
 	"github.com/supudo/Kuplung-Go/gui/dialogs"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -44,7 +45,7 @@ type Context struct {
 	vboHandle              uint32
 	elementsHandle         uint32
 
-	guiVars WindowVariables
+	GuiVars WindowVariables
 
 	viewControls *dialogs.ViewControls
 	viewModels   *dialogs.ViewModels
@@ -59,6 +60,8 @@ type WindowVariables struct {
 	showAboutImGui   bool
 	showAboutKuplung bool
 	showMetrics      bool
+
+	GlobalVars types.ObjectVariables
 }
 
 // NewContext initializes a new UI context based on the provided OpenGL window.
@@ -72,12 +75,13 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 		viewModels:   dialogs.NewViewModels(),
 	}
 
-	context.guiVars.showModels = true
-	context.guiVars.showControls = true
-	context.guiVars.showDemoWindow = false
-	context.guiVars.showAboutImGui = false
-	context.guiVars.showAboutKuplung = false
-	context.guiVars.showMetrics = false
+	context.GuiVars.showModels = true
+	context.GuiVars.showControls = true
+	context.GuiVars.showDemoWindow = false
+	context.GuiVars.showAboutImGui = false
+	context.GuiVars.showAboutKuplung = false
+	context.GuiVars.showMetrics = false
+	context.GuiVars.GlobalVars.ShowCube = true
 
 	err := context.createDeviceObjects(param)
 	if err != nil {
@@ -156,27 +160,27 @@ func (context *Context) Render() {
 func (context *Context) DrawGUI() {
 	context.DrawMainMenu()
 
-	if context.guiVars.showControls {
-		context.viewControls.Render(&context.guiVars.showControls)
+	if context.GuiVars.showControls {
+		context.viewControls.Render(&context.GuiVars.showControls)
 	}
-	if context.guiVars.showModels {
-		context.viewModels.Render(&context.guiVars.showModels)
-	}
-
-	if context.guiVars.showAboutImGui {
-		context.ShowAboutImGui(&context.guiVars.showAboutImGui)
+	if context.GuiVars.showModels {
+		context.viewModels.Render(&context.GuiVars.showModels)
 	}
 
-	if context.guiVars.showAboutKuplung {
-		context.ShowAboutKuplung(&context.guiVars.showAboutKuplung)
+	if context.GuiVars.showAboutImGui {
+		context.showAboutImGui(&context.GuiVars.showAboutImGui)
 	}
 
-	if context.guiVars.showDemoWindow {
-		imgui.ShowDemoWindow(&context.guiVars.showDemoWindow)
+	if context.GuiVars.showAboutKuplung {
+		context.showAboutKuplung(&context.GuiVars.showAboutKuplung)
 	}
 
-	if context.guiVars.showMetrics {
-		context.ShowMetrics(&context.guiVars.showMetrics)
+	if context.GuiVars.showDemoWindow {
+		imgui.ShowDemoWindow(&context.GuiVars.showDemoWindow)
+	}
+
+	if context.GuiVars.showMetrics {
+		context.showMetrics(&context.GuiVars.showMetrics)
 	}
 }
 
