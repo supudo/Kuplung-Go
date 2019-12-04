@@ -263,16 +263,16 @@ func (cube *Cube) newTexture(file string) (uint32, error) {
 
 	imgFile, err := os.Open(file)
 	if err != nil {
-		return 0, fmt.Errorf("texture %q not found on disk: %v", file, err)
+		settings.LogError("[Cube] Texture file not found: %v", err)
 	}
 	img, _, err := image.Decode(imgFile)
 	if err != nil {
-		return 0, err
+		settings.LogError("[Cube] Can't decode texture: %v", err)
 	}
 
 	rgba := image.NewRGBA(img.Bounds())
 	if rgba.Stride != rgba.Rect.Size().X*4 {
-		return 0, fmt.Errorf("unsupported stride")
+		settings.LogError("[Cube] Texture unsupported stride!")
 	}
 	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
 
