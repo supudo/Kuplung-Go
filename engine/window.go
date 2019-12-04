@@ -79,6 +79,8 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 		nextRenderTick:        time.Now(),
 	}
 
+	window.OnClosed(window.onClosed)
+
 	return
 }
 
@@ -94,9 +96,70 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 		window.CallOnMouseButtonDown(uint32(i), input.ModNone)
 	}
 
+	switch ev := event.(type) {
+	case *sdl.QuitEvent:
+		sett.MemSettings.QuitApplication = true
+		window.CallClosed()
+	case *sdl.MouseWheelEvent:
+		var deltaX, deltaY float32
+		if ev.X > 0 {
+			deltaX++
+		} else if ev.X < 0 {
+			deltaX--
+		}
+		if ev.Y > 0 {
+			deltaY++
+		} else if ev.Y < 0 {
+			deltaY--
+		}
+		io.AddMouseWheelDelta(deltaX, deltaY)
+	case *sdl.TextInputEvent:
+		io.AddInputCharacters(string(ev.Text[:]))
+	case *sdl.KeyboardEvent:
+		switch ev.Type {
+		case sdl.KEYDOWN:
+			io.KeyPress(int(ev.Keysym.Scancode))
+			window.updateKeyModifier()
+		case sdl.KEYUP:
+			io.KeyRelease(int(ev.Keysym.Scancode))
+			window.updateKeyModifier()
+		}
+	case *sdl.WindowEvent:
+		switch ev.Event {
+		case sdl.WINDOWEVENT_RESIZED:
+			width, height := ev.Data1, ev.Data2
+			sett.AppWindow.SDLWindowWidth = width
+			sett.AppWindow.SDLWindowHeight = height
+			io.SetDisplaySize(imgui.Vec2{X: float32(width), Y: float32(height)})
+			window.CallResize(int(width), int(height))
+		case sdl.WINDOWEVENT_CLOSE:
+			sett.MemSettings.QuitApplication = true
+			window.CallClosed()
+		}
+	}
+}
+
+func (window *KuplungWindow) processEvent2(event sdl.Event) {
+	var sett = settings.GetSettings()
+
+	if sett.MemSettings.QuitApplication {
+		return
+	}
+
+	io := imgui.CurrentIO()
+
+	x, y, state := sdl.GetMouseState()
+	io.SetMousePosition(imgui.Vec2{X: float32(x), Y: float32(y)})
+	for i, button := range []uint32{sdl.BUTTON_LEFT, sdl.BUTTON_RIGHT, sdl.BUTTON_MIDDLE} {
+		io.SetMouseButtonDown(i, window.buttonsDown[i] || (state&sdl.Button(button)) != 0)
+		window.buttonsDown[i] = false
+		window.CallOnMouseButtonDown(uint32(i), input.ModNone)
+	}
+
 	switch event.GetType() {
 	case sdl.QUIT:
 		sett.MemSettings.QuitApplication = true
+		window.CallClosed()
 	case sdl.MOUSEWHEEL:
 		wheelEvent := event.(*sdl.MouseWheelEvent)
 		var deltaX, deltaY float32
@@ -111,26 +174,6 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 			deltaY--
 		}
 		io.AddMouseWheelDelta(deltaX, deltaY)
-	// case sdl.MOUSEBUTTONDOWN:
-	// 	buttonEvent := event.(*sdl.MouseButtonEvent)
-	// 	switch buttonEvent.Button {
-	// 	case sdl.BUTTON_LEFT:
-	// 		window.CallOnMouseButtonDown(0, input.ModNone)
-	// 	case sdl.BUTTON_RIGHT:
-	// 		window.CallOnMouseButtonDown(1, input.ModNone)
-	// 	case sdl.BUTTON_MIDDLE:
-	// 		window.CallOnMouseButtonDown(2, input.ModNone)
-	// 	}
-	// case sdl.MOUSEBUTTONUP:
-	// 	buttonEvent := event.(*sdl.MouseButtonEvent)
-	// 	switch buttonEvent.Button {
-	// 	case sdl.BUTTON_LEFT:
-	// 		window.CallOnMouseButtonUp(0, input.ModNone)
-	// 	case sdl.BUTTON_RIGHT:
-	// 		window.CallOnMouseButtonUp(1, input.ModNone)
-	// 	case sdl.BUTTON_MIDDLE:
-	// 		window.CallOnMouseButtonUp(2, input.ModNone)
-	// 	}
 	case sdl.TEXTINPUT:
 		inputEvent := event.(*sdl.TextInputEvent)
 		io.AddInputCharacters(string(inputEvent.Text[:]))
@@ -142,6 +185,16 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 		keyEvent := event.(*sdl.KeyboardEvent)
 		io.KeyRelease(int(keyEvent.Keysym.Scancode))
 		window.updateKeyModifier()
+	case sdl.WINDOWEVENT_RESIZED:
+		windowEvent := event.(*sdl.WindowEvent)
+		width, height := windowEvent.Data1, windowEvent.Data2
+		sett.AppWindow.SDLWindowWidth = width
+		sett.AppWindow.SDLWindowHeight = height
+		io.SetDisplaySize(imgui.Vec2{X: float32(width), Y: float32(height)})
+		window.CallResize(int(width), int(height))
+	case sdl.WINDOWEVENT_CLOSE:
+		sett.MemSettings.QuitApplication = true
+		window.CallClosed()
 	}
 }
 
@@ -231,37 +284,6 @@ func (window *KuplungWindow) SetFullScreen(on bool) {
 	}
 }
 
-// OnMouseMove implements the WindowEventDispatcher interface.
-func (window *WindowEventDispatcher) OnMouseMove(callback interfaces.MouseMoveCallback) {
-	window.CallOnMouseMove = callback
-}
-
-// OnMouseButtonDown implements the WindowEventDispatcher interface.
-func (window *WindowEventDispatcher) OnMouseButtonDown(callback interfaces.MouseButtonCallback) {
-	window.CallOnMouseButtonDown = callback
-}
-
-// OnMouseButtonUp implements the WindowEventDispatcher interface.
-func (window *WindowEventDispatcher) OnMouseButtonUp(callback interfaces.MouseButtonCallback) {
-	window.CallOnMouseButtonUp = callback
-}
-
-// OnMouseScroll implements the WindowEventDispatcher interface.
-func (window *WindowEventDispatcher) OnMouseScroll(callback interfaces.MouseScrollCallback) {
-	window.CallOnMouseScroll = callback
-}
-
-// OnKey implements the WindowEventDispatcher interface
-func (window *WindowEventDispatcher) OnKey(callback interfaces.KeyCallback) {
-	window.CallKey = callback
-}
-
-// OnModifier implements the WindowEventDispatcher interface
-func (window *WindowEventDispatcher) OnModifier(callback interfaces.ModifierCallback) {
-	window.CallModifier = callback
-}
-
-// OnCharCallback implements the WindowEventDispatcher interface
-func (window *WindowEventDispatcher) OnCharCallback(callback interfaces.CharCallback) {
-	window.CallCharCallback = callback
+func (window *KuplungWindow) onClosed() {
+	window.CallClosed()
 }

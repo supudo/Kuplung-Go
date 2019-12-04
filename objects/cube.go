@@ -16,7 +16,7 @@ import (
 
 // Cube ...
 type Cube struct {
-	glWrapper interfaces.OpenGL
+	window interfaces.Window
 
 	angle        float32
 	previousTime uint32
@@ -32,13 +32,13 @@ type Cube struct {
 }
 
 // CubeInit ...
-func CubeInit(gl interfaces.OpenGL) *Cube {
+func CubeInit(window interfaces.Window) *Cube {
 	sett := settings.GetSettings()
 
 	cube := &Cube{}
 
 	cube.version = "#version 330"
-	cube.glWrapper = gl
+	cube.window = window
 
 	vertexShader := cube.version + `
 uniform mat4 projection;
@@ -112,6 +112,8 @@ void main() {
 		1.0, 1.0, 1.0, 0.0, 1.0,
 	}
 
+	gl := window.OpenGL()
+
 	// Configure the vertex and fragment shaders
 	program := cube.newProgram(vertexShader, fragmentShader)
 
@@ -119,7 +121,7 @@ void main() {
 
 	gl.LogOpenGLError()
 
-	w, h := sett.AppWindow.SDLWindowWidth, sett.AppWindow.SDLWindowHeight
+	w, h := window.Size()
 
 	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(w/h), 0.1, 10.0)
 	projectionUniform := gl.GLGetUniformLocation(program, gl.Str("projection\x00"))
@@ -166,7 +168,7 @@ void main() {
 
 // Render ...
 func (cube *Cube) Render() {
-	gl := cube.glWrapper
+	gl := cube.window.OpenGL()
 
 	gl.Enable(oglconsts.DEPTH_TEST)
 	gl.DepthFunc(oglconsts.LESS)
@@ -192,8 +194,17 @@ func (cube *Cube) Render() {
 	gl.DrawArrays(oglconsts.TRIANGLES, 0, 6*2*3)
 }
 
+// Dispose will cleanup everything
+func (cube *Cube) Dispose() {
+	gl := cube.window.OpenGL()
+
+	gl.DeleteTextures([]uint32{cube.texture})
+	gl.DeleteVertexArrays([]uint32{cube.vao})
+	gl.DeleteProgram(cube.program)
+}
+
 func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) uint32 {
-	gl := cube.glWrapper
+	gl := cube.window.OpenGL()
 
 	vertexShader := cube.compileShader(vertexShaderSource, oglconsts.VERTEX_SHADER)
 	fragmentShader := cube.compileShader(fragmentShaderSource, oglconsts.FRAGMENT_SHADER)
@@ -223,7 +234,7 @@ func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) ui
 }
 
 func (cube *Cube) compileShader(source string, shaderType uint32) uint32 {
-	gl := cube.glWrapper
+	gl := cube.window.OpenGL()
 
 	shader := gl.CreateShader(shaderType)
 
@@ -248,7 +259,7 @@ func (cube *Cube) compileShader(source string, shaderType uint32) uint32 {
 }
 
 func (cube *Cube) newTexture(file string) uint32 {
-	gl := cube.glWrapper
+	gl := cube.window.OpenGL()
 
 	imgFile, err := os.Open(file)
 	if err != nil {

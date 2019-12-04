@@ -2,8 +2,8 @@ package app
 
 import (
 	"github.com/supudo/Kuplung-Go/engine"
-	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/engine/input"
+	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/gui"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/rendering"
@@ -35,11 +35,11 @@ func (kapp *KuplungApp) InitializeKuplungWindow(window interfaces.Window) {
 	kapp.window = window
 	kapp.clipboard.Window = window
 	kapp.gl = window.OpenGL()
-	kapp.renderManager = rendering.NewRenderManager(kapp.gl)
 
 	kapp.initWindowCallbacks()
 	kapp.initOpenGL()
 	kapp.initGui()
+	kapp.initRenderingManager()
 }
 
 func (kapp *KuplungApp) initWindowCallbacks() {
@@ -52,25 +52,20 @@ func (kapp *KuplungApp) initWindowCallbacks() {
 	kapp.window.OnMouseButtonUp(kapp.onMouseButtonUp)
 
 	kapp.window.OnKey(kapp.onKey)
-	kapp.window.OnCharCallback(kapp.onChar)
 	kapp.window.OnModifier(kapp.onModifier)
 }
 
-func (kapp *KuplungApp) onWindowClosed() {
-	if kapp.guiContext != nil {
-		kapp.guiContext.Destroy()
-		kapp.guiContext = nil
-	}
-}
-
 func (kapp *KuplungApp) render() {
-	kapp.guiContext.NewFrame()
-	kapp.gl.Clear(oglconsts.COLOR_BUFFER_BIT)
-	kapp.guiContext.DrawGUI()
+	sett := settings.GetSettings()
+	if !sett.MemSettings.QuitApplication {
+		kapp.guiContext.NewFrame()
+		kapp.gl.Clear(oglconsts.COLOR_BUFFER_BIT)
+		kapp.guiContext.DrawGUI()
 
-	kapp.renderManager.Render()
+		kapp.renderManager.Render()
 
-	kapp.guiContext.Render()
+		kapp.guiContext.Render()
+	}
 }
 
 func (kapp *KuplungApp) initOpenGL() {
@@ -106,74 +101,26 @@ func (kapp *KuplungApp) initGuiSizes() {
 }
 
 func (kapp *KuplungApp) initGuiStyle() {
-	// if len(kapp.FontFile) == 0 {
-	// 	imgui.CurrentIO().SetFontGlobalScale(kapp.GuiScale)
-	// }
-	// imgui.CurrentStyle().ScaleAllSizes(kapp.GuiScale)
-
-	// color := func(r, g, b byte, alpha float32) imgui.Vec4 {
-	// 	return imgui.Vec4{X: float32(r) / 255.0, Y: float32(g) / 255.0, Z: float32(b) / 255.0, W: alpha}
-	// }
-	// colorDoubleFull := func(alpha float32) imgui.Vec4 { return color(0xC4, 0x38, 0x9F, alpha) }
-	// colorDoubleDark := func(alpha float32) imgui.Vec4 { return color(0x31, 0x01, 0x38, alpha) }
-
-	// colorTripleFull := func(alpha float32) imgui.Vec4 { return color(0x21, 0xFF, 0x43, alpha) }
-	// colorTripleDark := func(alpha float32) imgui.Vec4 { return color(0x06, 0xCC, 0x94, alpha) }
-	// colorTripleLight := func(alpha float32) imgui.Vec4 { return color(0x51, 0x99, 0x58, alpha) }
-
-	// style := imgui.CurrentStyle()
-	// style.SetColor(imgui.StyleColorText, colorTripleFull(1.0))
-	// style.SetColor(imgui.StyleColorTextDisabled, colorTripleDark(1.0))
-
-	// style.SetColor(imgui.StyleColorWindowBg, colorDoubleDark(0.80))
-	// style.SetColor(imgui.StyleColorPopupBg, colorDoubleDark(0.75))
-
-	// style.SetColor(imgui.StyleColorTitleBgActive, colorTripleLight(1.0))
-	// style.SetColor(imgui.StyleColorFrameBg, colorTripleLight(0.54))
-
-	// style.SetColor(imgui.StyleColorFrameBgHovered, colorTripleDark(0.4))
-	// style.SetColor(imgui.StyleColorFrameBgActive, colorTripleDark(0.67))
-	// style.SetColor(imgui.StyleColorCheckMark, colorTripleDark(1.0))
-	// style.SetColor(imgui.StyleColorSliderGrabActive, colorTripleDark(1.0))
-	// style.SetColor(imgui.StyleColorButton, colorTripleDark(0.4))
-	// style.SetColor(imgui.StyleColorButtonHovered, colorTripleDark(1.0))
-	// style.SetColor(imgui.StyleColorHeader, colorTripleLight(0.70))
-	// style.SetColor(imgui.StyleColorHeaderHovered, colorTripleDark(0.8))
-	// style.SetColor(imgui.StyleColorHeaderActive, colorTripleDark(1.0))
-	// style.SetColor(imgui.StyleColorResizeGrip, colorTripleDark(0.25))
-	// style.SetColor(imgui.StyleColorResizeGripHovered, colorTripleDark(0.67))
-	// style.SetColor(imgui.StyleColorResizeGripActive, colorTripleDark(0.95))
-	// style.SetColor(imgui.StyleColorTextSelectedBg, colorTripleDark(0.35))
-
-	// style.SetColor(imgui.StyleColorSliderGrab, colorDoubleFull(1.0))
-	// style.SetColor(imgui.StyleColorButtonActive, colorDoubleFull(1.0))
-	// style.SetColor(imgui.StyleColorSeparatorHovered, colorDoubleFull(0.78))
-	// style.SetColor(imgui.StyleColorSeparatorActive, colorTripleLight(1.0))
 }
 
-func (kapp *KuplungApp) onKey(key input.Key, modifier input.Modifier) {
-	// kapp.lastModifier = modifier
-	// switch {
-	// case key == input.KeyEscape:
-	// 	kapp.modalState.SetState(nil)
-	// case key == input.KeyUndo:
-	// 	kapp.tryUndo()
-	// case key == input.KeyRedo:
-	// 	kapp.tryRedo()
-	// }
+func (kapp *KuplungApp) initRenderingManager() {
+	kapp.renderManager = rendering.NewRenderManager(kapp.window)
 }
 
-func (kapp *KuplungApp) onChar(char rune) {
-	if !kapp.guiContext.IsUsingKeyboard() {
-		switch char {
-		case 'v':
-			break
-		}
+func (kapp *KuplungApp) onWindowClosed() {
+	if kapp.guiContext != nil {
+		kapp.guiContext.Destroy()
+		kapp.guiContext = nil
+	}
+	if kapp.renderManager != nil {
+		kapp.renderManager.Dispose()
 	}
 }
 
+func (kapp *KuplungApp) onKey(key input.Key, modifier input.Modifier) {
+}
+
 func (kapp *KuplungApp) onModifier(modifier input.Modifier) {
-	// kapp.lastModifier = modifier
 }
 
 func (kapp *KuplungApp) onMouseMove(x, y float32) {

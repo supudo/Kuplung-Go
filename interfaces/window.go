@@ -30,8 +30,8 @@ type KeyCallback func(key input.Key, modifier input.Modifier)
 // ModifierCallback is called when the currently active modifier changed.
 type ModifierCallback func(modifier input.Modifier)
 
-// CharCallback is called for typing a character.
-type CharCallback func(char rune)
+// ResizeCallback is called for a change of window dimensions.
+type ResizeCallback func(width int, height int)
 
 // Window represents an OpenGL render surface.
 type Window interface {
@@ -40,6 +40,8 @@ type Window interface {
 	// SetClipboardText sets the current value of the clipboard as UTF-8 string.
 	SetClipboardText(value string)
 
+	// OnResize registers a callback function for sizing events.
+	OnResize(callback ResizeCallback)
 	// OnClosed registers a callback function which shall be called when the window is being closed.
 	OnClosed(callback ClosedCallback)
 
@@ -66,6 +68,4 @@ type Window interface {
 	OnKey(callback KeyCallback)
 	// OnModifier registers a callback function for change of modifier events.
 	OnModifier(callback ModifierCallback)
-	// OnCharCallback registers a callback function for typed characters.
-	OnCharCallback(callback CharCallback)
 }
