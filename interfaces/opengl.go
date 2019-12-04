@@ -81,4 +81,5 @@ type OpenGL interface {
 	GetRendererName() string
 
 	BindFragDataLocation(program uint32, color uint32, name string)
+	DepthFunc(xfunc uint32)
 }

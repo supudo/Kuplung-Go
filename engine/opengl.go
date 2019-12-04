@@ -354,3 +354,8 @@ func (native *OpenGL) GetRendererName() string {
 func (native *OpenGL) BindFragDataLocation(program uint32, color uint32, name string) {
 	gl.BindFragDataLocation(program, color, gl.Str(name+"\x00"))
 }
+
+// DepthFunc specify the value used for depth buffer comparisons
+func (native *OpenGL) DepthFunc(xfunc uint32) {
+	gl.DepthFunc(xfunc)
+}

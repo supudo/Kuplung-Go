@@ -56,6 +56,7 @@ const (
 	DEPTH_TEST          = 0x0B71
 	CULL_FACE           = 0x0B44
 	SCISSOR_TEST        = 0x0C11
+	LESS                = 0x0201
 
 	ACTIVE_TEXTURE               = 0x84E0
 	CURRENT_PROGRAM              = 0x8B8D

@@ -14,9 +14,6 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-const windowWidth = 800
-const windowHeight = 600
-
 // Cube ...
 type Cube struct {
 	glWrapper interfaces.OpenGL
@@ -113,11 +110,26 @@ void main() {
 		1.0, 1.0, 1.0, 0.0, 1.0,
 	}
 
-	cube.newProgram(vertexShader, fragmentShader)
+	var err error
+	cube.program, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)
+	if err != nil {
+		settings.LogError("Cube new program error : %v", err)
+	}
+
+	//cube.newProgram(vertexShader, fragmentShader)
 
 	gl.UseProgram(cube.program)
 
-	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 10.0)
+	sett := settings.GetSettings()
+	w, h := sett.AppWindow.SDLWindowWidth, sett.AppWindow.SDLWindowHeight
+
+	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(w/h), 0.1, 10.0)
+	// projection = [16]float32{
+	// 	2.0 / float32(w), 0.0, 0.0, 0.0,
+	// 	0.0, 2.0 / float32(-h), 0.0, 0.0,
+	// 	0.0, 0.0, -1.0, 0.0,
+	// 	-1.0, 1.0, 0.0, 1.0,
+	// }
 	projectionUniform := gl.GetUniformLocation(cube.program, "projection")
 	gl.UniformMatrix4fv(projectionUniform, false, &projection[0])
 
@@ -135,7 +147,6 @@ void main() {
 	gl.BindFragDataLocation(cube.program, 0, "outputColor")
 
 	// Load the texture
-	sett := settings.GetSettings()
 	cube.newTexture(sett.App.CurrentPath + "/../Resources/resources/textures/square.png")
 
 	// Configure the vertex data
@@ -166,6 +177,10 @@ void main() {
 // Render ...
 func (cube *Cube) Render() {
 	gl := cube.glWrapper
+
+	gl.Enable(constants.DEPTH_TEST)
+	gl.DepthFunc(constants.LESS)
+	gl.Clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT)
 
 	// Update
 	time := sdl.GetTicks()
