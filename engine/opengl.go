@@ -303,15 +303,14 @@ func (native *OpenGL) Uniform4fv(location int32, value *[4]float32) {
 	gl.Uniform4fv(location, 1, &value[0])
 }
 
-// UniformMatrix4fvImgui implements the interfaces.OpenGL interface.
-func (native *OpenGL) UniformMatrix4fvImgui(location int32, transpose bool, value *[16]float32) {
+// UniformMatrix4fv implements the interfaces.OpenGL interface.
+func (native *OpenGL) UniformMatrix4fv(location int32, transpose bool, value *[16]float32) {
 	count := int32(1)
 	gl.UniformMatrix4fv(location, count, transpose, &value[0])
 }
 
-// UniformMatrix4fv implements the interfaces.OpenGL interface.
-func (native *OpenGL) UniformMatrix4fv(location int32, transpose bool, value *float32) {
-	count := int32(1)
+// GLUniformMatrix4fv implements the interfaces.OpenGL interface.
+func (native *OpenGL) GLUniformMatrix4fv(location int32, count int32, transpose bool, value *float32) {
 	gl.UniformMatrix4fv(location, count, transpose, value)
 }
 
@@ -358,4 +357,72 @@ func (native *OpenGL) BindFragDataLocation(program uint32, color uint32, name st
 // DepthFunc specify the value used for depth buffer comparisons
 func (native *OpenGL) DepthFunc(xfunc uint32) {
 	gl.DepthFunc(xfunc)
+}
+
+// Str takes a null-terminated Go string and returns its GL-compatible address. This function reaches
+// into Go string storage in an unsafe way so the caller must ensure the string is not garbage collected.
+func (native *OpenGL) Str(str string) *uint8 {
+	return gl.Str(str)
+}
+
+// Strs takes a list of Go strings (with or without null-termination) and returns their C counterpart.
+func (native *OpenGL) Strs(strs ...string) (cstrs **uint8, free func()) {
+	return gl.Strs(strs[0])
+}
+
+// PtrOffset takes a pointer offset and returns a GL-compatible pointer. Useful for functions such as
+// glVertexAttribPointer that take pointer parameters indicating an offset rather than an absolute memory address.
+func (native *OpenGL) PtrOffset(offset int) unsafe.Pointer {
+	return gl.PtrOffset(offset)
+}
+
+// VertexAttribPointer define an array of generic vertex attribute data
+func (native *OpenGL) VertexAttribPointer(index uint32, size int32, xtype uint32, normalized bool, stride int32, pointer unsafe.Pointer) {
+	gl.VertexAttribPointer(index, size, xtype, normalized, stride, pointer)
+}
+
+// Ptr takes a slice or pointer (to a singular scalar value or the first element of an array or slice)
+// and returns its GL-compatible address.
+func (native *OpenGL) Ptr(data interface{}) unsafe.Pointer {
+	return gl.Ptr(data)
+}
+
+// GLGetUniformLocation Returns the location of a uniform variable
+func (native *OpenGL) GLGetUniformLocation(program uint32, name *uint8) int32 {
+	return gl.GetUniformLocation(program, name)
+}
+
+// GLGetAttribLocation Returns the location of an attribute variable
+func (native *OpenGL) GLGetAttribLocation(program uint32, name *uint8) int32 {
+	return gl.GetAttribLocation(program, name)
+}
+
+// GLBindFragDataLocation bind a user-defined varying out variable to a fragment shader color number
+func (native *OpenGL) GLBindFragDataLocation(program uint32, color uint32, name *uint8) {
+	gl.BindFragDataLocation(program, color, name)
+}
+
+// GLGetShaderiv Returns a parameter from a shader object
+func (native *OpenGL) GLGetShaderiv(shader uint32, pname uint32, params *int32) {
+	gl.GetShaderiv(shader, pname, params)
+}
+
+// GLShaderSource returns the source code string from a shader object
+func (native *OpenGL) GLShaderSource(shader uint32, count int32, xstring **uint8, length *int32) {
+	gl.ShaderSource(shader, count, xstring, length)
+}
+
+// GLGetShaderInfoLog Returns the information log for a shader object
+func (native *OpenGL) GLGetShaderInfoLog(shader uint32, bufSize int32, length *int32, infoLog *uint8) {
+	gl.GetShaderInfoLog(shader, bufSize, length, infoLog)
+}
+
+// GetProgramiv Returns a parameter from a program object
+func (native *OpenGL) GetProgramiv(program uint32, pname uint32, params *int32) {
+	gl.GetProgramiv(program, pname, params)
+}
+
+// GLGetProgramInfoLog Returns the information log for a program object
+func (native *OpenGL) GLGetProgramInfoLog(program uint32, bufSize int32, length *int32, infoLog *uint8) {
+	gl.GetProgramInfoLog(program, bufSize, length, infoLog)
 }

@@ -1,5 +1,7 @@
 package interfaces
 
+import "unsafe"
+
 // OpenGL ...
 type OpenGL interface {
 	ActiveTexture(texture uint32)
@@ -68,8 +70,8 @@ type OpenGL interface {
 
 	Uniform1i(location int32, value int32)
 	Uniform4fv(location int32, value *[4]float32)
-	UniformMatrix4fvImgui(location int32, transpose bool, value *[16]float32)
-	UniformMatrix4fv(location int32, transpose bool, value *float32)
+	UniformMatrix4fv(location int32, transpose bool, value *[16]float32)
+	GLUniformMatrix4fv(location int32, count int32, transpose bool, value *float32)
 	UseProgram(program uint32)
 
 	VertexAttribOffset(index uint32, size int32, attribType uint32, normalized bool, stride int32, offset int)
@@ -82,4 +84,18 @@ type OpenGL interface {
 
 	BindFragDataLocation(program uint32, color uint32, name string)
 	DepthFunc(xfunc uint32)
+
+	Str(str string) *uint8
+	Strs(strs ...string) (cstrs **uint8, free func())
+	Ptr(data interface{}) unsafe.Pointer
+	PtrOffset(offset int) unsafe.Pointer
+	VertexAttribPointer(index uint32, size int32, xtype uint32, normalized bool, stride int32, pointer unsafe.Pointer)
+	GLGetUniformLocation(program uint32, name *uint8) int32
+	GLGetAttribLocation(program uint32, name *uint8) int32
+	GLBindFragDataLocation(program uint32, color uint32, name *uint8)
+	GLGetShaderiv(shader uint32, pname uint32, params *int32)
+	GLShaderSource(shader uint32, count int32, xstring **uint8, length *int32)
+	GLGetShaderInfoLog(shader uint32, bufSize int32, length *int32, infoLog *uint8)
+	GetProgramiv(program uint32, pname uint32, params *int32)
+	GLGetProgramInfoLog(program uint32, bufSize int32, length *int32, infoLog *uint8)
 }

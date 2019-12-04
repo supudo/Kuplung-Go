@@ -30,8 +30,11 @@ const (
 // Status Values
 // nolint: golint,megacheck
 const (
-	COMPILE_STATUS uint32 = 0x8B81
-	LINK_STATUS           = 0x8B82
+	COMPILE_STATUS  uint32 = 0x8B81
+	LINK_STATUS            = 0x8B82
+	INFO_LOG_LENGTH        = 0x8B84
+	TRUE                   = 1
+	FALSE                  = 0
 )
 
 // Buffer Types

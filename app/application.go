@@ -74,10 +74,10 @@ func (kapp *KuplungApp) render() {
 }
 
 func (kapp *KuplungApp) initOpenGL() {
+	sett := settings.GetSettings()
 	kapp.gl.Enable(constants.DEPTH_TEST)
 	kapp.gl.Enable(constants.BLEND)
 	kapp.gl.BlendFunc(constants.SRC_ALPHA, constants.ONE_MINUS_SRC_ALPHA)
-	sett := settings.GetSettings()
 	kapp.gl.ClearColor(sett.AppGui.GUIClearColor[0], sett.AppGui.GUIClearColor[1], sett.AppGui.GUIClearColor[2], sett.AppGui.GUIClearColor[3])
 }
 
