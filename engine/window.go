@@ -46,7 +46,7 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 	_ = sdl.SetHint(sdl.HINT_VIDEO_HIGHDPI_DISABLED, "0")
 
 	var sett = settings.GetSettings()
-	wWidth, wHeight := sett.AppWindow.SDLWindowWidth, sett.AppWindow.SDLWindowHeight
+	wWidth, wHeight := int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight)
 	win, err := sdl.CreateWindow(title, sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, wWidth, wHeight, sdl.WINDOW_OPENGL|sdl.WINDOW_SHOWN|sdl.WINDOW_ALLOW_HIGHDPI|sdl.WINDOW_RESIZABLE)
 	if err != nil {
 		sdl.Quit()
@@ -133,8 +133,8 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 		switch ev.Event {
 		case sdl.WINDOWEVENT_RESIZED:
 			width, height := ev.Data1, ev.Data2
-			sett.AppWindow.SDLWindowWidth = width
-			sett.AppWindow.SDLWindowHeight = height
+			sett.AppWindow.SDLWindowWidth = float32(width)
+			sett.AppWindow.SDLWindowHeight = float32(height)
 			io.SetDisplaySize(imgui.Vec2{X: float32(width), Y: float32(height)})
 			window.CallResize(int(width), int(height))
 		case sdl.WINDOWEVENT_CLOSE:
@@ -286,7 +286,7 @@ func (window *KuplungWindow) SetFullScreen(on bool) {
 		_ = window.sdlWindow.SetFullscreen(sdl.WINDOW_FULLSCREEN)
 	} else {
 		var sett = settings.GetSettings()
-		window.sdlWindow.SetSize(sett.AppWindow.SDLWindowWidth, sett.AppWindow.SDLWindowHeight)
+		window.sdlWindow.SetSize(int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight))
 	}
 }
 

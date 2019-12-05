@@ -33,6 +33,11 @@ func (context *Context) DrawMainMenu() {
 		if imgui.MenuItem("Controls") {
 			context.GuiVars.showControls = !context.GuiVars.showControls
 		}
+		imgui.Separator()
+		if imgui.MenuItem("Log") {
+			context.GuiVars.showLog = !context.GuiVars.showLog
+		}
+		imgui.Separator()
 		if imgui.MenuItem("Cube") {
 			context.GuiVars.GlobalVars.ShowCube = !context.GuiVars.GlobalVars.ShowCube
 		}

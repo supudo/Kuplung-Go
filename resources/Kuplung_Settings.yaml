@@ -9,6 +9,8 @@ App:
 AppWindow:
   SDL_Window_Width: 1200
   SDL_Window_Height: 800
+  LogWidth: 400
+  LogHeight: 300
 
 Rendering:
   FramesPerSecond: 30.0

@@ -7,6 +7,7 @@ import (
 	"github.com/inkyblackness/imgui-go"
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
+	"github.com/supudo/Kuplung-Go/gui/components"
 	"github.com/supudo/Kuplung-Go/gui/dialogs"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
@@ -49,12 +50,16 @@ type Context struct {
 
 	viewControls *dialogs.ViewControls
 	viewModels   *dialogs.ViewModels
+
+	componentLog *components.ComponentLog
 }
 
 // WindowVariables holds boolean variables for all the windows
 type WindowVariables struct {
 	showModels   bool
 	showControls bool
+
+	showLog bool
 
 	showDemoWindow   bool
 	showAboutImGui   bool
@@ -73,15 +78,21 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 
 		viewControls: dialogs.NewViewControls(),
 		viewModels:   dialogs.NewViewModels(),
+
+		componentLog: components.NewComponentLog(),
 	}
 
 	context.GuiVars.showModels = true
 	context.GuiVars.showControls = true
+
+	context.GuiVars.showLog = false
+
 	context.GuiVars.showDemoWindow = false
 	context.GuiVars.showAboutImGui = false
 	context.GuiVars.showAboutKuplung = false
 	context.GuiVars.showMetrics = false
-	context.GuiVars.GlobalVars.ShowCube = true
+
+	context.GuiVars.GlobalVars.ShowCube = false
 
 	err := context.createDeviceObjects(param)
 	if err != nil {
@@ -163,8 +174,13 @@ func (context *Context) DrawGUI() {
 	if context.GuiVars.showControls {
 		context.viewControls.Render(&context.GuiVars.showControls)
 	}
+
 	if context.GuiVars.showModels {
 		context.viewModels.Render(&context.GuiVars.showModels)
+	}
+
+	if context.GuiVars.showLog {
+		context.componentLog.Render(&context.GuiVars.showLog)
 	}
 
 	if context.GuiVars.showAboutImGui {

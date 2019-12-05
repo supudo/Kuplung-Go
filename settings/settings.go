@@ -16,8 +16,10 @@ type ApplicationSettings struct {
 		CurrentPath        string `yaml:"currentFolder"`
 	} `yaml:"App"`
 	AppWindow struct {
-		SDLWindowWidth  int32 `yaml:"SDL_Window_Width"`
-		SDLWindowHeight int32 `yaml:"SDL_Window_Height"`
+		SDLWindowWidth  float32 `yaml:"SDL_Window_Width"`
+		SDLWindowHeight float32 `yaml:"SDL_Window_Height"`
+		LogWidth        float32 `yaml:"Log_Width"`
+		LogHeight       float32 `yaml:"Log_Height"`
 	} `yaml:"AppWindow"`
 	Rendering struct {
 		FramesPerSecond float64 `yaml:"FramesPerSecond"`
