@@ -3,6 +3,7 @@ package rendering
 import (
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/objects"
+	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
 )
 
@@ -19,10 +20,11 @@ type RenderManager struct {
 func NewRenderManager(window interfaces.Window) *RenderManager {
 	rm := &RenderManager{}
 	rm.window = window
+	sett := settings.GetSettings()
 
 	rm.Settings.GLSLVersion = "#version 410"
 
-	rm.Settings.Fov = 45.0
+	rm.Settings.Fov = sett.MemSettings.ZoomFactor
 	rm.Settings.RatioWidth = 4.0
 	rm.Settings.RatioHeight = 3.0
 	rm.Settings.PlaneClose = 1.0
@@ -35,8 +37,10 @@ func NewRenderManager(window interfaces.Window) *RenderManager {
 
 // Render handles rendering of all scene objects
 func (rm *RenderManager) Render(gvars types.ObjectVariables) {
+	sett := settings.GetSettings()
+	rm.Settings.Fov = sett.MemSettings.ZoomFactor
 	if gvars.ShowCube {
-		rm.cube.Render()
+		rm.cube.Render(rm.Settings)
 	}
 }
 

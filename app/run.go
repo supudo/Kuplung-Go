@@ -9,7 +9,7 @@ import (
 )
 
 // Run ...
-func Run(initializer func(interfaces.Window), title string, framesPerSecond float64, deferrer <-chan func()) (err error) {
+func Run(initializer func(interfaces.Window), title string, deferrer <-chan func()) (err error) {
 	runtime.LockOSThread()
 
 	var window *engine.KuplungWindow

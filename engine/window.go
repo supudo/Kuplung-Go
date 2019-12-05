@@ -112,10 +112,10 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 		}
 		if ev.Y > 0 {
 			deltaY++
-			settings.LogWarn("zoom in ...")
+			sett.MemSettings.ZoomFactor -= 4.0
 		} else if ev.Y < 0 {
 			deltaY--
-			settings.LogWarn("zoom out ...")
+			sett.MemSettings.ZoomFactor += 4.0
 		}
 		io.AddMouseWheelDelta(deltaX, deltaY)
 	case *sdl.TextInputEvent:
@@ -144,64 +144,65 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 	}
 }
 
-func (window *KuplungWindow) processEvent2(event sdl.Event) {
-	var sett = settings.GetSettings()
+// func (window *KuplungWindow) processEvent2(event sdl.Event) {
+// 	var sett = settings.GetSettings()
 
-	if sett.MemSettings.QuitApplication {
-		return
-	}
+// 	if sett.MemSettings.QuitApplication {
+// 		return
+// 	}
 
-	io := imgui.CurrentIO()
+// 	io := imgui.CurrentIO()
 
-	x, y, state := sdl.GetMouseState()
-	io.SetMousePosition(imgui.Vec2{X: float32(x), Y: float32(y)})
-	for i, button := range []uint32{sdl.BUTTON_LEFT, sdl.BUTTON_RIGHT, sdl.BUTTON_MIDDLE} {
-		io.SetMouseButtonDown(i, window.buttonsDown[i] || (state&sdl.Button(button)) != 0)
-		window.buttonsDown[i] = false
-		window.CallOnMouseButtonDown(uint32(i), input.ModNone)
-	}
+// 	x, y, state := sdl.GetMouseState()
+// 	io.SetMousePosition(imgui.Vec2{X: float32(x), Y: float32(y)})
+// 	for i, button := range []uint32{sdl.BUTTON_LEFT, sdl.BUTTON_RIGHT, sdl.BUTTON_MIDDLE} {
+// 		io.SetMouseButtonDown(i, window.buttonsDown[i] || (state&sdl.Button(button)) != 0)
+// 		window.buttonsDown[i] = false
+// 		window.CallOnMouseButtonDown(uint32(i), input.ModNone)
+// 	}
 
-	switch event.GetType() {
-	case sdl.QUIT:
-		sett.MemSettings.QuitApplication = true
-		window.CallClosed()
-	case sdl.MOUSEWHEEL:
-		wheelEvent := event.(*sdl.MouseWheelEvent)
-		var deltaX, deltaY float32
-		if wheelEvent.X > 0 {
-			deltaX++
-		} else if wheelEvent.X < 0 {
-			deltaX--
-		}
-		if wheelEvent.Y > 0 {
-			deltaY++
-		} else if wheelEvent.Y < 0 {
-			deltaY--
-		}
-		io.AddMouseWheelDelta(deltaX, deltaY)
-	case sdl.TEXTINPUT:
-		inputEvent := event.(*sdl.TextInputEvent)
-		io.AddInputCharacters(string(inputEvent.Text[:]))
-	case sdl.KEYDOWN:
-		keyEvent := event.(*sdl.KeyboardEvent)
-		io.KeyPress(int(keyEvent.Keysym.Scancode))
-		window.updateKeyModifier()
-	case sdl.KEYUP:
-		keyEvent := event.(*sdl.KeyboardEvent)
-		io.KeyRelease(int(keyEvent.Keysym.Scancode))
-		window.updateKeyModifier()
-	case sdl.WINDOWEVENT_RESIZED:
-		windowEvent := event.(*sdl.WindowEvent)
-		width, height := windowEvent.Data1, windowEvent.Data2
-		sett.AppWindow.SDLWindowWidth = width
-		sett.AppWindow.SDLWindowHeight = height
-		io.SetDisplaySize(imgui.Vec2{X: float32(width), Y: float32(height)})
-		window.CallResize(int(width), int(height))
-	case sdl.WINDOWEVENT_CLOSE:
-		sett.MemSettings.QuitApplication = true
-		window.CallClosed()
-	}
-}
+// 	switch event.GetType() {
+// 	case sdl.QUIT:
+// 		sett.MemSettings.QuitApplication = true
+// 		window.CallClosed()
+// 	case sdl.MOUSEWHEEL:
+// 		wheelEvent := event.(*sdl.MouseWheelEvent)
+// 		var deltaX, deltaY float32
+// 		if wheelEvent.X > 0 {
+// 			deltaX++
+// 		} else if wheelEvent.X < 0 {
+// 			deltaX--
+// 		}
+// 		if wheelEvent.Y > 0 {
+// 			deltaY++
+// 		} else if wheelEvent.Y < 0 {
+// 			deltaY--
+// 			sett.MemSettings.ZoomFactor += 4.0
+// 		}
+// 		io.AddMouseWheelDelta(deltaX, deltaY)
+// 	case sdl.TEXTINPUT:
+// 		inputEvent := event.(*sdl.TextInputEvent)
+// 		io.AddInputCharacters(string(inputEvent.Text[:]))
+// 	case sdl.KEYDOWN:
+// 		keyEvent := event.(*sdl.KeyboardEvent)
+// 		io.KeyPress(int(keyEvent.Keysym.Scancode))
+// 		window.updateKeyModifier()
+// 	case sdl.KEYUP:
+// 		keyEvent := event.(*sdl.KeyboardEvent)
+// 		io.KeyRelease(int(keyEvent.Keysym.Scancode))
+// 		window.updateKeyModifier()
+// 	case sdl.WINDOWEVENT_RESIZED:
+// 		windowEvent := event.(*sdl.WindowEvent)
+// 		width, height := windowEvent.Data1, windowEvent.Data2
+// 		sett.AppWindow.SDLWindowWidth = width
+// 		sett.AppWindow.SDLWindowHeight = height
+// 		io.SetDisplaySize(imgui.Vec2{X: float32(width), Y: float32(height)})
+// 		window.CallResize(int(width), int(height))
+// 	case sdl.WINDOWEVENT_CLOSE:
+// 		sett.MemSettings.QuitApplication = true
+// 		window.CallClosed()
+// 	}
+// }
 
 func (window *KuplungWindow) updateKeyModifier() {
 	modState := sdl.GetModState()

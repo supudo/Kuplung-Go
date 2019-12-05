@@ -30,7 +30,7 @@ func main() {
 	}
 	defer profileFin()
 
-	app.Run(kapp.InitializeKuplungWindow, versionInfo, 30.0, deferrer)
+	app.Run(kapp.InitializeKuplungWindow, versionInfo, deferrer)
 }
 
 func initProfiling(mbv string) (func(), error) {

@@ -27,6 +27,7 @@ type ApplicationSettings struct {
 	} `yaml:"AppGui"`
 	MemSettings struct {
 		QuitApplication bool
+		ZoomFactor      float32
 	}
 }
 
@@ -63,6 +64,7 @@ func InitSettings() ApplicationSettings {
 
 	appSettings.App.CurrentPath = dir
 	appSettings.MemSettings.QuitApplication = false
+	appSettings.MemSettings.ZoomFactor = 45.0
 
 	if appSettings.Rendering.FramesPerSecond == 0.0 {
 		appSettings.Rendering.FramesPerSecond = 30.0

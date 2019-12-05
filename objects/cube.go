@@ -20,16 +20,20 @@ type Cube struct {
 	window interfaces.Window
 
 	angle        float32
-	previousTime uint32
+	previousTime float32
 	program      uint32
 	texture      uint32
 
 	modelUniform int32
 	model        mgl32.Mat4
 
+	projectionUniform int32
+
 	vao uint32
 
 	version string
+
+	fov float32
 }
 
 // CubeInit ...
@@ -113,71 +117,84 @@ void main() {
 		1.0, 1.0, 1.0, 0.0, 1.0,
 	}
 
+	cube.fov = renderSettings.Fov
+
 	gl := window.OpenGL()
 
 	// Configure the vertex and fragment shaders
-	program := cube.newProgram(vertexShader, fragmentShader)
+	cube.program = cube.newProgram(vertexShader, fragmentShader)
 
-	gl.UseProgram(program)
+	gl.UseProgram(cube.program)
 
-	projection := mgl32.Perspective(mgl32.DegToRad(renderSettings.Fov), renderSettings.RatioWidth/renderSettings.RatioHeight, renderSettings.PlaneClose, renderSettings.PlaneFar)
-	projectionUniform := gl.GLGetUniformLocation(program, gl.Str("projection\x00"))
-	gl.GLUniformMatrix4fv(projectionUniform, 1, false, &projection[0])
+	projection := mgl32.Perspective(mgl32.DegToRad(cube.fov), renderSettings.RatioWidth/renderSettings.RatioHeight, renderSettings.PlaneClose, renderSettings.PlaneFar)
+	cube.projectionUniform = gl.GLGetUniformLocation(cube.program, gl.Str("projection\x00"))
+	gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
 
 	camera := mgl32.LookAtV(mgl32.Vec3{3, 3, 3}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
-	cameraUniform := gl.GLGetUniformLocation(program, gl.Str("camera\x00"))
+	cameraUniform := gl.GLGetUniformLocation(cube.program, gl.Str("camera\x00"))
 	gl.GLUniformMatrix4fv(cameraUniform, 1, false, &camera[0])
 
 	model := mgl32.Ident4()
-	modelUniform := gl.GLGetUniformLocation(program, gl.Str("model\x00"))
-	gl.GLUniformMatrix4fv(modelUniform, 1, false, &model[0])
+	cube.modelUniform = gl.GLGetUniformLocation(cube.program, gl.Str("model\x00"))
+	gl.GLUniformMatrix4fv(cube.modelUniform, 1, false, &model[0])
 
-	textureUniform := gl.GLGetUniformLocation(program, gl.Str("tex\x00"))
+	textureUniform := gl.GLGetUniformLocation(cube.program, gl.Str("tex\x00"))
 	gl.Uniform1i(textureUniform, 0)
 
-	gl.GLBindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
+	gl.GLBindFragDataLocation(cube.program, 0, gl.Str("outputColor\x00"))
 
 	// Load the texture
 	cube.texture = cube.newTexture(sett.App.CurrentPath + "/../Resources/resources/textures/square.png")
 
 	// Configure the vertex data
-	vao := gl.GenVertexArrays(1)[0]
+	cube.vao = gl.GenVertexArrays(1)[0]
 
-	gl.BindVertexArray(vao)
+	gl.BindVertexArray(cube.vao)
 
 	vbo := gl.GenBuffers(1)[0]
 	gl.BindBuffer(oglconsts.ARRAY_BUFFER, vbo)
 	gl.BufferData(oglconsts.ARRAY_BUFFER, len(cubeVertices)*4, gl.Ptr(cubeVertices), oglconsts.STATIC_DRAW)
 
-	vertAttrib := uint32(gl.GLGetAttribLocation(program, gl.Str("vert\x00")))
+	vertAttrib := uint32(gl.GLGetAttribLocation(cube.program, gl.Str("vert\x00")))
 	gl.EnableVertexAttribArray(vertAttrib)
 	gl.VertexAttribPointer(vertAttrib, 3, oglconsts.FLOAT, false, 5*4, gl.PtrOffset(0))
 
-	texCoordAttrib := uint32(gl.GLGetAttribLocation(program, gl.Str("vertTexCoord\x00")))
+	texCoordAttrib := uint32(gl.GLGetAttribLocation(cube.program, gl.Str("vertTexCoord\x00")))
 	gl.EnableVertexAttribArray(texCoordAttrib)
 	gl.VertexAttribPointer(texCoordAttrib, 2, oglconsts.FLOAT, false, 5*4, gl.PtrOffset(3*4))
 
 	cube.angle = 0.0
-	cube.previousTime = sdl.GetTicks()
+	cube.previousTime = float32(sdl.GetTicks())
 
 	return cube
 }
 
 // Render ...
-func (cube *Cube) Render() {
+func (cube *Cube) Render(renderSettings types.RenderSettings) {
 	gl := cube.window.OpenGL()
 
 	gl.Enable(oglconsts.DEPTH_TEST)
 	gl.DepthFunc(oglconsts.LESS)
-	gl.Clear(oglconsts.COLOR_BUFFER_BIT | oglconsts.DEPTH_BUFFER_BIT)
+	gl.Disable(oglconsts.BLEND)
+	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
+	gl.PolygonMode(oglconsts.FRONT_AND_BACK, oglconsts.FILL)
 
 	// Update
-	time := sdl.GetTicks()
-	elapsed := time - cube.previousTime
-	cube.previousTime = time
+	sdlTime := float32(sdl.GetTicks())
+	elapsed := (sdlTime - cube.previousTime) / 1000
+	cube.previousTime = sdlTime
 
 	cube.angle += float32(elapsed)
 	cube.model = mgl32.HomogRotate3D(float32(cube.angle), mgl32.Vec3{0, 1, 0})
+
+	if cube.fov != renderSettings.Fov {
+		projection := mgl32.Perspective(mgl32.DegToRad(renderSettings.Fov), renderSettings.RatioWidth/renderSettings.RatioHeight, renderSettings.PlaneClose, renderSettings.PlaneFar)
+		gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
+		cube.fov = renderSettings.Fov
+	}
+
+	w, h := cube.window.Size()
+	gl.Viewport(0, 0, int32(w), int32(h))
 
 	// Render
 	gl.UseProgram(cube.program)
