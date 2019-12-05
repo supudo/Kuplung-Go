@@ -11,6 +11,7 @@ func (context *Context) DrawMainMenu() {
 	// Main Menu
 	imgui.BeginMainMenuBar()
 
+	//ICON_FA_FILE_O := "\xf016"
 	if imgui.BeginMenu("File") {
 		if imgui.MenuItem("New") {
 		}

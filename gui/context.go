@@ -286,6 +286,15 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextPa
 	io.Fonts().SetTextureID(TextureIDForSimpleTexture(context.fontTexture))
 
 	gl.BindTexture(oglconsts.TEXTURE_2D, 0)
+
+	// sett := settings.GetSettings()
+	// fileFA := sett.App.CurrentPath + "/../Resources/resources/fonts/fontawesome-webfont.ttf"
+	// var builder imgui.GlyphRangesBuilder
+	// builder.AddExisting(fontAtlas.GlyphRangesDefault())
+	// builder.Add(5871, 5873)
+	// faRanges := builder.Build()
+	// fontAtlas.AddFontFromFileTTFV(fileFA, 14, imgui.DefaultFontConfig, faRanges.GlyphRanges)
+
 	return nil
 }
 
