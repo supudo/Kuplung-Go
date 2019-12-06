@@ -85,7 +85,7 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 	context.GuiVars.showModels = true
 	context.GuiVars.showControls = true
 
-	context.GuiVars.showLog = false
+	context.GuiVars.showLog = true
 
 	context.GuiVars.showDemoWindow = false
 	context.GuiVars.showAboutImGui = false

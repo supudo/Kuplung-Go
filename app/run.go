@@ -6,6 +6,7 @@ import (
 
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/interfaces"
+	"github.com/supudo/Kuplung-Go/settings"
 )
 
 // Run ...
@@ -17,6 +18,7 @@ func Run(initializer func(interfaces.Window), title string, deferrer <-chan func
 	defer window.Close()
 
 	initializer(window)
+	sett := settings.GetSettings()
 
 	stopLoop := false
 	for !window.ShouldClose() && !stopLoop {
@@ -29,7 +31,9 @@ func Run(initializer func(interfaces.Window), title string, deferrer <-chan func
 			}
 		case <-time.After(time.Millisecond):
 		}
-		window.Update()
+		if !sett.MemSettings.QuitApplication {
+			window.Update()
+		}
 	}
 
 	return

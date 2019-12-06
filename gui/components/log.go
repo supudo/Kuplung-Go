@@ -12,9 +12,10 @@ type ComponentLog struct {
 
 // NewComponentLog ...
 func NewComponentLog() *ComponentLog {
-	return &ComponentLog{
+	component := &ComponentLog{
 		fullLog: "",
 	}
+	return component
 }
 
 // Render ...
@@ -46,7 +47,7 @@ func (view *ComponentLog) Render(open *bool) {
 	}
 }
 
-// AddToLog will add the message to the log
+// AddToLog ...
 func (view *ComponentLog) AddToLog(message string) {
 	view.fullLog += "\n" + message
 }
