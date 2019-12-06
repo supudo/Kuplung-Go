@@ -29,9 +29,10 @@ type ApplicationSettings struct {
 	} `yaml:"AppGui"`
 	MemSettings struct {
 		QuitApplication bool
-		ZoomFactor      float32
 		LogBuffer       string
 		LogBufferLimit  int
+
+		ZoomFactor float32
 	}
 }
 

@@ -33,6 +33,7 @@ type Context struct {
 	window       interfaces.Window
 
 	lastRenderTime time.Time
+	isFrame        bool
 
 	fontTexture            uint32
 	shaderHandle           uint32
@@ -75,6 +76,8 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 	context := &Context{
 		imguiContext: imgui.CreateContext(nil),
 		window:       window,
+
+		isFrame: false,
 
 		viewControls: dialogs.NewViewControls(),
 		viewModels:   dialogs.NewViewModels(),
@@ -172,7 +175,7 @@ func (context *Context) DrawGUI() {
 	context.DrawMainMenu()
 
 	if context.GuiVars.showControls {
-		context.viewControls.Render(&context.GuiVars.showControls)
+		context.viewControls.Render(&context.GuiVars.showControls, &context.isFrame)
 	}
 
 	if context.GuiVars.showModels {

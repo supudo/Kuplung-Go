@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/sadlil/go-trigger"
 )
@@ -28,6 +29,6 @@ func LogWarn(format string, args ...interface{}) {
 // LogInfo logs a info message
 func LogInfo(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	fmt.Println("[Kuplung] " + msg)
+	fmt.Println("[Kuplung] [" + time.Now().String() + "] " + msg)
 	_, _ = trigger.Fire("log", msg)
 }
