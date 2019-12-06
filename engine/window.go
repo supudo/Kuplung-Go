@@ -30,6 +30,7 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		settings.LogError("[initSDL] Failed to create window: %v", err)
 	}
+	settings.LogInfo("[Window] SDL Initialized.")
 
 	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, 4)
 	_ = sdl.GLSetAttribute(sdl.GL_CONTEXT_MINOR_VERSION, 1)
@@ -52,11 +53,13 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 		sdl.Quit()
 		settings.LogError("[initSDL] Failed to create window: %v", err)
 	}
+	settings.LogInfo("[Window] SDL Window created.")
 
 	glContext, err := win.GLCreateContext()
 	if err != nil {
 		settings.LogError("[initSDL] Failed to create OpenGL context: %v", err)
 	}
+	settings.LogInfo("[Window] OpenGL contenxt created.")
 
 	err = win.GLMakeCurrent(glContext)
 	if err != nil {
@@ -80,6 +83,8 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 	}
 
 	window.OnClosed(window.onClosed)
+
+	settings.LogInfo("[Window] Window initialized.")
 
 	return
 }
@@ -284,9 +289,11 @@ func (window *KuplungWindow) Size() (width int, height int) {
 func (window *KuplungWindow) SetFullScreen(on bool) {
 	if on {
 		_ = window.sdlWindow.SetFullscreen(sdl.WINDOW_FULLSCREEN)
+		settings.LogInfo("[Window] Fullscreen entered.")
 	} else {
 		var sett = settings.GetSettings()
 		window.sdlWindow.SetSize(int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight))
+		settings.LogInfo("[Window] Window initialized.")
 	}
 }
 

@@ -53,6 +53,7 @@ func (kapp *KuplungApp) initWindowCallbacks() {
 
 	kapp.window.OnKey(kapp.onKey)
 	kapp.window.OnModifier(kapp.onModifier)
+	settings.LogInfo("[Application] Callbacks initialized.")
 }
 
 func (kapp *KuplungApp) render() {
@@ -84,6 +85,7 @@ func (kapp *KuplungApp) initGui() {
 	}
 	kapp.guiContext = gui.NewContext(kapp.window, param)
 	kapp.initGuiStyle()
+	settings.LogInfo("[Application] GUI initialized.")
 }
 
 func (kapp *KuplungApp) initGuiSizes() {
@@ -105,6 +107,7 @@ func (kapp *KuplungApp) initGuiStyle() {
 
 func (kapp *KuplungApp) initRenderingManager() {
 	kapp.renderManager = rendering.NewRenderManager(kapp.window)
+	settings.LogInfo("[Application] Rendering Manager initialized.")
 }
 
 func (kapp *KuplungApp) onWindowClosed() {

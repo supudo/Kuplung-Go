@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/sadlil/go-trigger"
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
@@ -12,6 +13,8 @@ import (
 // Run ...
 func Run(initializer func(interfaces.Window), title string, deferrer <-chan func()) (err error) {
 	runtime.LockOSThread()
+
+	trigger.On("log", addToLog)
 
 	var window *engine.KuplungWindow
 	window = engine.NewKuplungWindow(title)
@@ -37,4 +40,12 @@ func Run(initializer func(interfaces.Window), title string, deferrer <-chan func
 	}
 
 	return
+}
+
+func addToLog(msg string) {
+	sett := settings.GetSettings()
+	if len(sett.MemSettings.LogBuffer) > sett.MemSettings.LogBufferLimit {
+		sett.MemSettings.LogBuffer = ""
+	}
+	sett.MemSettings.LogBuffer += "\n" + msg
 }

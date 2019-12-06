@@ -30,6 +30,8 @@ type ApplicationSettings struct {
 	MemSettings struct {
 		QuitApplication bool
 		ZoomFactor      float32
+		LogBuffer       string
+		LogBufferLimit  int
 	}
 }
 
@@ -67,6 +69,8 @@ func InitSettings() ApplicationSettings {
 	appSettings.App.CurrentPath = dir
 	appSettings.MemSettings.QuitApplication = false
 	appSettings.MemSettings.ZoomFactor = 45.0
+	appSettings.MemSettings.LogBuffer = ""
+	appSettings.MemSettings.LogBufferLimit = 15360
 
 	if appSettings.Rendering.FramesPerSecond == 0.0 {
 		appSettings.Rendering.FramesPerSecond = 30.0

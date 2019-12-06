@@ -11,6 +11,8 @@ github.com/inkyblackness/imgui-go v1.10.0 h1:DEgLKIhFQga7ElKmwfHucphTPq8QcOOEeiW
 github.com/inkyblackness/imgui-go v1.10.0/go.mod h1:Mki1fp0SBQ0dq2wkAPKjI3Zod0fgpEFsPM9cGUoCNi8=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/sadlil/go-trigger v0.0.0-20170328161825-cfc3d83007cd h1:RKo57AqwbojWklkoMUpQL/Q6b8LGxW6zWmMjem6gHiw=
+github.com/sadlil/go-trigger v0.0.0-20170328161825-cfc3d83007cd/go.mod h1:8hxS6rA07bxyo5pU9aq+7AoxtYwnaytmIeHCS76Ta7Y=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0Q=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=

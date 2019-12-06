@@ -7,15 +7,11 @@ import (
 
 // ComponentLog ...
 type ComponentLog struct {
-	fullLog string
 }
 
 // NewComponentLog ...
 func NewComponentLog() *ComponentLog {
-	component := &ComponentLog{
-		fullLog: "",
-	}
-	return component
+	return &ComponentLog{}
 }
 
 // Render ...
@@ -39,7 +35,7 @@ func (view *ComponentLog) Render(open *bool) {
 		if doCopy {
 			// TODO: copy to clipboard
 		}
-		imgui.Text(view.fullLog)
+		imgui.Text(sett.MemSettings.LogBuffer)
 		imgui.SetScrollHereY(1.0)
 		imgui.PopStyleVar()
 		imgui.EndChild()
@@ -47,11 +43,7 @@ func (view *ComponentLog) Render(open *bool) {
 	}
 }
 
-// AddToLog ...
-func (view *ComponentLog) AddToLog(message string) {
-	view.fullLog += "\n" + message
-}
-
 func (view *ComponentLog) clear() {
-	view.fullLog = ""
+	sett := settings.GetSettings()
+	sett.MemSettings.LogBuffer = ""
 }
