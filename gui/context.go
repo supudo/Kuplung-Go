@@ -9,6 +9,7 @@ import (
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/gui/components"
 	"github.com/supudo/Kuplung-Go/gui/dialogs"
+	"github.com/supudo/Kuplung-Go/gui/fonts"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
@@ -53,6 +54,9 @@ type Context struct {
 	viewModels   *dialogs.ViewModels
 
 	componentLog *components.ComponentLog
+
+	fontFA imgui.Font
+	fontMD imgui.Font
 }
 
 // WindowVariables holds boolean variables for all the windows
@@ -282,6 +286,7 @@ void main()
 func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextParameters) error {
 	io := imgui.CurrentIO()
 	fontAtlas := io.Fonts()
+	_ = fontAtlas.AddFontDefault()
 	if len(param.FontFile) > 0 {
 		fontSize := float32(16.0)
 		if param.FontSize > 0.0 {
@@ -292,6 +297,32 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextPa
 			return fmt.Errorf("could not load font <%s>", param.FontFile)
 		}
 	}
+
+	sett := settings.GetSettings()
+	fileFA := sett.App.CurrentPath + "/../Resources/resources/fonts/fontawesome-webfont.ttf"
+	fontConfigFA := imgui.NewFontConfig()
+	fontConfigFA.SetGlyphMaxAdvanceX(float32(fonts.FA_ICON_MIN))
+	fontConfigFA.SetGlyphMinAdvanceX(float32(fonts.FA_ICON_MAX))
+	fontConfigFA.SetMergeMode(true)
+	fontConfigFA.SetPixelSnapH(true)
+	var builderFA imgui.GlyphRangesBuilder
+	builderFA.Add(rune(fonts.FA_ICON_MIN), rune(fonts.FA_ICON_MAX))
+	rangesFA := builderFA.Build()
+	context.fontFA = fontAtlas.AddFontFromFileTTFV(fileFA, 14, fontConfigFA, rangesFA.GlyphRanges)
+	fontConfigFA.Delete()
+
+	fileMD := sett.App.CurrentPath + "/../Resources/resources/fonts/material-icons-regular.ttf"
+	fontConfigMD := imgui.NewFontConfig()
+	fontConfigMD.SetGlyphMaxAdvanceX(float32(fonts.MD_ICON_MIN))
+	fontConfigMD.SetGlyphMinAdvanceX(float32(fonts.MD_ICON_MAX))
+	fontConfigMD.SetMergeMode(true)
+	fontConfigMD.SetPixelSnapH(true)
+	var builderMD imgui.GlyphRangesBuilder
+	builderMD.Add(rune(fonts.MD_ICON_MIN), rune(fonts.MD_ICON_MAX))
+	rangesMD := builderMD.Build()
+	context.fontMD = fontAtlas.AddFontFromFileTTFV(fileMD, 14, fontConfigMD, rangesMD.GlyphRanges)
+	fontConfigMD.Delete()
+
 	image := fontAtlas.TextureDataAlpha8()
 
 	context.fontTexture = gl.GenTextures(1)[0]
@@ -305,14 +336,6 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextPa
 	io.Fonts().SetTextureID(TextureIDForSimpleTexture(context.fontTexture))
 
 	gl.BindTexture(oglconsts.TEXTURE_2D, 0)
-
-	// sett := settings.GetSettings()
-	// fileFA := sett.App.CurrentPath + "/../Resources/resources/fonts/fontawesome-webfont.ttf"
-	// var builder imgui.GlyphRangesBuilder
-	// builder.AddExisting(fontAtlas.GlyphRangesDefault())
-	// builder.Add(5871, 5873)
-	// faRanges := builder.Build()
-	// fontAtlas.AddFontFromFileTTFV(fileFA, 14, imgui.DefaultFontConfig, faRanges.GlyphRanges)
 
 	return nil
 }

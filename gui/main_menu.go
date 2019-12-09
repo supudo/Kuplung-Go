@@ -1,9 +1,12 @@
 package gui
 
 import (
+	"fmt"
 	"os"
+	"unicode"
 
 	"github.com/inkyblackness/imgui-go"
+	"github.com/supudo/Kuplung-Go/gui/fonts"
 )
 
 // DrawMainMenu ...
@@ -11,9 +14,12 @@ func (context *Context) DrawMainMenu() {
 	// Main Menu
 	imgui.BeginMainMenuBar()
 
-	//ICON_FA_FILE_O := "\xf016"
 	if imgui.BeginMenu("File") {
-		if imgui.MenuItem("New") {
+		// TODO: add FA icons
+		lbl := ""
+		lbl += fmt.Sprintf("%#U", unicode.ToLower(fonts.FA_ICON_FILE_O)) + " "
+		lbl += "New"
+		if imgui.MenuItem(lbl) {
 		}
 		imgui.Separator()
 		if imgui.MenuItemV("Quit", "Cmd+Q", false, true) {
