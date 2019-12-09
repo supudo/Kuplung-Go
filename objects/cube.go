@@ -23,10 +23,10 @@ type Cube struct {
 	program      uint32
 	texture      uint32
 
-	modelUniform int32
-	model        mgl32.Mat4
-
+	modelUniform      int32
+	model             mgl32.Mat4
 	projectionUniform int32
+	fov               float32
 
 	vao uint32
 
@@ -40,7 +40,7 @@ func CubeInit(window interfaces.Window) *Cube {
 
 	cube := &Cube{}
 
-	cube.version = "#version 410"
+	cube.version = "#version 410 core"
 	cube.window = window
 
 	vertexShader := cube.version + `
@@ -115,7 +115,7 @@ void main() {
 		1.0, 1.0, 1.0, 0.0, 1.0,
 	}
 
-	rsett.Fov = rsett.Fov
+	cube.fov = rsett.Fov
 
 	gl := window.OpenGL()
 
@@ -124,8 +124,7 @@ void main() {
 
 	gl.UseProgram(cube.program)
 
-	
-	projection := mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
+	projection := mgl32.Perspective(mgl32.DegToRad(cube.fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 	cube.projectionUniform = gl.GLGetUniformLocation(cube.program, gl.Str("projection\x00"))
 	gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
 
@@ -187,10 +186,10 @@ func (cube *Cube) Render() {
 	cube.angle += float32(elapsed)
 	cube.model = mgl32.HomogRotate3D(float32(cube.angle), mgl32.Vec3{0, 1, 0})
 
-	if rsett.Fov != rsett.Fov {
-		projection := mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
+	if cube.fov != rsett.Fov {
+		projection := mgl32.Perspective(mgl32.DegToRad(cube.fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 		gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
-		rsett.Fov = rsett.Fov
+		cube.fov = rsett.Fov
 	}
 
 	w, h := cube.window.Size()

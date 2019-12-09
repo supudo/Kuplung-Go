@@ -22,10 +22,10 @@ type WorldGrid struct {
 	program      uint32
 	texture      uint32
 
-	modelUniform int32
-	model        mgl32.Mat4
-
+	modelUniform      int32
+	model             mgl32.Mat4
 	projectionUniform int32
+	fov               float32
 
 	vao uint32
 
@@ -114,7 +114,7 @@ void main() {
 		1.0, 1.0, 1.0, 0.0, 1.0,
 	}
 
-	rsett.Fov = rsett.Fov
+	wgrid.fov = rsett.Fov
 
 	gl := window.OpenGL()
 
@@ -123,7 +123,7 @@ void main() {
 
 	gl.UseProgram(wgrid.program)
 
-	projection := mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
+	projection := mgl32.Perspective(mgl32.DegToRad(wgrid.fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 	wgrid.projectionUniform = gl.GLGetUniformLocation(wgrid.program, gl.Str("projection\x00"))
 	gl.GLUniformMatrix4fv(wgrid.projectionUniform, 1, false, &projection[0])
 
@@ -185,10 +185,10 @@ func (grid *WorldGrid) Render() {
 	grid.angle += float32(elapsed)
 	grid.model = mgl32.HomogRotate3D(float32(grid.angle), mgl32.Vec3{0, 1, 0})
 
-	if rsett.Fov != rsett.Fov {
-		projection := mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
+	if grid.fov != rsett.Fov {
+		projection := mgl32.Perspective(mgl32.DegToRad(grid.fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 		gl.GLUniformMatrix4fv(grid.projectionUniform, 1, false, &projection[0])
-		rsett.Fov = rsett.Fov
+		grid.fov = rsett.Fov
 	}
 
 	w, h := grid.window.Size()
