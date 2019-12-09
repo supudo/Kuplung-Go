@@ -11,7 +11,6 @@ import (
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
-	"github.com/supudo/Kuplung-Go/types"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -32,17 +31,16 @@ type Cube struct {
 	vao uint32
 
 	version string
-
-	fov float32
 }
 
 // CubeInit ...
-func CubeInit(window interfaces.Window, renderSettings types.RenderSettings) *Cube {
+func CubeInit(window interfaces.Window) *Cube {
 	sett := settings.GetSettings()
+	rsett := settings.GetRenderingSettings()
 
 	cube := &Cube{}
 
-	cube.version = renderSettings.GLSLVersion
+	cube.version = "#version 410"
 	cube.window = window
 
 	vertexShader := cube.version + `
@@ -117,7 +115,7 @@ void main() {
 		1.0, 1.0, 1.0, 0.0, 1.0,
 	}
 
-	cube.fov = renderSettings.Fov
+	rsett.Fov = rsett.Fov
 
 	gl := window.OpenGL()
 
@@ -126,7 +124,8 @@ void main() {
 
 	gl.UseProgram(cube.program)
 
-	projection := mgl32.Perspective(mgl32.DegToRad(cube.fov), renderSettings.RatioWidth/renderSettings.RatioHeight, renderSettings.PlaneClose, renderSettings.PlaneFar)
+	
+	projection := mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 	cube.projectionUniform = gl.GLGetUniformLocation(cube.program, gl.Str("projection\x00"))
 	gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
 
@@ -170,8 +169,9 @@ void main() {
 }
 
 // Render ...
-func (cube *Cube) Render(renderSettings types.RenderSettings) {
+func (cube *Cube) Render() {
 	gl := cube.window.OpenGL()
+	rsett := settings.GetRenderingSettings()
 
 	gl.Enable(oglconsts.DEPTH_TEST)
 	gl.DepthFunc(oglconsts.LESS)
@@ -187,10 +187,10 @@ func (cube *Cube) Render(renderSettings types.RenderSettings) {
 	cube.angle += float32(elapsed)
 	cube.model = mgl32.HomogRotate3D(float32(cube.angle), mgl32.Vec3{0, 1, 0})
 
-	if cube.fov != renderSettings.Fov {
-		projection := mgl32.Perspective(mgl32.DegToRad(renderSettings.Fov), renderSettings.RatioWidth/renderSettings.RatioHeight, renderSettings.PlaneClose, renderSettings.PlaneFar)
+	if rsett.Fov != rsett.Fov {
+		projection := mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 		gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
-		cube.fov = renderSettings.Fov
+		rsett.Fov = rsett.Fov
 	}
 
 	w, h := cube.window.Size()

@@ -31,21 +31,19 @@ type ApplicationSettings struct {
 		QuitApplication bool
 		LogBuffer       string
 		LogBufferLimit  int
-
-		ZoomFactor float32
 	}
 }
 
-var instantiated *ApplicationSettings
-var once sync.Once
+var instantiatedSettings *ApplicationSettings
+var onceSettings sync.Once
 
 // GetSettings singleton for our application settings
 func GetSettings() *ApplicationSettings {
-	once.Do(func() {
+	onceSettings.Do(func() {
 		as := InitSettings()
-		instantiated = &as
+		instantiatedSettings = &as
 	})
-	return instantiated
+	return instantiatedSettings
 }
 
 // InitSettings will initialize application settings
@@ -69,7 +67,6 @@ func InitSettings() ApplicationSettings {
 
 	appSettings.App.CurrentPath = dir
 	appSettings.MemSettings.QuitApplication = false
-	appSettings.MemSettings.ZoomFactor = 45.0
 	appSettings.MemSettings.LogBuffer = ""
 	appSettings.MemSettings.LogBufferLimit = 15360
 

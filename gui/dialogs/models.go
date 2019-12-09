@@ -14,7 +14,7 @@ func NewViewModels() *ViewModels {
 }
 
 // Render ...
-func (view *ViewModels) Render(open *bool) {
+func (view *ViewModels) Render(open, isFrame *bool) {
 	imgui.SetNextWindowSizeV(imgui.Vec2{X: 300, Y: 600}, imgui.ConditionFirstUseEver)
 	imgui.SetNextWindowPosV(imgui.Vec2{X: 10, Y: 28}, imgui.ConditionFirstUseEver, imgui.Vec2{X: 0, Y: 0})
 

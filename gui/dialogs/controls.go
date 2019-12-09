@@ -37,6 +37,7 @@ func NewViewControls() *ViewControls {
 // Render ...
 func (view *ViewControls) Render(open, isFrame *bool) {
 	sett := settings.GetSettings()
+	rsett := settings.GetRenderingSettings()
 
 	imgui.SetNextWindowSizeV(imgui.Vec2{X: 300, Y: 600}, imgui.ConditionFirstUseEver)
 	imgui.SetNextWindowPosV(imgui.Vec2{X: float32(sett.AppWindow.SDLWindowWidth - 310), Y: 28}, imgui.ConditionFirstUseEver, imgui.Vec2{X: 0, Y: 0})
@@ -123,9 +124,35 @@ func (view *ViewControls) Render(open, isFrame *bool) {
 	switch view.selectedObject {
 	case 0:
 		if imgui.TreeNodeV("View Options", imgui.TreeNodeFlagsCollapsingHeader) {
-			imgui.PushStyleVarVec2(imgui.StyleVarWindowPadding, imgui.Vec2{X: 20, Y: 0})
+			//imgui.PushStyleVarVec2(imgui.StyleVarWindowPadding, imgui.Vec2{X: 20, Y: 0})
 			helpers.AddSliderF32("Field of view", 1, 1.0, -180, 180, true, true, &view.fovAnimated, isFrame, &view.fov)
-			imgui.PopStyleVar()
+			imgui.Separator()
+			imgui.Text("Ratio")
+			if imgui.IsItemHovered() {
+				imgui.SetTooltip("W & H")
+			}
+			imgui.SliderFloat("W##105", &rsett.RatioWidth, 0.0, 5.0)
+			imgui.SliderFloat("H##106", &rsett.RatioHeight, 0.0, 5.0)
+			imgui.Separator()
+			imgui.Text("Planes")
+			if imgui.IsItemHovered() {
+				imgui.SetTooltip("Far & Close")
+			}
+			imgui.SliderFloat("Close##108", &rsett.PlaneClose, 0.0, 1000.0)
+			imgui.SliderFloat("Far##107", &rsett.PlaneFar, 0.0, 1000.0)
+			imgui.Separator()
+			imgui.Text("Gamma")
+			if imgui.IsItemHovered() {
+				imgui.SetTooltip("Gamma correction")
+			}
+			imgui.SliderFloat("##109", &rsett.GammaCoeficient, 1.0, 4.0)
+			//mgui.PopStyleVar()
+			imgui.TreePop()
+		}
+		if imgui.TreeNodeV("Editor Artefacts", imgui.TreeNodeFlagsCollapsingHeader) {
+			imgui.Checkbox("Axis Helpers", &rsett.ShowAxisHelpers)
+			imgui.Checkbox("Z Axis", &rsett.ShowZAxis)
+			imgui.TreePop()
 		}
 	}
 	imgui.PopItemWidth()

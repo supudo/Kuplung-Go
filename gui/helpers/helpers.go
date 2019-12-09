@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/inkyblackness/imgui-go"
 )
@@ -43,7 +44,9 @@ func animateValueAsync(isFrame, animatedFlag *bool, animatedValue *float32, step
 				}
 			}
 			*animatedValue = v
-			*isFrame = false
+			// TODO: fix the proper framerate for animated values
+			// *isFrame = false
+			time.Sleep(2500 * time.Millisecond)
 		}
 	}
 }

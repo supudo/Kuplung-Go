@@ -91,6 +91,7 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 
 func (window *KuplungWindow) processEvent(event sdl.Event) {
 	sett := settings.GetSettings()
+	rsett := settings.GetRenderingSettings()
 	if sett.MemSettings.QuitApplication {
 		return
 	}
@@ -117,10 +118,10 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 		}
 		if ev.Y > 0 {
 			deltaY++
-			sett.MemSettings.ZoomFactor -= 4.0
+			rsett.ZoomFactor -= 4.0
 		} else if ev.Y < 0 {
 			deltaY--
-			sett.MemSettings.ZoomFactor += 4.0
+			rsett.ZoomFactor += 4.0
 		}
 		io.AddMouseWheelDelta(deltaX, deltaY)
 	case *sdl.TextInputEvent:

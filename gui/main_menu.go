@@ -7,10 +7,13 @@ import (
 
 	"github.com/inkyblackness/imgui-go"
 	"github.com/supudo/Kuplung-Go/gui/fonts"
+	"github.com/supudo/Kuplung-Go/settings"
 )
 
 // DrawMainMenu ...
 func (context *Context) DrawMainMenu() {
+	rsett := settings.GetRenderingSettings()
+
 	// Main Menu
 	imgui.BeginMainMenuBar()
 
@@ -45,7 +48,7 @@ func (context *Context) DrawMainMenu() {
 		}
 		imgui.Separator()
 		if imgui.MenuItem("Cube") {
-			context.GuiVars.GlobalVars.ShowCube = !context.GuiVars.GlobalVars.ShowCube
+			rsett.ShowCube = !rsett.ShowCube
 		}
 		imgui.EndMenu()
 	}

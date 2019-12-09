@@ -12,7 +12,6 @@ import (
 	"github.com/supudo/Kuplung-Go/gui/fonts"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
-	"github.com/supudo/Kuplung-Go/types"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -70,8 +69,6 @@ type WindowVariables struct {
 	showAboutImGui   bool
 	showAboutKuplung bool
 	showMetrics      bool
-
-	GlobalVars types.ObjectVariables
 }
 
 // NewContext initializes a new UI context based on the provided OpenGL window.
@@ -98,8 +95,6 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 	context.GuiVars.showAboutImGui = false
 	context.GuiVars.showAboutKuplung = false
 	context.GuiVars.showMetrics = false
-
-	context.GuiVars.GlobalVars.ShowCube = false
 
 	err := context.createDeviceObjects(param)
 	if err != nil {
@@ -175,15 +170,15 @@ func (context *Context) Render() {
 }
 
 // DrawGUI ...
-func (context *Context) DrawGUI() {
+func (context *Context) DrawGUI(isFrame bool) {
 	context.DrawMainMenu()
 
 	if context.GuiVars.showControls {
-		context.viewControls.Render(&context.GuiVars.showControls, &context.isFrame)
+		context.viewControls.Render(&context.GuiVars.showControls, &isFrame)
 	}
 
 	if context.GuiVars.showModels {
-		context.viewModels.Render(&context.GuiVars.showModels)
+		context.viewModels.Render(&context.GuiVars.showModels, &isFrame)
 	}
 
 	if context.GuiVars.showLog {
