@@ -154,6 +154,20 @@ func (view *ViewControls) Render(open, isFrame *bool) {
 			imgui.Checkbox("Z Axis", &rsett.ShowZAxis)
 			imgui.TreePop()
 		}
+	case 3:
+		imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+		imgui.Text("General World Grid settings")
+		imgui.PopStyleColor()
+		imgui.Text("Grid Size")
+		if imgui.IsItemHovered() {
+			imgui.SetTooltip("In squares")
+		}
+		imgui.SliderInt("##109", &rsett.WorldGridSizeSquares, 0, 100)
+		imgui.Separator()
+		imgui.Checkbox("Grid fixed with World", &rsett.WorldGridFixedWithWorld)
+		imgui.Checkbox("Use WorldGrid", &rsett.UseWorldGrid)
+		imgui.Checkbox("Show Grid", &rsett.ShowGrid)
+		imgui.Checkbox("Act as mirror", &rsett.ActAsMirror)
 	}
 	imgui.PopItemWidth()
 	imgui.EndChild()

@@ -18,6 +18,12 @@ type RenderingSettings struct {
 
 	ShowAxisHelpers bool
 	ShowZAxis       bool
+
+	WorldGridSizeSquares    int32
+	WorldGridFixedWithWorld bool
+	UseWorldGrid            bool
+	ShowGrid                bool
+	ActAsMirror             bool
 }
 
 var instantiatedRendering *RenderingSettings
@@ -49,6 +55,12 @@ func InitRenderingSettings() RenderingSettings {
 
 	rSettings.ShowAxisHelpers = true
 	rSettings.ShowZAxis = true
+
+	rSettings.WorldGridSizeSquares = 10
+	rSettings.WorldGridFixedWithWorld = true
+	rSettings.UseWorldGrid = true
+	rSettings.ShowGrid = true
+	rSettings.ActAsMirror = false
 
 	return rSettings
 }
