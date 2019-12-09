@@ -17,19 +17,17 @@ import (
 type WorldGrid struct {
 	window interfaces.Window
 
-	angle        float32
-	previousTime float32
-	program      uint32
-	texture      uint32
-
+	angle             float32
+	previousTime      float32
+	program           uint32
+	texture           uint32
 	modelUniform      int32
 	model             mgl32.Mat4
 	projectionUniform int32
-	fov               float32
+	vao               uint32
+	version           string
 
-	vao uint32
-
-	version string
+	fov float32
 }
 
 // InitWorldGrid ...

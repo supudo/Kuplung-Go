@@ -44,8 +44,9 @@ func InitRenderingSettings() RenderingSettings {
 
 	rSettings.ShowCube = false
 
-	rSettings.ZoomFactor = 45.0
+	rSettings.ZoomFactor = 1.0
 
+	rSettings.Fov = 45.0
 	rSettings.RatioWidth = 4.0
 	rSettings.RatioHeight = 3.0
 	rSettings.PlaneClose = 1.0
