@@ -19,9 +19,10 @@ type Cube struct {
 	previousTime      float32
 	program           uint32
 	texture           uint32
-	modelUniform      int32
 	model             mgl32.Mat4
+	modelUniform      int32
 	projectionUniform int32
+	cameraUniform     int32
 	vao               uint32
 	version           string
 
@@ -114,23 +115,16 @@ void main() {
 
 	gl := window.OpenGL()
 
+	cube.model = mgl32.Ident4()
+
 	// Configure the vertex and fragment shaders
-	// cube.program = cube.newProgram(vertexShader, fragmentShader)
 	cube.program, _ = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)
 
 	gl.UseProgram(cube.program)
 
-	projection := mgl32.Perspective(mgl32.DegToRad(cube.fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 	cube.projectionUniform = gl.GLGetUniformLocation(cube.program, gl.Str("projection\x00"))
-	gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
-
-	camera := mgl32.LookAtV(mgl32.Vec3{3, 3, 3}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
-	cameraUniform := gl.GLGetUniformLocation(cube.program, gl.Str("camera\x00"))
-	gl.GLUniformMatrix4fv(cameraUniform, 1, false, &camera[0])
-
-	model := mgl32.Ident4()
+	cube.cameraUniform = gl.GLGetUniformLocation(cube.program, gl.Str("camera\x00"))
 	cube.modelUniform = gl.GLGetUniformLocation(cube.program, gl.Str("model\x00"))
-	gl.GLUniformMatrix4fv(cube.modelUniform, 1, false, &model[0])
 
 	textureUniform := gl.GLGetUniformLocation(cube.program, gl.Str("tex\x00"))
 	gl.Uniform1i(textureUniform, 0)
@@ -182,19 +176,14 @@ func (cube *Cube) Render() {
 	cube.angle += float32(elapsed)
 	cube.model = mgl32.HomogRotate3D(float32(cube.angle), mgl32.Vec3{0, 1, 0})
 
-	if cube.fov != rsett.Fov {
-		settings.LogInfo("fov = %v", rsett.Fov)
-		projection := mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
-		gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
-		cube.fov = rsett.Fov
-	}
-
 	w, h := cube.window.Size()
 	gl.Viewport(0, 0, int32(w), int32(h))
 
 	// Render
 	gl.UseProgram(cube.program)
 	gl.GLUniformMatrix4fv(cube.modelUniform, 1, false, &cube.model[0])
+	gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &rsett.MatrixProjection[0])
+	gl.GLUniformMatrix4fv(cube.cameraUniform, 1, false, &rsett.MatrixCamera[0])
 
 	gl.BindVertexArray(cube.vao)
 
