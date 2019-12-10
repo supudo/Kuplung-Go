@@ -14,7 +14,6 @@ type ViewControls struct {
 
 	heightTopPanel float32
 
-	fov         float32
 	fovAnimated bool
 }
 
@@ -26,7 +25,6 @@ func NewViewControls() *ViewControls {
 
 		heightTopPanel: 160,
 
-		fov:         45.0,
 		fovAnimated: false,
 	}
 	trigger.On("selectedObject", view.setSelectedObject)
@@ -125,7 +123,7 @@ func (view *ViewControls) Render(open, isFrame *bool) {
 	case 0:
 		if imgui.TreeNodeV("View Options", imgui.TreeNodeFlagsCollapsingHeader) {
 			//imgui.PushStyleVarVec2(imgui.StyleVarWindowPadding, imgui.Vec2{X: 20, Y: 0})
-			helpers.AddSliderF32("Field of view", 1, 1.0, -180, 180, true, true, &view.fovAnimated, isFrame, &view.fov)
+			helpers.AddSliderF32("Field of view", 1, 1.0, -180, 180, true, true, &view.fovAnimated, isFrame, &rsett.Fov)
 			imgui.Separator()
 			imgui.Text("Ratio")
 			if imgui.IsItemHovered() {

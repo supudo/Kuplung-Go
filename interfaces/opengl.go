@@ -102,4 +102,6 @@ type OpenGL interface {
 	LogOpenGLReturn() string
 	LogOpenGLError()
 	LogOpenGLWarn()
+
+	LineWidth(float32)
 }

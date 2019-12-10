@@ -1,167 +1,128 @@
 package objects
 
 import (
-	"image"
-	"image/draw"
-	"os"
-	"strings"
-
 	"github.com/go-gl/mathgl/mgl32"
+	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
-	"github.com/veandco/go-sdl2/sdl"
 )
 
 // WorldGrid ...
 type WorldGrid struct {
 	window interfaces.Window
 
-	angle             float32
-	previousTime      float32
-	program           uint32
-	texture           uint32
-	modelUniform      int32
-	model             mgl32.Mat4
-	projectionUniform int32
-	vao               uint32
-	version           string
+	shaderProgram uint32
+	glVAO         uint32
+	vboVertices   uint32
+	vboColors     uint32
+	vboIndices    uint32
 
-	fov float32
+	glUniformMVPMatrix     int32
+	glAttributeActAsMirror int32
+	glAttributeAlpha       int32
+
+	matrixModel mgl32.Mat4
+
+	actAsMirror    bool
+	gridSizeVertex int32
+	zIndex         int
 }
 
 // InitWorldGrid ...
 func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	sett := settings.GetSettings()
 	rsett := settings.GetRenderingSettings()
-
-	wgrid := &WorldGrid{}
-
-	wgrid.version = "#version 410"
-	wgrid.window = window
-
-	vertexShader := wgrid.version + `
-uniform mat4 projection;
-uniform mat4 camera;
-uniform mat4 model;
-in vec3 vert;
-in vec2 vertTexCoord;
-out vec2 fragTexCoord;
-void main()
-{
-	fragTexCoord = vertTexCoord;
-	gl_Position = projection * camera * model * vec4(vert, 1);
-}
-` + "\x00"
-	fragmentShader := wgrid.version + `
-uniform sampler2D tex;
-in vec2 fragTexCoord;
-out vec4 outputColor;
-void main() {
-	outputColor = texture(tex, fragTexCoord);
-}
-` + "\x00"
-	cubeVertices := []float32{
-		//  X, Y, Z, U, V
-		// Bottom
-		-1.0, -1.0, -1.0, 0.0, 0.0,
-		1.0, -1.0, -1.0, 1.0, 0.0,
-		-1.0, -1.0, 1.0, 0.0, 1.0,
-		1.0, -1.0, -1.0, 1.0, 0.0,
-		1.0, -1.0, 1.0, 1.0, 1.0,
-		-1.0, -1.0, 1.0, 0.0, 1.0,
-
-		// Top
-		-1.0, 1.0, -1.0, 0.0, 0.0,
-		-1.0, 1.0, 1.0, 0.0, 1.0,
-		1.0, 1.0, -1.0, 1.0, 0.0,
-		1.0, 1.0, -1.0, 1.0, 0.0,
-		-1.0, 1.0, 1.0, 0.0, 1.0,
-		1.0, 1.0, 1.0, 1.0, 1.0,
-
-		// Front
-		-1.0, -1.0, 1.0, 1.0, 0.0,
-		1.0, -1.0, 1.0, 0.0, 0.0,
-		-1.0, 1.0, 1.0, 1.0, 1.0,
-		1.0, -1.0, 1.0, 0.0, 0.0,
-		1.0, 1.0, 1.0, 0.0, 1.0,
-		-1.0, 1.0, 1.0, 1.0, 1.0,
-
-		// Back
-		-1.0, -1.0, -1.0, 0.0, 0.0,
-		-1.0, 1.0, -1.0, 0.0, 1.0,
-		1.0, -1.0, -1.0, 1.0, 0.0,
-		1.0, -1.0, -1.0, 1.0, 0.0,
-		-1.0, 1.0, -1.0, 0.0, 1.0,
-		1.0, 1.0, -1.0, 1.0, 1.0,
-
-		// Left
-		-1.0, -1.0, 1.0, 0.0, 1.0,
-		-1.0, 1.0, -1.0, 1.0, 0.0,
-		-1.0, -1.0, -1.0, 0.0, 0.0,
-		-1.0, -1.0, 1.0, 0.0, 1.0,
-		-1.0, 1.0, 1.0, 1.0, 1.0,
-		-1.0, 1.0, -1.0, 1.0, 0.0,
-
-		// Right
-		1.0, -1.0, 1.0, 1.0, 1.0,
-		1.0, -1.0, -1.0, 1.0, 0.0,
-		1.0, 1.0, -1.0, 0.0, 0.0,
-		1.0, -1.0, 1.0, 1.0, 1.0,
-		1.0, 1.0, -1.0, 0.0, 0.0,
-		1.0, 1.0, 1.0, 0.0, 1.0,
-	}
-
-	wgrid.fov = rsett.Fov
-
 	gl := window.OpenGL()
 
-	// Configure the vertex and fragment shaders
-	wgrid.program = wgrid.newProgram(vertexShader, fragmentShader)
+	grid := &WorldGrid{}
 
-	gl.UseProgram(wgrid.program)
+	grid.window = window
+	grid.actAsMirror = rsett.ActAsMirror
+	grid.gridSizeVertex = rsett.WorldGridSizeSquares
+	grid.zIndex = 0
+	grid.matrixModel = mgl32.Ident4()
 
-	projection := mgl32.Perspective(mgl32.DegToRad(wgrid.fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
-	wgrid.projectionUniform = gl.GLGetUniformLocation(wgrid.program, gl.Str("projection\x00"))
-	gl.GLUniformMatrix4fv(wgrid.projectionUniform, 1, false, &projection[0])
+	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.vert")
+	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.frag")
 
-	camera := mgl32.LookAtV(mgl32.Vec3{3, 3, 3}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0})
-	cameraUniform := gl.GLGetUniformLocation(wgrid.program, gl.Str("camera\x00"))
-	gl.GLUniformMatrix4fv(cameraUniform, 1, false, &camera[0])
+	var err error
+	grid.shaderProgram, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)
+	if err != nil {
+		settings.LogWarn("[WorldGrid] Can't load the grid shaders: %v", err)
+	}
 
-	model := mgl32.Ident4()
-	wgrid.modelUniform = gl.GLGetUniformLocation(wgrid.program, gl.Str("model\x00"))
-	gl.GLUniformMatrix4fv(wgrid.modelUniform, 1, false, &model[0])
+	grid.glAttributeActAsMirror = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("a_actAsMirror\x00"))
+	grid.glAttributeAlpha = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("a_alpha\x00"))
+	grid.glUniformMVPMatrix = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("u_MVPMatrix\x00"))
 
-	textureUniform := gl.GLGetUniformLocation(wgrid.program, gl.Str("tex\x00"))
-	gl.Uniform1i(textureUniform, 0)
+	grid.glVAO = gl.GenVertexArrays(1)[0]
+	gl.BindVertexArray(grid.glVAO)
 
-	gl.GLBindFragDataLocation(wgrid.program, 0, gl.Str("outputColor\x00"))
+	if grid.gridSizeVertex%2 == 0 {
+		grid.gridSizeVertex++
+	}
 
-	// Load the texture
-	wgrid.texture = wgrid.newTexture(sett.App.CurrentPath + "/../Resources/resources/textures/square.png")
+	gridVerticesData := []float32{}
+	gridColorsData := []float32{}
+	//gridIndicesData := []float32{}
 
-	// Configure the vertex data
-	wgrid.vao = gl.GenVertexArrays(1)[0]
+	unitSize := float32(1.0)
+	gridMinus := float32(grid.gridSizeVertex / 2)
+	var i, j float32
+	var x, y, z float32
+	for i = 0; i < float32(grid.gridSizeVertex*2); i++ {
+		for j = 0; j < float32(grid.gridSizeVertex); j++ {
+			if i < float32(grid.gridSizeVertex) {
+				x = (j - gridMinus) * unitSize
+				y = 0
+				z = (i - gridMinus) * unitSize
+				gridVerticesData = append(gridVerticesData, x, y, z)
+				if z < 0 || z > 0 {
+					gridColorsData = append(gridColorsData, 0.7, 0.7, 0.7)
+				} else {
+					gridColorsData = append(gridColorsData, 1.0, 0.0, 0.0)
+				}
+			} else {
+				x = (i - float32(grid.gridSizeVertex) - gridMinus) * unitSize
+				y = 0
+				z = (j - gridMinus) * unitSize
+				if x < 0 || x > 0 {
+					gridColorsData = append(gridColorsData, 0.7, 0.7, 0.7)
+				} else {
+					gridColorsData = append(gridColorsData, .0, 0.0, 1.0)
+				}
+			}
+		}
+	}
 
-	gl.BindVertexArray(wgrid.vao)
+	grid.zIndex = len(gridVerticesData)
 
-	vbo := gl.GenBuffers(1)[0]
-	gl.BindBuffer(oglconsts.ARRAY_BUFFER, vbo)
-	gl.BufferData(oglconsts.ARRAY_BUFFER, len(cubeVertices)*4, gl.Ptr(cubeVertices), oglconsts.STATIC_DRAW)
+	x = float32(0.0)
+	y = float32(-1.0 * gridMinus)
+	z = float32(0.0)
+	gridVerticesData = append(gridVerticesData, x, y, z)
+	gridColorsData = append(gridColorsData, 0.0, 1.0, 0.0)
 
-	vertAttrib := uint32(gl.GLGetAttribLocation(wgrid.program, gl.Str("vert\x00")))
-	gl.EnableVertexAttribArray(vertAttrib)
-	gl.VertexAttribPointer(vertAttrib, 3, oglconsts.FLOAT, false, 5*4, gl.PtrOffset(0))
+	x = float32(0.0)
+	y = float32(gridMinus)
+	z = float32(0.0)
+	gridVerticesData = append(gridVerticesData, x, y, z)
+	gridColorsData = append(gridColorsData, 0.0, 1.0, 0.0)
 
-	texCoordAttrib := uint32(gl.GLGetAttribLocation(wgrid.program, gl.Str("vertTexCoord\x00")))
-	gl.EnableVertexAttribArray(texCoordAttrib)
-	gl.VertexAttribPointer(texCoordAttrib, 2, oglconsts.FLOAT, false, 5*4, gl.PtrOffset(3*4))
+	grid.vboVertices = gl.GenBuffers(1)[0]
+	gl.BindBuffer(oglconsts.ARRAY_BUFFER, grid.vboVertices)
+	gl.BufferData(oglconsts.ARRAY_BUFFER, len(gridVerticesData)*3, gl.Ptr(gridVerticesData), oglconsts.STATIC_DRAW)
 
-	wgrid.angle = 0.0
-	wgrid.previousTime = float32(sdl.GetTicks())
+	grid.vboColors = gl.GenBuffers(1)[0]
+	gl.BindBuffer(oglconsts.ARRAY_BUFFER, grid.vboVertices)
+	gl.BufferData(oglconsts.ARRAY_BUFFER, len(gridColorsData)*3, gl.Ptr(gridColorsData), oglconsts.STATIC_DRAW)
 
-	return wgrid
+	// grid.vboIndices = gl.GenBuffers(1)[0]
+	// gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, grid.vboVertices)
+	// gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, len(gridIndicesData), gl.Ptr(gridIndicesData), oglconsts.STATIC_DRAW)
+
+	return grid
 }
 
 // Render ...
@@ -169,141 +130,34 @@ func (grid *WorldGrid) Render() {
 	gl := grid.window.OpenGL()
 	rsett := settings.GetRenderingSettings()
 
+	mvpMatrix := grid.matrixModel.Mul4(rsett.MatrixProjection).Mul4(rsett.MatrixCamera)
+	gl.GLUniformMatrix4fv(grid.glUniformMVPMatrix, 1, false, &mvpMatrix[0])
+
+	gl.BindVertexArray(grid.glVAO)
+
+	gl.LineWidth(1.0)
+
 	gl.Enable(oglconsts.DEPTH_TEST)
 	gl.DepthFunc(oglconsts.LESS)
 	gl.Disable(oglconsts.BLEND)
 	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
-	gl.PolygonMode(oglconsts.FRONT_AND_BACK, oglconsts.FILL)
 
-	// Update
-	sdlTime := float32(sdl.GetTicks())
-	elapsed := (sdlTime - grid.previousTime) / 1000
-	grid.previousTime = sdlTime
-
-	grid.angle += float32(elapsed)
-	grid.model = mgl32.HomogRotate3D(float32(grid.angle), mgl32.Vec3{0, 1, 0})
-
-	if grid.fov != rsett.Fov {
-		projection := mgl32.Perspective(mgl32.DegToRad(grid.fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
-		gl.GLUniformMatrix4fv(grid.projectionUniform, 1, false, &projection[0])
-		grid.fov = rsett.Fov
+	var i int32
+	for i = 0; i < grid.gridSizeVertex*2; i++ {
+		gl.DrawArrays(oglconsts.LINE_STRIP, grid.gridSizeVertex*i, grid.gridSizeVertex)
+	}
+	for i = 0; i < grid.gridSizeVertex; i++ {
+		gl.DrawArrays(oglconsts.LINE_STRIP, 0, grid.gridSizeVertex)
 	}
 
-	w, h := grid.window.Size()
-	gl.Viewport(0, 0, int32(w), int32(h))
-
-	// Render
-	gl.UseProgram(grid.program)
-	gl.GLUniformMatrix4fv(grid.modelUniform, 1, false, &grid.model[0])
-
-	gl.BindVertexArray(grid.vao)
-
-	gl.ActiveTexture(oglconsts.TEXTURE0)
-	gl.BindTexture(oglconsts.TEXTURE_2D, grid.texture)
-
-	gl.DrawArrays(oglconsts.TRIANGLES, 0, 6*2*3)
+	gl.BindVertexArray(0)
+	gl.UseProgram(0)
 }
 
 // Dispose will cleanup everything
 func (grid *WorldGrid) Dispose() {
 	gl := grid.window.OpenGL()
 
-	gl.DeleteTextures([]uint32{grid.texture})
-	gl.DeleteVertexArrays([]uint32{grid.vao})
-	gl.DeleteProgram(grid.program)
-}
-
-func (grid *WorldGrid) newProgram(vertexShaderSource, fragmentShaderSource string) uint32 {
-	gl := grid.window.OpenGL()
-
-	vertexShader := grid.compileShader(vertexShaderSource, oglconsts.VERTEX_SHADER)
-	fragmentShader := grid.compileShader(fragmentShaderSource, oglconsts.FRAGMENT_SHADER)
-
-	program := gl.CreateProgram()
-
-	gl.AttachShader(program, vertexShader)
-	gl.AttachShader(program, fragmentShader)
-	gl.LinkProgram(program)
-
-	var status int32
-	gl.GetProgramiv(program, oglconsts.LINK_STATUS, &status)
-	if status == oglconsts.FALSE {
-		var logLength int32
-		gl.GetProgramiv(program, oglconsts.INFO_LOG_LENGTH, &logLength)
-
-		log := strings.Repeat("\x00", int(logLength+1))
-		gl.GLGetProgramInfoLog(program, logLength, nil, gl.Str(log))
-
-		settings.LogError("[Cube] Failed to link program: %v", log)
-	}
-
-	gl.DeleteShader(vertexShader)
-	gl.DeleteShader(fragmentShader)
-
-	return program
-}
-
-func (grid *WorldGrid) compileShader(source string, shaderType uint32) uint32 {
-	gl := grid.window.OpenGL()
-
-	shader := gl.CreateShader(shaderType)
-
-	csources, free := gl.Strs(source)
-	gl.GLShaderSource(shader, 1, csources, nil)
-	free()
-	gl.CompileShader(shader)
-
-	var status int32
-	gl.GLGetShaderiv(shader, oglconsts.COMPILE_STATUS, &status)
-	if status == oglconsts.FALSE {
-		var logLength int32
-		gl.GLGetShaderiv(shader, oglconsts.INFO_LOG_LENGTH, &logLength)
-
-		log := strings.Repeat("\x00", int(logLength+1))
-		gl.GLGetShaderInfoLog(shader, logLength, nil, gl.Str(log))
-
-		settings.LogError("[Cube] Failed to compile shader %v : %v", source, log)
-	}
-
-	return shader
-}
-
-func (grid *WorldGrid) newTexture(file string) uint32 {
-	gl := grid.window.OpenGL()
-
-	imgFile, err := os.Open(file)
-	if err != nil {
-		settings.LogError("[Cube] Texture file not found: %v", err)
-	}
-	img, _, err := image.Decode(imgFile)
-	if err != nil {
-		settings.LogError("[Cube] Can't decode texture: %v", err)
-	}
-
-	rgba := image.NewRGBA(img.Bounds())
-	if rgba.Stride != rgba.Rect.Size().X*4 {
-		settings.LogError("[Cube] Texture unsupported stride!")
-	}
-	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
-
-	var texture uint32
-	grid.texture = gl.GenTextures(1)[0]
-	gl.ActiveTexture(oglconsts.TEXTURE0)
-	gl.BindTexture(oglconsts.TEXTURE_2D, texture)
-	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MIN_FILTER, oglconsts.LINEAR)
-	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.LINEAR)
-	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_S, oglconsts.CLAMP_TO_EDGE)
-	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_T, oglconsts.CLAMP_TO_EDGE)
-	gl.TexImage2D(
-		oglconsts.TEXTURE_2D,
-		0,
-		oglconsts.RGBA,
-		int32(rgba.Rect.Size().X),
-		int32(rgba.Rect.Size().Y),
-		0,
-		oglconsts.RGBA,
-		oglconsts.UNSIGNED_BYTE,
-		gl.Ptr(rgba.Pix))
-
-	return texture
+	gl.DeleteVertexArrays([]uint32{grid.glVAO})
+	gl.DeleteProgram(grid.shaderProgram)
 }

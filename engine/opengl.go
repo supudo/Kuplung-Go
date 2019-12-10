@@ -450,3 +450,8 @@ func (native *OpenGL) LogOpenGLWarn() {
 		settings.LogWarn("[OpenGL Error] Error occured: %v", err)
 	}
 }
+
+// LineWidth will set the line width
+func (native *OpenGL) LineWidth(lw float32) {
+	gl.LineWidth(lw)
+}

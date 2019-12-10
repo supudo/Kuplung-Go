@@ -1,12 +1,17 @@
 package settings
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 // RenderingSettings ...
 type RenderingSettings struct {
-	ShowCube bool
+	MatrixProjection mgl32.Mat4
+	MatrixCamera     mgl32.Mat4
 
-	ZoomFactor float32
+	ShowCube bool
 
 	Fov         float32
 	RatioWidth  float32
@@ -44,8 +49,6 @@ func InitRenderingSettings() RenderingSettings {
 
 	rSettings.ShowCube = false
 
-	rSettings.ZoomFactor = 1.0
-
 	rSettings.Fov = 45.0
 	rSettings.RatioWidth = 4.0
 	rSettings.RatioHeight = 3.0
@@ -62,6 +65,9 @@ func InitRenderingSettings() RenderingSettings {
 	rSettings.UseWorldGrid = true
 	rSettings.ShowGrid = true
 	rSettings.ActAsMirror = false
+
+	rSettings.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rSettings.Fov), rSettings.RatioWidth/rSettings.RatioHeight, rSettings.PlaneClose, rSettings.PlaneFar)
+	rSettings.MatrixCamera = mgl32.Ident4()
 
 	return rSettings
 }

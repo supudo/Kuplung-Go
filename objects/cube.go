@@ -1,13 +1,10 @@
 package objects
 
 import (
-	"image"
-	"image/draw"
 	_ "image/png"
-	"os"
-	"strings"
 
 	"github.com/go-gl/mathgl/mgl32"
+	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
@@ -118,7 +115,8 @@ void main() {
 	gl := window.OpenGL()
 
 	// Configure the vertex and fragment shaders
-	cube.program = cube.newProgram(vertexShader, fragmentShader)
+	// cube.program = cube.newProgram(vertexShader, fragmentShader)
+	cube.program, _ = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)
 
 	gl.UseProgram(cube.program)
 
@@ -140,7 +138,7 @@ void main() {
 	gl.GLBindFragDataLocation(cube.program, 0, gl.Str("outputColor\x00"))
 
 	// Load the texture
-	cube.texture = cube.newTexture(sett.App.CurrentPath + "/../Resources/resources/textures/square.png")
+	cube.texture = engine.LoadTexture(gl, sett.App.CurrentPath+"/../Resources/resources/textures/square.png")
 
 	// Configure the vertex data
 	cube.vao = gl.GenVertexArrays(1)[0]
@@ -185,7 +183,8 @@ func (cube *Cube) Render() {
 	cube.model = mgl32.HomogRotate3D(float32(cube.angle), mgl32.Vec3{0, 1, 0})
 
 	if cube.fov != rsett.Fov {
-		projection := mgl32.Perspective(mgl32.DegToRad(cube.fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
+		settings.LogInfo("fov = %v", rsett.Fov)
+		projection := mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 		gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &projection[0])
 		cube.fov = rsett.Fov
 	}
@@ -203,6 +202,9 @@ func (cube *Cube) Render() {
 	gl.BindTexture(oglconsts.TEXTURE_2D, cube.texture)
 
 	gl.DrawArrays(oglconsts.TRIANGLES, 0, 6*2*3)
+
+	gl.BindVertexArray(0)
+	gl.UseProgram(0)
 }
 
 // Dispose will cleanup everything
@@ -212,99 +214,4 @@ func (cube *Cube) Dispose() {
 	gl.DeleteTextures([]uint32{cube.texture})
 	gl.DeleteVertexArrays([]uint32{cube.vao})
 	gl.DeleteProgram(cube.program)
-}
-
-func (cube *Cube) newProgram(vertexShaderSource, fragmentShaderSource string) uint32 {
-	gl := cube.window.OpenGL()
-
-	vertexShader := cube.compileShader(vertexShaderSource, oglconsts.VERTEX_SHADER)
-	fragmentShader := cube.compileShader(fragmentShaderSource, oglconsts.FRAGMENT_SHADER)
-
-	program := gl.CreateProgram()
-
-	gl.AttachShader(program, vertexShader)
-	gl.AttachShader(program, fragmentShader)
-	gl.LinkProgram(program)
-
-	var status int32
-	gl.GetProgramiv(program, oglconsts.LINK_STATUS, &status)
-	if status == oglconsts.FALSE {
-		var logLength int32
-		gl.GetProgramiv(program, oglconsts.INFO_LOG_LENGTH, &logLength)
-
-		log := strings.Repeat("\x00", int(logLength+1))
-		gl.GLGetProgramInfoLog(program, logLength, nil, gl.Str(log))
-
-		settings.LogError("[Cube] Failed to link program: %v", log)
-	}
-
-	gl.DeleteShader(vertexShader)
-	gl.DeleteShader(fragmentShader)
-
-	return program
-}
-
-func (cube *Cube) compileShader(source string, shaderType uint32) uint32 {
-	gl := cube.window.OpenGL()
-
-	shader := gl.CreateShader(shaderType)
-
-	csources, free := gl.Strs(source)
-	gl.GLShaderSource(shader, 1, csources, nil)
-	free()
-	gl.CompileShader(shader)
-
-	var status int32
-	gl.GLGetShaderiv(shader, oglconsts.COMPILE_STATUS, &status)
-	if status == oglconsts.FALSE {
-		var logLength int32
-		gl.GLGetShaderiv(shader, oglconsts.INFO_LOG_LENGTH, &logLength)
-
-		log := strings.Repeat("\x00", int(logLength+1))
-		gl.GLGetShaderInfoLog(shader, logLength, nil, gl.Str(log))
-
-		settings.LogError("[Cube] Failed to compile shader %v : %v", source, log)
-	}
-
-	return shader
-}
-
-func (cube *Cube) newTexture(file string) uint32 {
-	gl := cube.window.OpenGL()
-
-	imgFile, err := os.Open(file)
-	if err != nil {
-		settings.LogError("[Cube] Texture file not found: %v", err)
-	}
-	img, _, err := image.Decode(imgFile)
-	if err != nil {
-		settings.LogError("[Cube] Can't decode texture: %v", err)
-	}
-
-	rgba := image.NewRGBA(img.Bounds())
-	if rgba.Stride != rgba.Rect.Size().X*4 {
-		settings.LogError("[Cube] Texture unsupported stride!")
-	}
-	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
-
-	var texture uint32
-	cube.texture = gl.GenTextures(1)[0]
-	gl.ActiveTexture(oglconsts.TEXTURE0)
-	gl.BindTexture(oglconsts.TEXTURE_2D, texture)
-	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MIN_FILTER, oglconsts.LINEAR)
-	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.LINEAR)
-	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_S, oglconsts.CLAMP_TO_EDGE)
-	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_T, oglconsts.CLAMP_TO_EDGE)
-	gl.TexImage2D(
-		oglconsts.TEXTURE_2D,
-		0,
-		oglconsts.RGBA,
-		int32(rgba.Rect.Size().X),
-		int32(rgba.Rect.Size().Y),
-		0,
-		oglconsts.RGBA,
-		oglconsts.UNSIGNED_BYTE,
-		gl.Ptr(rgba.Pix))
-
-	return texture
 }
