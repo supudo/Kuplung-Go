@@ -130,18 +130,31 @@ func (grid *WorldGrid) Render() {
 	gl := grid.window.OpenGL()
 	rsett := settings.GetRenderingSettings()
 
-	mvpMatrix := grid.matrixModel.Mul4(rsett.MatrixProjection).Mul4(rsett.MatrixCamera)
-	gl.GLUniformMatrix4fv(grid.glUniformMVPMatrix, 1, false, &mvpMatrix[0])
-
-	gl.BindVertexArray(grid.glVAO)
-
-	gl.LineWidth(1.0)
-
 	gl.Enable(oglconsts.DEPTH_TEST)
 	gl.DepthFunc(oglconsts.LESS)
 	gl.Disable(oglconsts.BLEND)
 	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
 
+	w, h := grid.window.Size()
+	gl.Viewport(0, 0, int32(w), int32(h))
+
+	grid.matrixModel = mgl32.Ident4()
+	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Scale3D(1, 1, 1))
+	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
+	grid.matrixModel = grid.matrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{1, 0, 0}))
+	grid.matrixModel = grid.matrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{0, 1, 0}))
+	grid.matrixModel = grid.matrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{0, 0, 1}))
+	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
+	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
+
+	mvpMatrix := rsett.MatrixProjection.Mul4(rsett.MatrixCamera.Mul4(grid.matrixModel))
+
+	gl.UseProgram(grid.shaderProgram)
+	gl.GLUniformMatrix4fv(grid.glUniformMVPMatrix, 1, false, &mvpMatrix[0])
+	gl.BindVertexArray(grid.glVAO)
+	gl.LineWidth(1.0)
+	gl.Uniform1i(grid.glAttributeAlpha, 1.0)
+	gl.Uniform1i(grid.glAttributeActAsMirror, 0)
 	var i int32
 	for i = 0; i < grid.gridSizeVertex*2; i++ {
 		gl.DrawArrays(oglconsts.LINE_STRIP, grid.gridSizeVertex*i, grid.gridSizeVertex)
@@ -149,7 +162,6 @@ func (grid *WorldGrid) Render() {
 	for i = 0; i < grid.gridSizeVertex; i++ {
 		gl.DrawArrays(oglconsts.LINE_STRIP, 0, grid.gridSizeVertex)
 	}
-
 	gl.BindVertexArray(0)
 	gl.UseProgram(0)
 }

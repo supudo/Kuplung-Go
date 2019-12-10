@@ -23,6 +23,7 @@ type Cube struct {
 	modelUniform      int32
 	projectionUniform int32
 	cameraUniform     int32
+	mvpMatrixUniform  int32
 	vao               uint32
 	version           string
 
@@ -43,13 +44,15 @@ func CubeInit(window interfaces.Window) *Cube {
 uniform mat4 projection;
 uniform mat4 camera;
 uniform mat4 model;
+uniform mat4 mvp;
 in vec3 vert;
 in vec2 vertTexCoord;
 out vec2 fragTexCoord;
 void main()
 {
 	fragTexCoord = vertTexCoord;
-	gl_Position = projection * camera * model * vec4(vert, 1);
+	//gl_Position = projection * camera * model * vec4(vert, 1);
+	gl_Position = mvp * vec4(vert, 1);
 }
 ` + "\x00"
 	fragmentShader := cube.version + `
@@ -125,6 +128,7 @@ void main() {
 	cube.projectionUniform = gl.GLGetUniformLocation(cube.program, gl.Str("projection\x00"))
 	cube.cameraUniform = gl.GLGetUniformLocation(cube.program, gl.Str("camera\x00"))
 	cube.modelUniform = gl.GLGetUniformLocation(cube.program, gl.Str("model\x00"))
+	cube.mvpMatrixUniform = gl.GLGetUniformLocation(cube.program, gl.Str("mvp\x00"))
 
 	textureUniform := gl.GLGetUniformLocation(cube.program, gl.Str("tex\x00"))
 	gl.Uniform1i(textureUniform, 0)
@@ -174,16 +178,32 @@ func (cube *Cube) Render() {
 	cube.previousTime = sdlTime
 
 	cube.angle += float32(elapsed)
-	cube.model = mgl32.HomogRotate3D(float32(cube.angle), mgl32.Vec3{0, 1, 0})
 
 	w, h := cube.window.Size()
 	gl.Viewport(0, 0, int32(w), int32(h))
+
+	cube.model = mgl32.Ident4()
+	cube.model = cube.model.Mul4(mgl32.Scale3D(1, 1, 1))
+	cube.model = cube.model.Mul4(mgl32.Translate3D(0, 0, 0))
+	cube.model = cube.model.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{1, 0, 0}))
+	cube.model = cube.model.Mul4(mgl32.HomogRotate3D(float32(cube.angle), mgl32.Vec3{0, 1, 0}))
+	cube.model = cube.model.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{0, 0, 1}))
+	cube.model = cube.model.Mul4(mgl32.Translate3D(0, 0, 0))
+	cube.model = cube.model.Mul4(mgl32.Translate3D(0, 0, 0))
+
+	mvpMatrix := rsett.MatrixProjection.Mul4(rsett.MatrixCamera.Mul4(cube.model))
+
+	// settings.LogInfo("Projection Matrix : %v", rsett.MatrixProjection.String())
+	// settings.LogInfo("Camera Matrix : %v", rsett.MatrixCamera.String())
+	// settings.LogInfo("Model Matrix : %v", cube.model.String())
+	// settings.LogInfo("MVP Matrix : %v", mvpMatrix.String())
 
 	// Render
 	gl.UseProgram(cube.program)
 	gl.GLUniformMatrix4fv(cube.modelUniform, 1, false, &cube.model[0])
 	gl.GLUniformMatrix4fv(cube.projectionUniform, 1, false, &rsett.MatrixProjection[0])
 	gl.GLUniformMatrix4fv(cube.cameraUniform, 1, false, &rsett.MatrixCamera[0])
+	gl.GLUniformMatrix4fv(cube.mvpMatrixUniform, 1, false, &mvpMatrix[0])
 
 	gl.BindVertexArray(cube.vao)
 
