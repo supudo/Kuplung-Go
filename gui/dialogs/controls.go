@@ -40,7 +40,7 @@ func (view *ViewControls) Render(open, isFrame *bool) {
 	imgui.SetNextWindowSizeV(imgui.Vec2{X: 300, Y: 600}, imgui.ConditionFirstUseEver)
 	imgui.SetNextWindowPosV(imgui.Vec2{X: float32(sett.AppWindow.SDLWindowWidth - 310), Y: 28}, imgui.ConditionFirstUseEver, imgui.Vec2{X: 0, Y: 0})
 
-	_ = imgui.Begin("GUI Controls")
+	_ = imgui.BeginV("GUI Controls", open, imgui.WindowFlagsResizeFromAnySide)
 
 	imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
 	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: .4, Y: .2, Z: .2, W: 1})
