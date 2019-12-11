@@ -15,12 +15,16 @@ type RenderManager struct {
 
 	cube  *objects.Cube
 	wgrid *objects.WorldGrid
+
+	gridSize int32
 }
 
 // NewRenderManager will return an instance of the rendering manager
 func NewRenderManager(window interfaces.Window) *RenderManager {
 	rm := &RenderManager{}
+	rsett := settings.GetRenderingSettings()
 	rm.window = window
+	rm.gridSize = rsett.WorldGridSizeSquares
 	rm.initCamera()
 	rm.initCube()
 	rm.initWorldGrid()
@@ -38,11 +42,18 @@ func (rm *RenderManager) Render() {
 	rm.camera.Render()
 	rsett.MatrixCamera = rm.camera.MatrixCamera
 
+	if rsett.WorldGridSizeSquares != rm.gridSize {
+		rm.gridSize = rsett.WorldGridSizeSquares
+		rm.wgrid.GridSize = rsett.WorldGridSizeSquares
+		rm.wgrid.InitBuffers(rsett.WorldGridSizeSquares, 1.0)
+	}
+
 	if rsett.ShowCube {
 		rm.cube.Render()
 	}
 
 	if rsett.ShowGrid {
+		rm.wgrid.ActAsMirror = rsett.ActAsMirror
 		rm.wgrid.Render()
 	}
 }

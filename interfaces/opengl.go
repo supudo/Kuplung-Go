@@ -104,4 +104,5 @@ type OpenGL interface {
 	LogOpenGLWarn()
 
 	LineWidth(float32)
+	DepthMask(bool)
 }

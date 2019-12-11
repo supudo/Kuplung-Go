@@ -455,3 +455,8 @@ func (native *OpenGL) LogOpenGLWarn() {
 func (native *OpenGL) LineWidth(lw float32) {
 	gl.LineWidth(lw)
 }
+
+// DepthMask will set the depth mask
+func (native *OpenGL) DepthMask(mask bool) {
+	gl.DepthMask(mask)
+}

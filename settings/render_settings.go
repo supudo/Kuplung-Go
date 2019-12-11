@@ -26,7 +26,6 @@ type RenderingSettings struct {
 
 	WorldGridSizeSquares    int32
 	WorldGridFixedWithWorld bool
-	UseWorldGrid            bool
 	ShowGrid                bool
 	ActAsMirror             bool
 }
@@ -62,7 +61,6 @@ func InitRenderingSettings() RenderingSettings {
 
 	rSettings.WorldGridSizeSquares = 10
 	rSettings.WorldGridFixedWithWorld = true
-	rSettings.UseWorldGrid = true
 	rSettings.ShowGrid = true
 	rSettings.ActAsMirror = false
 

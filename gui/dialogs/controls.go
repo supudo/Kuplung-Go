@@ -163,7 +163,6 @@ func (view *ViewControls) Render(open, isFrame *bool) {
 		imgui.SliderInt("##109", &rsett.WorldGridSizeSquares, 0, 100)
 		imgui.Separator()
 		imgui.Checkbox("Grid fixed with World", &rsett.WorldGridFixedWithWorld)
-		imgui.Checkbox("Use WorldGrid", &rsett.UseWorldGrid)
 		imgui.Checkbox("Show Grid", &rsett.ShowGrid)
 		imgui.Checkbox("Act as mirror", &rsett.ActAsMirror)
 	}
