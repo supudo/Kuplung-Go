@@ -31,6 +31,9 @@ func NewRenderManager(window interfaces.Window) *RenderManager {
 func (rm *RenderManager) Render() {
 	rsett := settings.GetRenderingSettings()
 
+	w, h := rm.window.Size()
+	rm.window.OpenGL().Viewport(0, 0, int32(w), int32(h))
+
 	rsett.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
 	rm.camera.Render()
 	rsett.MatrixCamera = rm.camera.MatrixCamera

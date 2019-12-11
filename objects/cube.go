@@ -179,9 +179,6 @@ func (cube *Cube) Render() {
 
 	cube.angle += float32(elapsed)
 
-	w, h := cube.window.Size()
-	gl.Viewport(0, 0, int32(w), int32(h))
-
 	cube.model = mgl32.Ident4()
 	cube.model = cube.model.Mul4(mgl32.Scale3D(1, 1, 1))
 	cube.model = cube.model.Mul4(mgl32.Translate3D(0, 0, 0))

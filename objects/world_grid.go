@@ -1,6 +1,8 @@
 package objects
 
 import (
+	"math"
+
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
@@ -22,9 +24,11 @@ type WorldGrid struct {
 	glAttributeActAsMirror int32
 	glAttributeAlpha       int32
 
-	matrixModel mgl32.Mat4
+	matrixModel  mgl32.Mat4
+	indicesCount uint32
 
 	actAsMirror    bool
+	gridSize       int32
 	gridSizeVertex int32
 	zIndex         int
 }
@@ -56,73 +60,139 @@ func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	grid.glAttributeAlpha = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("a_alpha\x00"))
 	grid.glUniformMVPMatrix = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("u_MVPMatrix\x00"))
 
-	grid.glVAO = gl.GenVertexArrays(1)[0]
-	gl.BindVertexArray(grid.glVAO)
+	grid.initBuffers(29, 1)
 
+	return grid
+}
+
+func (grid *WorldGrid) initBuffers(gridSize int32, unitSize float32) {
+	gl := grid.window.OpenGL()
+
+	if gridSize%2 == 0 {
+		gridSize++
+	}
 	if grid.gridSizeVertex%2 == 0 {
 		grid.gridSizeVertex++
 	}
 
-	gridVerticesData := []float32{}
-	gridColorsData := []float32{}
-	//gridIndicesData := []float32{}
+	grid.gridSizeVertex = gridSize
 
-	unitSize := float32(1.0)
-	gridMinus := float32(grid.gridSizeVertex / 2)
-	var i, j float32
-	var x, y, z float32
-	for i = 0; i < float32(grid.gridSizeVertex*2); i++ {
-		for j = 0; j < float32(grid.gridSizeVertex); j++ {
-			if i < float32(grid.gridSizeVertex) {
-				x = (j - gridMinus) * unitSize
-				y = 0
-				z = (i - gridMinus) * unitSize
-				gridVerticesData = append(gridVerticesData, x, y, z)
-				if z < 0 || z > 0 {
-					gridColorsData = append(gridColorsData, 0.7, 0.7, 0.7)
-				} else {
-					gridColorsData = append(gridColorsData, 1.0, 0.0, 0.0)
-				}
-			} else {
-				x = (i - float32(grid.gridSizeVertex) - gridMinus) * unitSize
-				y = 0
-				z = (j - gridMinus) * unitSize
-				if x < 0 || x > 0 {
-					gridColorsData = append(gridColorsData, 0.7, 0.7, 0.7)
-				} else {
-					gridColorsData = append(gridColorsData, .0, 0.0, 1.0)
-				}
-			}
-		}
+	dataVertices := []float32{}
+	dataColors := []float32{}
+	dataIndices := []uint32{}
+
+	indiceCounter := uint32(0)
+	perLines := float32(math.Ceil(float64(grid.gridSizeVertex) / 2))
+
+	// +
+	for z := perLines; z > 0; z-- {
+		dataVertices = append(dataVertices, -perLines*unitSize, 0, -z*unitSize)
+		dataVertices = append(dataVertices, perLines*unitSize, 0, -z*unitSize)
+		dataColors = append(dataColors, 0.7, 0.7, 0.7)
+		dataColors = append(dataColors, 0.7, 0.7, 0.7)
+		dataIndices = append(dataIndices, indiceCounter)
+		indiceCounter++
+		dataIndices = append(dataIndices, indiceCounter)
+		indiceCounter++
 	}
 
-	grid.zIndex = len(gridVerticesData)
+	// X
+	dataVertices = append(dataVertices, -perLines*unitSize, 0, 0)
+	dataVertices = append(dataVertices, perLines*unitSize, 0, 0)
+	dataColors = append(dataColors, 1, 0, 0)
+	dataColors = append(dataColors, 1, 0, 0)
+	dataIndices = append(dataIndices, indiceCounter)
+	indiceCounter++
+	dataIndices = append(dataIndices, indiceCounter)
+	indiceCounter++
+	// X
 
-	x = float32(0.0)
-	y = float32(-1.0 * gridMinus)
-	z = float32(0.0)
-	gridVerticesData = append(gridVerticesData, x, y, z)
-	gridColorsData = append(gridColorsData, 0.0, 1.0, 0.0)
+	for z := float32(1.0); z <= perLines; z++ {
+		dataVertices = append(dataVertices, -perLines*unitSize, 0, z*unitSize)
+		dataVertices = append(dataVertices, perLines*unitSize, 0, z*unitSize)
+		dataColors = append(dataColors, 0.7, 0.7, 0.7)
+		dataColors = append(dataColors, 0.7, 0.7, 0.7)
+		dataIndices = append(dataIndices, indiceCounter)
+		indiceCounter++
+		dataIndices = append(dataIndices, indiceCounter)
+		indiceCounter++
+	}
 
-	x = float32(0.0)
-	y = float32(gridMinus)
-	z = float32(0.0)
-	gridVerticesData = append(gridVerticesData, x, y, z)
-	gridColorsData = append(gridColorsData, 0.0, 1.0, 0.0)
+	// -
+	for x := perLines; x > 0; x-- {
+		dataVertices = append(dataVertices, -x*unitSize, 0, -perLines*unitSize)
+		dataVertices = append(dataVertices, -x*unitSize, 0, perLines*unitSize)
+		dataColors = append(dataColors, 0.7, 0.7, 0.7)
+		dataColors = append(dataColors, 0.7, 0.7, 0.7)
+		dataIndices = append(dataIndices, indiceCounter)
+		indiceCounter++
+		dataIndices = append(dataIndices, indiceCounter)
+		indiceCounter++
+	}
+
+	// Z
+	dataVertices = append(dataVertices, 0, 0, perLines*unitSize)
+	dataVertices = append(dataVertices, 0, 0, -perLines*unitSize)
+	dataColors = append(dataColors, 0, 0, 1)
+	dataColors = append(dataColors, 0, 0, 1)
+	dataIndices = append(dataIndices, indiceCounter)
+	indiceCounter++
+	dataIndices = append(dataIndices, indiceCounter)
+	indiceCounter++
+	// Z
+
+	for x := float32(1.0); x <= perLines; x++ {
+		dataVertices = append(dataVertices, x*unitSize, 0, -perLines*unitSize)
+		dataVertices = append(dataVertices, x*unitSize, 0, perLines*unitSize)
+		dataColors = append(dataColors, 0.7, 0.7, 0.7)
+		dataColors = append(dataColors, 0.7, 0.7, 0.7)
+		dataIndices = append(dataIndices, indiceCounter)
+		indiceCounter++
+		dataIndices = append(dataIndices, indiceCounter)
+		indiceCounter++
+	}
+
+	grid.zIndex = len(dataVertices)
+
+	// Y
+	dataVertices = append(dataVertices, 0, perLines*unitSize, 0)
+	dataVertices = append(dataVertices, 0, -perLines*unitSize, 0)
+	dataColors = append(dataColors, 0, 1, 0)
+	dataColors = append(dataColors, 0, 1, 0)
+	dataIndices = append(dataIndices, indiceCounter)
+	indiceCounter++
+	dataIndices = append(dataIndices, indiceCounter)
+	indiceCounter++
+
+	dataVertices = append(dataVertices, 0, perLines*unitSize, 0)
+	dataVertices = append(dataVertices, 0, -perLines*unitSize, 0)
+	dataColors = append(dataColors, 0, 1, 0)
+	dataColors = append(dataColors, 0, 1, 0)
+	dataIndices = append(dataIndices, indiceCounter)
+	indiceCounter++
+	dataIndices = append(dataIndices, indiceCounter)
+	grid.indicesCount = indiceCounter
+
+	grid.glVAO = gl.GenVertexArrays(1)[0]
+	gl.BindVertexArray(grid.glVAO)
 
 	grid.vboVertices = gl.GenBuffers(1)[0]
 	gl.BindBuffer(oglconsts.ARRAY_BUFFER, grid.vboVertices)
-	gl.BufferData(oglconsts.ARRAY_BUFFER, len(gridVerticesData)*3, gl.Ptr(gridVerticesData), oglconsts.STATIC_DRAW)
+	gl.BufferData(oglconsts.ARRAY_BUFFER, len(dataVertices)*4, gl.Ptr(dataVertices), oglconsts.STATIC_DRAW)
+	gl.EnableVertexAttribArray(0)
+	gl.VertexAttribPointer(0, 3, oglconsts.FLOAT, false, 3*4, gl.PtrOffset(0))
 
 	grid.vboColors = gl.GenBuffers(1)[0]
 	gl.BindBuffer(oglconsts.ARRAY_BUFFER, grid.vboVertices)
-	gl.BufferData(oglconsts.ARRAY_BUFFER, len(gridColorsData)*3, gl.Ptr(gridColorsData), oglconsts.STATIC_DRAW)
+	gl.BufferData(oglconsts.ARRAY_BUFFER, len(dataColors)*4, gl.Ptr(dataColors), oglconsts.STATIC_DRAW)
+	gl.EnableVertexAttribArray(1)
+	gl.VertexAttribPointer(1, 3, oglconsts.FLOAT, false, 3*4, gl.PtrOffset(0))
 
-	// grid.vboIndices = gl.GenBuffers(1)[0]
-	// gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, grid.vboVertices)
-	// gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, len(gridIndicesData), gl.Ptr(gridIndicesData), oglconsts.STATIC_DRAW)
+	grid.vboIndices = gl.GenBuffers(1)[0]
+	gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, grid.vboVertices)
+	gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, len(dataIndices)*4, gl.Ptr(dataIndices), oglconsts.STATIC_DRAW)
 
-	return grid
+	gl.BindVertexArray(0)
 }
 
 // Render ...
@@ -135,9 +205,6 @@ func (grid *WorldGrid) Render() {
 	gl.Disable(oglconsts.BLEND)
 	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
 
-	w, h := grid.window.Size()
-	gl.Viewport(0, 0, int32(w), int32(h))
-
 	grid.matrixModel = mgl32.Ident4()
 	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Scale3D(1, 1, 1))
 	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
@@ -149,19 +216,19 @@ func (grid *WorldGrid) Render() {
 
 	mvpMatrix := rsett.MatrixProjection.Mul4(rsett.MatrixCamera.Mul4(grid.matrixModel))
 
+	// settings.LogInfo("Projection Matrix : %v", rsett.MatrixProjection.String())
+	// settings.LogInfo("Camera Matrix : %v", rsett.MatrixCamera.String())
+	// settings.LogInfo("Model Matrix : %v", grid.matrixModel.String())
+	// settings.LogInfo("MVP Matrix : %v", mvpMatrix.String())
+	// settings.LogError("--------")
+
 	gl.UseProgram(grid.shaderProgram)
-	gl.GLUniformMatrix4fv(grid.glUniformMVPMatrix, 1, false, &mvpMatrix[0])
 	gl.BindVertexArray(grid.glVAO)
+	gl.GLUniformMatrix4fv(grid.glUniformMVPMatrix, 1, false, &mvpMatrix[0])
 	gl.LineWidth(1.0)
 	gl.Uniform1i(grid.glAttributeAlpha, 1.0)
 	gl.Uniform1i(grid.glAttributeActAsMirror, 0)
-	var i int32
-	for i = 0; i < grid.gridSizeVertex*2; i++ {
-		gl.DrawArrays(oglconsts.LINE_STRIP, grid.gridSizeVertex*i, grid.gridSizeVertex)
-	}
-	for i = 0; i < grid.gridSizeVertex; i++ {
-		gl.DrawArrays(oglconsts.LINE_STRIP, 0, grid.gridSizeVertex)
-	}
+	gl.DrawElements(oglconsts.LINES, int32(grid.indicesCount), oglconsts.UNSIGNED_INT, 0)
 	gl.BindVertexArray(0)
 	gl.UseProgram(0)
 }
@@ -170,6 +237,7 @@ func (grid *WorldGrid) Render() {
 func (grid *WorldGrid) Dispose() {
 	gl := grid.window.OpenGL()
 
+	gl.DeleteBuffers([]uint32{grid.vboVertices, grid.vboColors, grid.vboIndices})
 	gl.DeleteVertexArrays([]uint32{grid.glVAO})
 	gl.DeleteProgram(grid.shaderProgram)
 }
