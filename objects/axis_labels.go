@@ -92,17 +92,17 @@ func (al *AxisLabels) InitBuffers() {
 	for i := 0; i < len(al.labels); i++ {
 		switch al.labels[i].model.ModelTitle {
 		case "XPlus":
-			al.labels[i].translatePos = mgl32.Vec3{al.ahPosition, 0, 0}
+			al.labels[i].translatePos = mgl32.Vec3{al.ahPosition + 1, 0, 0}
 		case "XMinus":
-			al.labels[i].translatePos = mgl32.Vec3{-al.ahPosition, -1, 0}
+			al.labels[i].translatePos = mgl32.Vec3{-al.ahPosition - 1, -1, 0}
 		case "YPlus":
-			al.labels[i].translatePos = mgl32.Vec3{0, al.ahPosition, 0}
+			al.labels[i].translatePos = mgl32.Vec3{0, al.ahPosition + 1, 0}
 		case "YMinus":
-			al.labels[i].translatePos = mgl32.Vec3{0, -al.ahPosition, 0}
+			al.labels[i].translatePos = mgl32.Vec3{0, -al.ahPosition - 1, 0}
 		case "ZPlus":
-			al.labels[i].translatePos = mgl32.Vec3{0, 0, al.ahPosition}
+			al.labels[i].translatePos = mgl32.Vec3{0, 0, al.ahPosition + 1}
 		case "ZMinus":
-			al.labels[i].translatePos = mgl32.Vec3{0, 0, -al.ahPosition}
+			al.labels[i].translatePos = mgl32.Vec3{0, 0, -al.ahPosition - 1}
 		}
 
 		al.labels[i].glVAO = gl.GenVertexArrays(1)[0]
