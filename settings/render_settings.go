@@ -59,7 +59,7 @@ func InitRenderingSettings() RenderingSettings {
 	rSettings.ShowAxisHelpers = true
 	rSettings.ShowZAxis = true
 
-	rSettings.WorldGridSizeSquares = 10
+	rSettings.WorldGridSizeSquares = 30
 	rSettings.WorldGridFixedWithWorld = true
 	rSettings.ShowGrid = true
 	rSettings.ActAsMirror = false
