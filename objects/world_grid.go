@@ -47,6 +47,7 @@ func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	grid.actAsMirrorNeedsChange = true
 	grid.zIndex = 0
 	grid.matrixModel = mgl32.Ident4()
+	grid.GridSize = rsett.WorldGridSizeSquares
 
 	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.vert")
 	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.frag")
@@ -61,7 +62,7 @@ func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	grid.glAttributeAlpha = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("a_alpha\x00"))
 	grid.glUniformMVPMatrix = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("u_MVPMatrix\x00"))
 
-	grid.InitBuffers(29, 1)
+	grid.InitBuffers(grid.GridSize, 1)
 
 	return grid
 }
@@ -175,12 +176,6 @@ func (grid *WorldGrid) InitBuffers(gridSize int32, unitSize float32) {
 		dataIndices = append(dataIndices, indiceCounter)
 		grid.indicesCount = indiceCounter
 
-		// x := ""
-		// for i := 0; i < len(dataVertices); i++ {
-		// 	x += fmt.Sprintf("%v", dataVertices[i]) + ", "
-		// }
-		// settings.LogError("%v", x)
-
 		grid.vboVertices = gl.GenBuffers(1)[0]
 		gl.BindBuffer(oglconsts.ARRAY_BUFFER, grid.vboVertices)
 		gl.BufferData(oglconsts.ARRAY_BUFFER, len(dataVertices)*4, gl.Ptr(dataVertices), oglconsts.STATIC_DRAW)
@@ -230,49 +225,6 @@ func (grid *WorldGrid) InitBuffers(gridSize int32, unitSize float32) {
 		gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, grid.vboIndices)
 		gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, len(dataIndices)*4, gl.Ptr(dataIndices), oglconsts.STATIC_DRAW)
 	}
-
-	gl.BindVertexArray(0)
-}
-
-// InitBuffers2 ...
-func (grid *WorldGrid) InitBuffers2(gridSize int32, unitSize float32) {
-	gl := grid.window.OpenGL()
-
-	vertices := []float32{
-		// top
-		0.0, 0.5, 0.0, // position
-		1.0, 0.0, 0.0, // Color
-
-		// bottom right
-		0.5, -0.5, 0.0,
-		0.0, 1.0, 0.0,
-
-		// bottom left
-		-0.5, -0.5, 0.0,
-		0.0, 0.0, 1.0,
-	}
-
-	indices := []uint32{
-		0, 1, 2, // only triangle
-	}
-
-	grid.glVAO = gl.GenVertexArrays(1)[0]
-	VBO := gl.GenBuffers(1)[0]
-	EBO := gl.GenBuffers(1)[0]
-
-	gl.BindVertexArray(grid.glVAO)
-
-	gl.BindBuffer(oglconsts.ARRAY_BUFFER, VBO)
-	gl.BufferData(oglconsts.ARRAY_BUFFER, len(vertices)*4, gl.Ptr(vertices), oglconsts.STATIC_DRAW)
-
-	gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, EBO)
-	gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, len(indices)*4, gl.Ptr(indices), oglconsts.STATIC_DRAW)
-
-	gl.VertexAttribPointer(0, 3, oglconsts.FLOAT, false, 6*4, gl.PtrOffset(0))
-	gl.EnableVertexAttribArray(0)
-
-	gl.VertexAttribPointer(1, 3, oglconsts.FLOAT, false, 6*4, gl.PtrOffset(3*4))
-	gl.EnableVertexAttribArray(1)
 
 	gl.BindVertexArray(0)
 }

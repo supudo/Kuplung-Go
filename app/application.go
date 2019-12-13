@@ -1,6 +1,8 @@
 package app
 
 import (
+	"math"
+
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/input"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
@@ -106,8 +108,14 @@ func (kapp *KuplungApp) initGuiStyle() {
 }
 
 func (kapp *KuplungApp) initRenderingManager() {
-	kapp.renderManager = rendering.NewRenderManager(kapp.window)
+	kapp.renderManager = rendering.NewRenderManager(kapp.window, kapp.DoProgress)
 	settings.LogInfo("[Application] Rendering Manager initialized.")
+}
+
+// DoProgress ...
+func (kapp *KuplungApp) DoProgress(progress float32) {
+	// TODO: implement messaging for progress
+	settings.LogWarn("[Progress] %v", math.Round(float64(progress)*100)/100)
 }
 
 func (kapp *KuplungApp) onWindowClosed() {
