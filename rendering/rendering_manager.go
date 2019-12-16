@@ -13,7 +13,7 @@ import (
 type RenderManager struct {
 	window interfaces.Window
 
-	camera *objects.Camera
+	Camera *objects.Camera
 
 	cube       *objects.Cube
 	wgrid      *objects.WorldGrid
@@ -30,10 +30,10 @@ type RenderManager struct {
 // NewRenderManager will return an instance of the rendering manager
 func NewRenderManager(window interfaces.Window, doProgress func(float32)) *RenderManager {
 	rsett := settings.GetRenderingSettings()
-	ahPosition := float32(rsett.WorldGridSizeSquares)
+	ahPosition := float32(rsett.Grid.WorldGridSizeSquares)
 	rm := &RenderManager{}
 	rm.window = window
-	rm.gridSize = rsett.WorldGridSizeSquares
+	rm.gridSize = rsett.Grid.WorldGridSizeSquares
 	rm.doProgress = doProgress
 	rm.initParserManager()
 	rm.initSystemModels()
@@ -51,29 +51,29 @@ func (rm *RenderManager) Render() {
 	w, h := rm.window.Size()
 	rm.window.OpenGL().Viewport(0, 0, int32(w), int32(h))
 
-	rsett.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rsett.Fov), rsett.RatioWidth/rsett.RatioHeight, rsett.PlaneClose, rsett.PlaneFar)
-	rm.camera.Render()
-	rsett.MatrixCamera = rm.camera.MatrixCamera
+	rsett.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rsett.General.Fov), rsett.General.RatioWidth/rsett.General.RatioHeight, rsett.General.PlaneClose, rsett.General.PlaneFar)
+	rm.Camera.Render()
+	rsett.MatrixCamera = rm.Camera.MatrixCamera
 
-	ahPosition := float32(rsett.WorldGridSizeSquares / 2)
+	ahPosition := float32(rsett.Grid.WorldGridSizeSquares / 2)
 
-	if rsett.WorldGridSizeSquares != rm.gridSize {
-		rm.gridSize = rsett.WorldGridSizeSquares
-		rm.wgrid.GridSize = rsett.WorldGridSizeSquares
-		rm.wgrid.InitBuffers(rsett.WorldGridSizeSquares, 1.0)
+	if rsett.Grid.WorldGridSizeSquares != rm.gridSize {
+		rm.gridSize = rsett.Grid.WorldGridSizeSquares
+		rm.wgrid.GridSize = rsett.Grid.WorldGridSizeSquares
+		rm.wgrid.InitBuffers(rsett.Grid.WorldGridSizeSquares, 1.0)
 		rm.axisLabels.InitBuffers()
 	}
 
-	if rsett.ShowCube {
+	if rsett.General.ShowCube {
 		rm.cube.Render()
 	}
 
-	if rsett.ShowGrid {
-		rm.wgrid.ActAsMirror = rsett.ActAsMirror
+	if rsett.Grid.ShowGrid {
+		rm.wgrid.ActAsMirror = rsett.Grid.ActAsMirror
 		rm.wgrid.Render()
 	}
 
-	if rsett.ShowAxisHelpers {
+	if rsett.Axis.ShowAxisHelpers {
 		rm.axisLabels.Render(ahPosition)
 	}
 }
@@ -82,7 +82,7 @@ func (rm *RenderManager) Render() {
 func (rm *RenderManager) Dispose() {
 	rm.cube.Dispose()
 	rm.wgrid.Dispose()
-	rm.camera.Dispose()
+	rm.Camera.Dispose()
 	rm.axisLabels.Dispose()
 }
 
@@ -102,7 +102,7 @@ func (rm *RenderManager) initSystemModels() {
 }
 
 func (rm *RenderManager) initCamera() {
-	rm.camera = objects.InitCamera(rm.window)
+	rm.Camera = objects.InitCamera(rm.window)
 }
 
 func (rm *RenderManager) initCube() {

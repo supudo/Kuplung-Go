@@ -13,10 +13,10 @@ type Camera struct {
 	MatrixCamera   mgl32.Mat4
 	cameraPosition mgl32.Vec3
 
-	eyeSettings                                 types.ObjectEye
-	positionX, positionY, positionZ             types.ObjectCoordinate
-	rotateX, rotateY, rotateZ                   types.ObjectCoordinate
-	rotateCenterX, rotateCenterY, rotateCenterZ types.ObjectCoordinate
+	EyeSettings                                 types.ObjectEye
+	PositionX, PositionY, PositionZ             types.ObjectCoordinate
+	RotateX, RotateY, RotateZ                   types.ObjectCoordinate
+	RotateCenterX, RotateCenterY, RotateCenterZ types.ObjectCoordinate
 }
 
 // InitCamera ...
@@ -24,22 +24,22 @@ func InitCamera(window interfaces.Window) *Camera {
 	camera := &Camera{}
 	camera.window = window
 
-	camera.eyeSettings = types.ObjectEye{}
-	camera.eyeSettings.ViewEye = mgl32.Vec3{0, 0, 10}
-	camera.eyeSettings.ViewCenter = mgl32.Vec3{0, 0, 0}
-	camera.eyeSettings.ViewUp = mgl32.Vec3{0, -1, 0}
+	camera.EyeSettings = types.ObjectEye{}
+	camera.EyeSettings.ViewEye = mgl32.Vec3{0, 0, 10}
+	camera.EyeSettings.ViewCenter = mgl32.Vec3{0, 0, 0}
+	camera.EyeSettings.ViewUp = mgl32.Vec3{0, -1, 0}
 
-	camera.positionX = types.ObjectCoordinate{Animate: false, Point: 0}
-	camera.positionY = types.ObjectCoordinate{Animate: false, Point: 0}
-	camera.positionZ = types.ObjectCoordinate{Animate: false, Point: -16}
+	camera.PositionX = types.ObjectCoordinate{Animate: false, Point: 0}
+	camera.PositionY = types.ObjectCoordinate{Animate: false, Point: 0}
+	camera.PositionZ = types.ObjectCoordinate{Animate: false, Point: -16}
 
-	camera.rotateX = types.ObjectCoordinate{Animate: false, Point: 160}
-	camera.rotateY = types.ObjectCoordinate{Animate: false, Point: 140}
-	camera.rotateZ = types.ObjectCoordinate{Animate: false, Point: 0}
+	camera.RotateX = types.ObjectCoordinate{Animate: false, Point: 160}
+	camera.RotateY = types.ObjectCoordinate{Animate: false, Point: 140}
+	camera.RotateZ = types.ObjectCoordinate{Animate: false, Point: 0}
 
-	camera.rotateCenterX = types.ObjectCoordinate{Animate: false, Point: 0}
-	camera.rotateCenterY = types.ObjectCoordinate{Animate: false, Point: 0}
-	camera.rotateCenterZ = types.ObjectCoordinate{Animate: false, Point: 0}
+	camera.RotateCenterX = types.ObjectCoordinate{Animate: false, Point: 0}
+	camera.RotateCenterY = types.ObjectCoordinate{Animate: false, Point: 0}
+	camera.RotateCenterZ = types.ObjectCoordinate{Animate: false, Point: 0}
 
 	camera.MatrixCamera = mgl32.Ident4()
 
@@ -52,19 +52,19 @@ func (camera *Camera) Dispose() {
 
 // Render ...
 func (camera *Camera) Render() {
-	camera.MatrixCamera = mgl32.LookAtV(camera.eyeSettings.ViewEye, camera.eyeSettings.ViewCenter, camera.eyeSettings.ViewUp)
+	camera.MatrixCamera = mgl32.LookAtV(camera.EyeSettings.ViewEye, camera.EyeSettings.ViewCenter, camera.EyeSettings.ViewUp)
 
-	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.Translate3D(camera.positionX.Point, camera.positionY.Point, camera.positionZ.Point))
+	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.Translate3D(camera.PositionX.Point, camera.PositionY.Point, camera.PositionZ.Point))
 
 	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.Translate3D(0, 0, 0))
-	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.rotateX.Point, mgl32.Vec3{1, 0, 0}))
-	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.rotateY.Point, mgl32.Vec3{0, 1, 0}))
-	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.rotateZ.Point, mgl32.Vec3{0, 0, 1}))
+	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.RotateX.Point, mgl32.Vec3{1, 0, 0}))
+	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.RotateY.Point, mgl32.Vec3{0, 1, 0}))
+	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.RotateZ.Point, mgl32.Vec3{0, 0, 1}))
 	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.Translate3D(0, 0, 0))
 
-	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.rotateCenterX.Point, mgl32.Vec3{1, 0, 0}))
-	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.rotateCenterY.Point, mgl32.Vec3{0, 1, 0}))
-	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.rotateCenterZ.Point, mgl32.Vec3{0, 0, 1}))
+	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.RotateCenterX.Point, mgl32.Vec3{1, 0, 0}))
+	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.RotateCenterY.Point, mgl32.Vec3{0, 1, 0}))
+	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.RotateCenterZ.Point, mgl32.Vec3{0, 0, 1}))
 
 	camera.cameraPosition = mgl32.Vec3{camera.MatrixCamera[4*3+0], camera.MatrixCamera[4*3+1], camera.MatrixCamera[4*3+2]}
 }

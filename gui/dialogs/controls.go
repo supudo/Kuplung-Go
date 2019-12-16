@@ -4,6 +4,7 @@ import (
 	"github.com/inkyblackness/imgui-go"
 	"github.com/sadlil/go-trigger"
 	"github.com/supudo/Kuplung-Go/gui/helpers"
+	"github.com/supudo/Kuplung-Go/rendering"
 	"github.com/supudo/Kuplung-Go/settings"
 )
 
@@ -15,6 +16,8 @@ type ViewControls struct {
 	heightTopPanel float32
 
 	fovAnimated bool
+
+	tabCamera1, tabCamera2, tabCamera3 bool
 }
 
 // NewViewControls ...
@@ -26,6 +29,10 @@ func NewViewControls() *ViewControls {
 		heightTopPanel: 160,
 
 		fovAnimated: false,
+
+		tabCamera1: true,
+		tabCamera2: false,
+		tabCamera3: false,
 	}
 	trigger.On("selectedObject", view.setSelectedObject)
 	trigger.On("selectedObjectLight", view.setSelectedObjectLight)
@@ -33,7 +40,7 @@ func NewViewControls() *ViewControls {
 }
 
 // Render ...
-func (view *ViewControls) Render(open, isFrame *bool) {
+func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManager) {
 	sett := settings.GetSettings()
 	rsett := settings.GetRenderingSettings()
 
@@ -46,7 +53,8 @@ func (view *ViewControls) Render(open, isFrame *bool) {
 	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: .4, Y: .2, Z: .2, W: 1})
 	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: .9, Y: .2, Z: .2, W: 1})
 	if imgui.ButtonV("Reset values to default", imgui.Vec2{X: -1, Y: 0}) {
-		// TODO: reset all settings
+		settings.ResetRenderSettings()
+		// TODO: reset settings in objects
 	}
 	imgui.PopStyleColorV(3)
 
@@ -122,35 +130,119 @@ func (view *ViewControls) Render(open, isFrame *bool) {
 	switch view.selectedObject {
 	case 0:
 		if imgui.TreeNodeV("View Options", imgui.TreeNodeFlagsCollapsingHeader) {
-			//imgui.PushStyleVarVec2(imgui.StyleVarWindowPadding, imgui.Vec2{X: 20, Y: 0})
-			helpers.AddSliderF32("Field of view", 1, 1.0, -180, 180, true, true, &view.fovAnimated, isFrame, &rsett.Fov)
+			helpers.AddControlsSlider("Field of view", 1, 1.0, -180.0, 180.0, false, &view.fovAnimated, &rsett.General.Fov, true, isFrame)
 			imgui.Separator()
 			imgui.Text("Ratio")
 			if imgui.IsItemHovered() {
 				imgui.SetTooltip("W & H")
 			}
-			imgui.SliderFloat("W##105", &rsett.RatioWidth, 0.0, 5.0)
-			imgui.SliderFloat("H##106", &rsett.RatioHeight, 0.0, 5.0)
+			imgui.SliderFloat("W##105", &rsett.General.RatioWidth, 0.0, 5.0)
+			imgui.SliderFloat("H##106", &rsett.General.RatioHeight, 0.0, 5.0)
 			imgui.Separator()
 			imgui.Text("Planes")
 			if imgui.IsItemHovered() {
 				imgui.SetTooltip("Far & Close")
 			}
-			imgui.SliderFloat("Close##108", &rsett.PlaneClose, 0.0, 1000.0)
-			imgui.SliderFloat("Far##107", &rsett.PlaneFar, 0.0, 1000.0)
+			imgui.SliderFloat("Close##108", &rsett.General.PlaneClose, 0.0, 1000.0)
+			imgui.SliderFloat("Far##107", &rsett.General.PlaneFar, 0.0, 1000.0)
 			imgui.Separator()
 			imgui.Text("Gamma")
 			if imgui.IsItemHovered() {
 				imgui.SetTooltip("Gamma correction")
 			}
-			imgui.SliderFloat("##109", &rsett.GammaCoeficient, 1.0, 4.0)
+			imgui.SliderFloat("##109", &rsett.General.GammaCoeficient, 1.0, 4.0)
 			//mgui.PopStyleVar()
 			imgui.TreePop()
 		}
 		if imgui.TreeNodeV("Editor Artefacts", imgui.TreeNodeFlagsCollapsingHeader) {
-			imgui.Checkbox("Axis Helpers", &rsett.ShowAxisHelpers)
-			imgui.Checkbox("Z Axis", &rsett.ShowZAxis)
+			imgui.Checkbox("Axis Helpers", &rsett.Axis.ShowAxisHelpers)
+			imgui.Checkbox("Z Axis", &rsett.Axis.ShowZAxis)
 			imgui.TreePop()
+		}
+		if imgui.TreeNodeV("Rays", imgui.TreeNodeFlagsCollapsingHeader) {
+			if imgui.Checkbox("Show Rays", &rsett.General.ShowPickRays) {
+				settings.SaveRenderingSettings()
+			}
+			if imgui.Checkbox("Single Ray", &rsett.General.ShowPickRaysSingle) {
+				settings.SaveRenderingSettings()
+			}
+			if imgui.TreeNodeV("Add Ray", imgui.TreeNodeFlagsCollapsingHeader|imgui.TreeNodeFlagsDefaultOpen) {
+				imgui.Text("Origin")
+				if imgui.ButtonV("Set to camera position", imgui.Vec2{X: imgui.WindowWidth() * 0.75, Y: 0}) {
+					rsett.General.RayOriginX = rm.Camera.PositionX.Point
+					rsett.General.RayOriginY = rm.Camera.PositionY.Point
+					rsett.General.RayOriginZ = rm.Camera.PositionZ.Point
+				}
+				imgui.InputTextV("X##9920", &rsett.General.RayOriginXS, imgui.InputTextFlagsCharsDecimal, nil)
+				imgui.InputTextV("Y##9921", &rsett.General.RayOriginYS, imgui.InputTextFlagsCharsDecimal, nil)
+				imgui.InputTextV("Z##9922", &rsett.General.RayOriginZS, imgui.InputTextFlagsCharsDecimal, nil)
+				imgui.Checkbox("Animate", &rsett.General.RayAnimate)
+				if rsett.General.RayAnimate {
+					imgui.Text("Direction")
+					imgui.SliderFloat("X##9930", &rsett.General.RayDirectionX, -1.0, 1.0)
+					imgui.SliderFloat("Y##9931", &rsett.General.RayDirectionY, -1.0, 1.0)
+					imgui.SliderFloat("Z##9932", &rsett.General.RayDirectionZ, -1.0, 1.0)
+				} else {
+					imgui.Text("Direction")
+					imgui.InputTextV("X##9930", &rsett.General.RayDirectionXS, imgui.InputTextFlagsCharsDecimal, nil)
+					imgui.InputTextV("Y##9931", &rsett.General.RayDirectionYS, imgui.InputTextFlagsCharsDecimal, nil)
+					imgui.InputTextV("Z##9932", &rsett.General.RayDirectionZS, imgui.InputTextFlagsCharsDecimal, nil)
+					if imgui.ButtonV("Draw", imgui.Vec2{X: imgui.WindowWidth() * 0.75, Y: 0}) {
+						rsett.General.RayDraw = true
+					}
+				}
+			}
+			imgui.TreePop()
+		}
+	case 1:
+		if imgui.BeginTabBarV("cameraTabs", imgui.TabBarFlagsNoCloseWithMiddleMouseButton|imgui.TabBarFlagsNoTooltip) {
+			if imgui.BeginTabItem("Look At") {
+				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
+				imgui.Text("Look-At Matrix")
+				imgui.PopStyleColorV(1)
+				imgui.Separator()
+				imgui.Text("Eye")
+				helpers.AddControlsSliderSameLine("X", 1, 1.0, -rsett.General.PlaneFar, rsett.General.PlaneFar, false, nil, &rm.Camera.EyeSettings.ViewEye[0], true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 2, 1.0, -rsett.General.PlaneFar, rsett.General.PlaneFar, false, nil, &rm.Camera.EyeSettings.ViewEye[1], true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 3, 1.0, -rsett.General.PlaneFar, rsett.General.PlaneFar, false, nil, &rm.Camera.EyeSettings.ViewEye[2], true, isFrame)
+				imgui.Separator()
+				imgui.Text("Center")
+				helpers.AddControlsSliderSameLine("X", 4, 1.0, -10.0, 10.0, false, nil, &rm.Camera.EyeSettings.ViewCenter[0], true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 5, 1.0, -10.0, 10.0, false, nil, &rm.Camera.EyeSettings.ViewCenter[1], true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 6, 1.0, 0.0, 45.0, false, nil, &rm.Camera.EyeSettings.ViewCenter[2], true, isFrame)
+				imgui.Separator()
+				imgui.Text("Up")
+				helpers.AddControlsSliderSameLine("X", 7, 1.0, -1.0, 1.0, false, nil, &rm.Camera.EyeSettings.ViewUp[0], true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 8, 1.0, -1.0, 1.0, false, nil, &rm.Camera.EyeSettings.ViewUp[1], true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 9, 1.0, -1.0, 1.0, false, nil, &rm.Camera.EyeSettings.ViewUp[2], true, isFrame)
+				imgui.EndTabItem()
+			}
+			if imgui.BeginTabItem("Rotate") {
+				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
+				imgui.Text("Rotate object around axis")
+				imgui.PopStyleColorV(1)
+				helpers.AddControlsSliderSameLine("X", 13, 1.0, 0.0, 360.0, true, &rm.Camera.RotateX.Animate, &rm.Camera.RotateX.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 14, 1.0, 0.0, 360.0, true, &rm.Camera.RotateY.Animate, &rm.Camera.RotateY.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 15, 1.0, 0.0, 360.0, true, &rm.Camera.RotateZ.Animate, &rm.Camera.RotateZ.Point, true, isFrame)
+				imgui.Separator()
+				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
+				imgui.Text("Rotate object around center")
+				imgui.PopStyleColorV(1)
+				helpers.AddControlsSliderSameLine("X", 16, 1.0, -180.0, 180.0, true, &rm.Camera.RotateCenterX.Animate, &rm.Camera.RotateCenterX.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 17, 1.0, -180.0, 180.0, true, &rm.Camera.RotateCenterY.Animate, &rm.Camera.RotateCenterY.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 18, 1.0, -180.0, 180.0, true, &rm.Camera.RotateCenterZ.Animate, &rm.Camera.RotateCenterZ.Point, true, isFrame)
+				imgui.EndTabItem()
+			}
+			if imgui.BeginTabItem("Translate") {
+				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
+				imgui.Text("Move object by axis")
+				imgui.PopStyleColorV(1)
+				helpers.AddControlsSliderSameLine("X", 19, 0.05, float32(-2*rsett.Grid.WorldGridSizeSquares), float32(2*rsett.Grid.WorldGridSizeSquares), true, &rm.Camera.PositionX.Animate, &rm.Camera.PositionX.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 20, 0.05, float32(-2*rsett.Grid.WorldGridSizeSquares), float32(2*rsett.Grid.WorldGridSizeSquares), true, &rm.Camera.PositionY.Animate, &rm.Camera.PositionY.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 21, 0.05, float32(-2*rsett.Grid.WorldGridSizeSquares), float32(2*rsett.Grid.WorldGridSizeSquares), true, &rm.Camera.PositionZ.Animate, &rm.Camera.PositionZ.Point, true, isFrame)
+				imgui.EndTabItem()
+			}
+			imgui.EndTabBar()
 		}
 	case 3:
 		imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
@@ -160,11 +252,11 @@ func (view *ViewControls) Render(open, isFrame *bool) {
 		if imgui.IsItemHovered() {
 			imgui.SetTooltip("In squares")
 		}
-		imgui.SliderInt("##109", &rsett.WorldGridSizeSquares, 0, 100)
+		imgui.SliderInt("##109", &rsett.Grid.WorldGridSizeSquares, 0, 100)
 		imgui.Separator()
-		imgui.Checkbox("Grid fixed with World", &rsett.WorldGridFixedWithWorld)
-		imgui.Checkbox("Show Grid", &rsett.ShowGrid)
-		imgui.Checkbox("Act as mirror", &rsett.ActAsMirror)
+		imgui.Checkbox("Grid fixed with World", &rsett.Grid.WorldGridFixedWithWorld)
+		imgui.Checkbox("Show Grid", &rsett.Grid.ShowGrid)
+		imgui.Checkbox("Act as mirror", &rsett.Grid.ActAsMirror)
 	}
 	imgui.PopItemWidth()
 	imgui.EndChild()

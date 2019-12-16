@@ -63,7 +63,7 @@ func (kapp *KuplungApp) render() {
 	if !sett.MemSettings.QuitApplication {
 		kapp.guiContext.NewFrame()
 		kapp.gl.Clear(oglconsts.COLOR_BUFFER_BIT | oglconsts.DEPTH_BUFFER_BIT | oglconsts.STENCIL_BUFFER_BIT)
-		kapp.guiContext.DrawGUI(true)
+		kapp.guiContext.DrawGUI(true, kapp.renderManager)
 
 		kapp.renderManager.Render()
 

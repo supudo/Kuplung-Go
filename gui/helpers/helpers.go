@@ -7,8 +7,8 @@ import (
 	"github.com/inkyblackness/imgui-go"
 )
 
-// AddSliderF32 ...
-func AddSliderF32(title string, idx int, step, min, limit float32, showAnimate, doMinus bool, animatedFlag, isFrame *bool, animatedValue *float32) {
+// AddControlsSlider ...
+func AddControlsSlider(title string, idx int32, step float32, min float32, limit float32, showAnimate bool, animatedFlag *bool, animatedValue *float32, doMinus bool, isFrame *bool) {
 	if len(title) > 0 {
 		imgui.Text(title)
 	}
@@ -25,6 +25,23 @@ func AddSliderF32(title string, idx int, step, min, limit float32, showAnimate, 
 	}
 	sid := fmt.Sprintf("##%v", idx)
 	imgui.SliderFloat(sid, animatedValue, min, limit)
+}
+
+// AddControlsSliderSameLine ...
+func AddControlsSliderSameLine(title string, idx int32, step float32, min float32, limit float32, showAnimate bool, animatedFlag *bool, animatedValue *float32, doMinus bool, isFrame *bool) {
+	if showAnimate {
+		cid := fmt.Sprintf("##%v", idx)
+		_ = imgui.Checkbox(cid, animatedFlag)
+		animateValue(isFrame, animatedFlag, animatedValue, step, limit, doMinus)
+		if imgui.IsItemHovered() {
+			imgui.SetTooltip("Animate " + title)
+		}
+		imgui.SameLine()
+	}
+	sid := fmt.Sprintf("##10%v", idx)
+	imgui.SliderFloat(sid, *(&animatedValue), min, limit)
+	imgui.SameLine()
+	imgui.Text(title)
 }
 
 func animateValue(isFrame, animatedFlag *bool, animatedValue *float32, step, limit float32, doMinus bool) {

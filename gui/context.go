@@ -11,6 +11,7 @@ import (
 	"github.com/supudo/Kuplung-Go/gui/dialogs"
 	"github.com/supudo/Kuplung-Go/gui/fonts"
 	"github.com/supudo/Kuplung-Go/interfaces"
+	"github.com/supudo/Kuplung-Go/rendering"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -170,11 +171,11 @@ func (context *Context) Render() {
 }
 
 // DrawGUI ...
-func (context *Context) DrawGUI(isFrame bool) {
+func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 	context.DrawMainMenu()
 
 	if context.GuiVars.showControls {
-		context.viewControls.Render(&context.GuiVars.showControls, &isFrame)
+		context.viewControls.Render(&context.GuiVars.showControls, &isFrame, rm)
 	}
 
 	if context.GuiVars.showModels {

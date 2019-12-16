@@ -114,7 +114,7 @@ void main() {
 		1.0, 1.0, 1.0, 0.0, 1.0,
 	}
 
-	cube.fov = rsett.Fov
+	cube.fov = rsett.General.Fov
 
 	gl := window.OpenGL()
 

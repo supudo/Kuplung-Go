@@ -48,7 +48,7 @@ func (context *Context) DrawMainMenu() {
 		}
 		imgui.Separator()
 		if imgui.MenuItem("Cube") {
-			rsett.ShowCube = !rsett.ShowCube
+			rsett.General.ShowCube = !rsett.General.ShowCube
 		}
 		imgui.EndMenu()
 	}

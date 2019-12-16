@@ -43,11 +43,11 @@ func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	grid := &WorldGrid{}
 
 	grid.window = window
-	grid.ActAsMirror = rsett.ActAsMirror
+	grid.ActAsMirror = rsett.Grid.ActAsMirror
 	grid.actAsMirrorNeedsChange = true
 	grid.zIndex = 0
 	grid.matrixModel = mgl32.Ident4()
-	grid.GridSize = rsett.WorldGridSizeSquares
+	grid.GridSize = rsett.Grid.WorldGridSizeSquares
 
 	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.vert")
 	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.frag")
