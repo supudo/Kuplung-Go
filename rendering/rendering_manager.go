@@ -19,6 +19,7 @@ type RenderManager struct {
 	wgrid       *objects.WorldGrid
 	axisLabels  *objects.AxisLabels
 	CameraModel *objects.CameraModel
+	miniAxis    *objects.MiniAxis
 
 	gridSize int32
 
@@ -43,6 +44,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm.initWorldGrid()
 	rm.initAxisLabels(ahPosition)
 	rm.initCameraModel()
+	rm.initMiniAxis()
 	return rm
 }
 
@@ -80,6 +82,7 @@ func (rm *RenderManager) Render() {
 	}
 
 	rm.CameraModel.Render(rm.wgrid.MatrixModel)
+	rm.miniAxis.Render()
 }
 
 // Dispose will cleanup everything
@@ -89,6 +92,7 @@ func (rm *RenderManager) Dispose() {
 	rm.Camera.Dispose()
 	rm.axisLabels.Dispose()
 	rm.CameraModel.Dispose()
+	rm.miniAxis.Dispose()
 }
 
 func (rm *RenderManager) initParserManager() {
@@ -138,4 +142,10 @@ func (rm *RenderManager) initCameraModel() {
 	rm.CameraModel = objects.InitCameraModel(rm.window, rm.systemModels["camera"])
 	rm.CameraModel.InitProperties()
 	rm.CameraModel.InitBuffers()
+}
+
+func (rm *RenderManager) initMiniAxis() {
+	rm.miniAxis = objects.InitMiniAxis(rm.window)
+	rm.miniAxis.InitProperties()
+	rm.miniAxis.InitBuffers()
 }
