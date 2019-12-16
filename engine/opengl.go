@@ -300,6 +300,11 @@ func (native *OpenGL) Uniform1i(location int32, value int32) {
 	gl.Uniform1i(location, value)
 }
 
+// Uniform3f implements the interfaces.OpenGL interface.
+func (native *OpenGL) Uniform3f(location int32, value1 float32, value2 float32, value3 float32) {
+	gl.Uniform3f(location, value1, value2, value3)
+}
+
 // Uniform4fv implements the interfaces.OpenGL interface.
 func (native *OpenGL) Uniform4fv(location int32, value *[4]float32) {
 	gl.Uniform4fv(location, 1, &value[0])

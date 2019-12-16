@@ -9,5 +9,5 @@ out vec3 fs_color;
 
 void main(void) {
   fs_color = a_color;
-    gl_Position = u_MVPMatrix * vec4(a_vertexPosition, 1.0);
+  gl_Position = u_MVPMatrix * vec4(a_vertexPosition, 1.0);
 }

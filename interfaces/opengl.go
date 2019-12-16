@@ -69,6 +69,7 @@ type OpenGL interface {
 	TexParameteri(target uint32, pname uint32, param int32)
 
 	Uniform1i(location int32, value int32)
+	Uniform3f(location int32, value1 float32, value2 float32, value3 float32)
 	Uniform4fv(location int32, value *[4]float32)
 	UniformMatrix4fv(location int32, transpose bool, value *[16]float32)
 	GLUniformMatrix4fv(location int32, count int32, transpose bool, value *float32)

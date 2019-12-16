@@ -12,6 +12,7 @@ const (
 // nolint: golint,megacheck
 const (
 	POINTS         uint32 = 0x0000
+	LINE                  = 0x1B01
 	LINES                 = 0x0001
 	LINE_LOOP             = 0x0002
 	LINE_STRIP            = 0x0003

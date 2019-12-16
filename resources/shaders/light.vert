@@ -10,8 +10,8 @@ out vec3 v_vertexNormal;
 out vec2 v_textureCoord;
 
 void main(void) {
-    v_vertexNormal = a_vertexNormal;
-    v_textureCoord = a_textureCoord;
+  v_vertexNormal = a_vertexNormal;
+  v_textureCoord = a_textureCoord;
 
-    gl_Position = u_MVPMatrix * vec4(a_vertexPosition, 1.0);
+  gl_Position = u_MVPMatrix * vec4(a_vertexPosition, 1.0);
 }

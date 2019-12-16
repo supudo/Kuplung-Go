@@ -244,6 +244,50 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 			}
 			imgui.EndTabBar()
 		}
+	case 2:
+		if imgui.BeginTabBarV("cameraModelTabs", imgui.TabBarFlagsNoCloseWithMiddleMouseButton|imgui.TabBarFlagsNoTooltip) {
+			if imgui.BeginTabItem("General") {
+				imgui.Checkbox("Camera", &rm.CameraModel.ShowCameraObject)
+				imgui.Checkbox("Wire", &rm.CameraModel.ShowInWire)
+				imgui.Separator()
+				imgui.Text("Inner Light Direction")
+				helpers.AddControlsSliderSameLine("X", 1, 0.001, -1.0, 1.0, true, &rm.CameraModel.InnerLightDirectionX.Animate, &rm.CameraModel.InnerLightDirectionX.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 2, 0.001, -1.0, 1.0, true, &rm.CameraModel.InnerLightDirectionY.Animate, &rm.CameraModel.InnerLightDirectionY.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 3, 0.001, -1.0, 1.0, true, &rm.CameraModel.InnerLightDirectionZ.Animate, &rm.CameraModel.InnerLightDirectionZ.Point, true, isFrame)
+				imgui.Separator()
+				imgui.Text("ModelFace Color")
+				helpers.AddControlsSliderSameLine("X", 13, 0.01, 0.0, 1.0, true, &rm.CameraModel.ColorR.Animate, &rm.CameraModel.ColorR.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 14, 0.01, 0.0, 1.0, true, &rm.CameraModel.ColorG.Animate, &rm.CameraModel.ColorG.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 15, 0.01, 0.0, 1.0, true, &rm.CameraModel.ColorB.Animate, &rm.CameraModel.ColorB.Point, true, isFrame)
+				imgui.EndTabItem()
+			}
+			if imgui.BeginTabItem("Position") {
+				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
+				imgui.Text("Move object by axis")
+				imgui.PopStyleColorV(1)
+				helpers.AddControlsSliderSameLine("X", 4, 0.05, float32(-2*rsett.Grid.WorldGridSizeSquares), float32(2*rsett.Grid.WorldGridSizeSquares), true, &rm.CameraModel.PositionX.Animate, &rm.CameraModel.PositionX.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 5, 0.05, float32(-2*rsett.Grid.WorldGridSizeSquares), float32(2*rsett.Grid.WorldGridSizeSquares), true, &rm.CameraModel.PositionY.Animate, &rm.CameraModel.PositionY.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 6, 0.05, float32(-2*rsett.Grid.WorldGridSizeSquares), float32(2*rsett.Grid.WorldGridSizeSquares), true, &rm.CameraModel.PositionZ.Animate, &rm.CameraModel.PositionZ.Point, true, isFrame)
+				imgui.EndTabItem()
+			}
+			if imgui.BeginTabItem("Rotate") {
+				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
+				imgui.Text("Rotate object around axis")
+				imgui.PopStyleColorV(1)
+				helpers.AddControlsSliderSameLine("X", 7, 1.0, 0.0, 360.0, true, &rm.CameraModel.RotateX.Animate, &rm.CameraModel.RotateX.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 8, 1.0, 0.0, 360.0, true, &rm.CameraModel.RotateY.Animate, &rm.CameraModel.RotateY.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 9, 1.0, 0.0, 360.0, true, &rm.CameraModel.RotateZ.Animate, &rm.CameraModel.RotateZ.Point, true, isFrame)
+				imgui.Separator()
+				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
+				imgui.Text("Rotate object around center")
+				imgui.PopStyleColorV(1)
+				helpers.AddControlsSliderSameLine("X", 10, 1.0, -180.0, 180.0, true, &rm.CameraModel.RotateCenterX.Animate, &rm.CameraModel.RotateCenterX.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Y", 11, 1.0, -180.0, 180.0, true, &rm.CameraModel.RotateCenterY.Animate, &rm.CameraModel.RotateCenterY.Point, true, isFrame)
+				helpers.AddControlsSliderSameLine("Z", 12, 1.0, -180.0, 180.0, true, &rm.CameraModel.RotateCenterZ.Animate, &rm.CameraModel.RotateCenterZ.Point, true, isFrame)
+				imgui.EndTabItem()
+			}
+			imgui.EndTabBar()
+		}
 	case 3:
 		imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
 		imgui.Text("General World Grid settings")

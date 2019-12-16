@@ -24,7 +24,8 @@ type WorldGrid struct {
 	glAttributeActAsMirror int32
 	glAttributeAlpha       int32
 
-	matrixModel  mgl32.Mat4
+	MatrixModel mgl32.Mat4
+
 	indicesCount uint32
 
 	ActAsMirror            bool
@@ -46,7 +47,7 @@ func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	grid.ActAsMirror = rsett.Grid.ActAsMirror
 	grid.actAsMirrorNeedsChange = true
 	grid.zIndex = 0
-	grid.matrixModel = mgl32.Ident4()
+	grid.MatrixModel = mgl32.Ident4()
 	grid.GridSize = rsett.Grid.WorldGridSizeSquares
 
 	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.vert")
@@ -239,16 +240,16 @@ func (grid *WorldGrid) Render() {
 	gl.Disable(oglconsts.BLEND)
 	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
 
-	grid.matrixModel = mgl32.Ident4()
-	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Scale3D(1, 1, 1))
-	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
-	grid.matrixModel = grid.matrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{1, 0, 0}))
-	grid.matrixModel = grid.matrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{0, 1, 0}))
-	grid.matrixModel = grid.matrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{0, 0, 1}))
-	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
-	grid.matrixModel = grid.matrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
+	grid.MatrixModel = mgl32.Ident4()
+	grid.MatrixModel = grid.MatrixModel.Mul4(mgl32.Scale3D(1, 1, 1))
+	grid.MatrixModel = grid.MatrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
+	grid.MatrixModel = grid.MatrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{1, 0, 0}))
+	grid.MatrixModel = grid.MatrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{0, 1, 0}))
+	grid.MatrixModel = grid.MatrixModel.Mul4(mgl32.HomogRotate3D(0, mgl32.Vec3{0, 0, 1}))
+	grid.MatrixModel = grid.MatrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
+	grid.MatrixModel = grid.MatrixModel.Mul4(mgl32.Translate3D(0, 0, 0))
 
-	mvpMatrix := rsett.MatrixProjection.Mul4(rsett.MatrixCamera.Mul4(grid.matrixModel))
+	mvpMatrix := rsett.MatrixProjection.Mul4(rsett.MatrixCamera.Mul4(grid.MatrixModel))
 
 	// settings.LogInfo("Projection Matrix : %v", rsett.MatrixProjection.String())
 	// settings.LogInfo("Camera Matrix : %v", rsett.MatrixCamera.String())

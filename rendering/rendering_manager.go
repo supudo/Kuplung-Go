@@ -15,9 +15,10 @@ type RenderManager struct {
 
 	Camera *objects.Camera
 
-	cube       *objects.Cube
-	wgrid      *objects.WorldGrid
-	axisLabels *objects.AxisLabels
+	cube        *objects.Cube
+	wgrid       *objects.WorldGrid
+	axisLabels  *objects.AxisLabels
+	CameraModel *objects.CameraModel
 
 	gridSize int32
 
@@ -41,6 +42,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm.initCube()
 	rm.initWorldGrid()
 	rm.initAxisLabels(ahPosition)
+	rm.initCameraModel()
 	return rm
 }
 
@@ -76,6 +78,8 @@ func (rm *RenderManager) Render() {
 	if rsett.Axis.ShowAxisHelpers {
 		rm.axisLabels.Render(ahPosition)
 	}
+
+	rm.CameraModel.Render(rm.wgrid.MatrixModel)
 }
 
 // Dispose will cleanup everything
@@ -84,6 +88,7 @@ func (rm *RenderManager) Dispose() {
 	rm.wgrid.Dispose()
 	rm.Camera.Dispose()
 	rm.axisLabels.Dispose()
+	rm.CameraModel.Dispose()
 }
 
 func (rm *RenderManager) initParserManager() {
@@ -99,6 +104,10 @@ func (rm *RenderManager) initSystemModels() {
 	rm.systemModels["axis_y_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/y_minus.obj", nil)[0]
 	rm.systemModels["axis_z_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/z_plus.obj", nil)[0]
 	rm.systemModels["axis_z_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/z_minus.obj", nil)[0]
+	rm.systemModels["camera"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/gui/camera.obj", nil)[0]
+	rm.systemModels["light_directional"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/gui/light_directional.obj", nil)[0]
+	rm.systemModels["light_point"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/gui/light_point.obj", nil)[0]
+	rm.systemModels["light_spot"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/gui/light_spot.obj", nil)[0]
 }
 
 func (rm *RenderManager) initCamera() {
@@ -123,4 +132,10 @@ func (rm *RenderManager) initAxisLabels(ahPosition float32) {
 		rm.systemModels["axis_z_plus"],
 		rm.systemModels["axis_z_minus"]}
 	rm.axisLabels.SetModels(models, ahPosition)
+}
+
+func (rm *RenderManager) initCameraModel() {
+	rm.CameraModel = objects.InitCameraModel(rm.window, rm.systemModels["camera"])
+	rm.CameraModel.InitProperties()
+	rm.CameraModel.InitBuffers()
 }
