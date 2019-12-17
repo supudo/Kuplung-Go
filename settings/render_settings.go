@@ -54,6 +54,10 @@ type RenderingSettings struct {
 		ShowGrid                bool  `yaml:"ShowGrid"`
 		ActAsMirror             bool  `yaml:"ActAsMirror"`
 	} `yaml:"Grid"`
+
+	SkyBox struct {
+		SkyboxSelectedItem int32
+	}
 }
 
 var instantiatedRendering *RenderingSettings

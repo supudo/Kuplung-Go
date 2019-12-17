@@ -301,6 +301,23 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 		imgui.Checkbox("Grid fixed with World", &rsett.Grid.WorldGridFixedWithWorld)
 		imgui.Checkbox("Show Grid", &rsett.Grid.ShowGrid)
 		imgui.Checkbox("Act as mirror", &rsett.Grid.ActAsMirror)
+	case 5:
+		imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+		imgui.Text("Skybox")
+		imgui.PopStyleColor()
+		if imgui.BeginCombo("##skybox", rm.SkyBox.SkyboxItems[rsett.SkyBox.SkyboxSelectedItem].Title) {
+			var i int32
+			for i = 0; i < int32(len(rm.SkyBox.SkyboxItems)); i++ {
+				sksel := (i == rsett.SkyBox.SkyboxSelectedItem)
+				if imgui.SelectableV(rm.SkyBox.SkyboxItems[i].Title, sksel, 0, imgui.Vec2{0, 0}) {
+					rsett.SkyBox.SkyboxSelectedItem = i
+				}
+				if sksel {
+					imgui.SetItemDefaultFocus()
+				}
+			}
+			imgui.EndCombo()
+		}
 	}
 	imgui.PopItemWidth()
 	imgui.EndChild()

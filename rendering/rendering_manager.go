@@ -20,6 +20,7 @@ type RenderManager struct {
 	axisLabels  *objects.AxisLabels
 	CameraModel *objects.CameraModel
 	miniAxis    *objects.MiniAxis
+	SkyBox      *objects.SkyBox
 
 	gridSize int32
 
@@ -45,6 +46,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm.initAxisLabels(ahPosition)
 	rm.initCameraModel()
 	rm.initMiniAxis()
+	rm.initSkyBox()
 	return rm
 }
 
@@ -83,6 +85,7 @@ func (rm *RenderManager) Render() {
 
 	rm.CameraModel.Render(rm.wgrid.MatrixModel)
 	rm.miniAxis.Render()
+	rm.SkyBox.Render()
 }
 
 // Dispose will cleanup everything
@@ -93,6 +96,7 @@ func (rm *RenderManager) Dispose() {
 	rm.axisLabels.Dispose()
 	rm.CameraModel.Dispose()
 	rm.miniAxis.Dispose()
+	rm.SkyBox.Dispose()
 }
 
 func (rm *RenderManager) initParserManager() {
@@ -148,4 +152,9 @@ func (rm *RenderManager) initMiniAxis() {
 	rm.miniAxis = objects.InitMiniAxis(rm.window)
 	rm.miniAxis.InitProperties()
 	rm.miniAxis.InitBuffers()
+}
+
+func (rm *RenderManager) initSkyBox() {
+	rm.SkyBox = objects.InitSkyBox(rm.window)
+	rm.SkyBox.InitBuffers()
 }

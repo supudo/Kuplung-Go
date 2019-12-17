@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/draw"
+	_ "image/jpeg"
 	"io/ioutil"
 	"os"
 
@@ -107,6 +108,52 @@ func LoadTexture(gl interfaces.OpenGL, file string) uint32 {
 		oglconsts.RGBA,
 		oglconsts.UNSIGNED_BYTE,
 		gl.Ptr(rgba.Pix))
+
+	return texture
+}
+
+// LoadCubemapTexture ...
+func LoadCubemapTexture(gl interfaces.OpenGL, images []string) uint32 {
+	tcms := []uint32{
+		oglconsts.TEXTURE_CUBE_MAP_POSITIVE_X, // Right
+		oglconsts.TEXTURE_CUBE_MAP_NEGATIVE_X, // Left
+		oglconsts.TEXTURE_CUBE_MAP_POSITIVE_Y, // Top
+		oglconsts.TEXTURE_CUBE_MAP_NEGATIVE_Y, // Bottom
+		oglconsts.TEXTURE_CUBE_MAP_POSITIVE_Z, // Back
+		oglconsts.TEXTURE_CUBE_MAP_NEGATIVE_Z, // Front
+	}
+
+	texture := gl.GenTextures(1)[0]
+	gl.ActiveTexture(oglconsts.TEXTURE0)
+	gl.BindTexture(oglconsts.TEXTURE_CUBE_MAP, texture)
+
+	sett := settings.GetSettings()
+	for i := 0; i < len(images); i++ {
+		file := sett.App.CurrentPath + "/../Resources/resources/skybox/" + images[i]
+		imgFile, err := os.Open(file)
+		if err != nil {
+			settings.LogError("Cubemap texture (%v) - file not found: %v", file, err)
+		}
+		img, _, err := image.Decode(imgFile)
+		if err != nil {
+			settings.LogError("Cubemap texture (%v) - can't decode texture: %v", file, err)
+		}
+
+		rgba := image.NewRGBA(img.Bounds())
+		if rgba.Stride != rgba.Rect.Size().X*4 {
+			settings.LogError("Cubemap texture (%v) - unsupported stride!", file)
+		}
+		draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
+
+		gl.TexImage2D(tcms[i], 0, oglconsts.RGBA, int32(rgba.Rect.Size().X), int32(rgba.Rect.Size().Y), 0, oglconsts.RGBA, oglconsts.UNSIGNED_BYTE, gl.Ptr(rgba.Pix))
+	}
+
+	gl.TexParameteri(oglconsts.TEXTURE_CUBE_MAP, oglconsts.TEXTURE_MAG_FILTER, oglconsts.LINEAR)
+	gl.TexParameteri(oglconsts.TEXTURE_CUBE_MAP, oglconsts.TEXTURE_MIN_FILTER, oglconsts.LINEAR)
+	gl.TexParameteri(oglconsts.TEXTURE_CUBE_MAP, oglconsts.TEXTURE_WRAP_S, oglconsts.CLAMP_TO_EDGE)
+	gl.TexParameteri(oglconsts.TEXTURE_CUBE_MAP, oglconsts.TEXTURE_WRAP_T, oglconsts.CLAMP_TO_EDGE)
+	gl.TexParameteri(oglconsts.TEXTURE_CUBE_MAP, oglconsts.TEXTURE_WRAP_R, oglconsts.CLAMP_TO_EDGE)
+	gl.BindTexture(oglconsts.TEXTURE_CUBE_MAP, 0)
 
 	return texture
 }
