@@ -38,17 +38,10 @@ type WorldGrid struct {
 // InitWorldGrid ...
 func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	sett := settings.GetSettings()
-	rsett := settings.GetRenderingSettings()
 	gl := window.OpenGL()
 
 	grid := &WorldGrid{}
-
 	grid.window = window
-	grid.ActAsMirror = rsett.Grid.ActAsMirror
-	grid.actAsMirrorNeedsChange = true
-	grid.zIndex = 0
-	grid.MatrixModel = mgl32.Ident4()
-	grid.GridSize = rsett.Grid.WorldGridSizeSquares
 
 	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.vert")
 	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/grid2d.frag")
@@ -63,9 +56,20 @@ func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	grid.glAttributeAlpha = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("a_alpha\x00"))
 	grid.glUniformMVPMatrix = gl.GLGetUniformLocation(grid.shaderProgram, gl.Str("u_MVPMatrix\x00"))
 
+	grid.InitProperties()
 	grid.InitBuffers(grid.GridSize, 1)
 
 	return grid
+}
+
+// InitProperties ...
+func (grid *WorldGrid) InitProperties() {
+	rsett := settings.GetRenderingSettings()
+	grid.ActAsMirror = rsett.Grid.ActAsMirror
+	grid.actAsMirrorNeedsChange = true
+	grid.zIndex = 0
+	grid.MatrixModel = mgl32.Ident4()
+	grid.GridSize = rsett.Grid.WorldGridSizeSquares
 }
 
 // InitBuffers ...

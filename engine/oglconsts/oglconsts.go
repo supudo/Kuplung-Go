@@ -128,6 +128,7 @@ const (
 	TEXTURE_WRAP_T     = 0x2803
 	TEXTURE_WRAP_R     = 0x8072
 	CLAMP_TO_EDGE      = 0x812F
+	REPEAT             = 0x2901
 
 	UNPACK_ROW_LENGTH = 0x0CF2
 

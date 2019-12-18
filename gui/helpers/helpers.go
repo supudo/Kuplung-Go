@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-gl/mathgl/mgl32"
 	"github.com/inkyblackness/imgui-go"
 )
 
@@ -25,6 +26,29 @@ func AddControlsSlider(title string, idx int32, step float32, min float32, limit
 	}
 	sid := fmt.Sprintf("##%v", idx)
 	imgui.SliderFloat(sid, animatedValue, min, limit)
+}
+
+// AddControlColor3 ...
+func AddControlColor3(title string, vValue *mgl32.Vec3, bValue *bool) {
+	ceid := fmt.Sprintf("##101%v", title)
+	imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: vValue.X(), Y: vValue.Y(), Z: vValue.Z(), W: 1})
+	imgui.Text(title)
+	imgui.PopStyleColor()
+	// TODO: ColorEdit3
+	// imgui.ColorEdit3(ce_id.c_str(), (float*)vValue)
+	imgui.SameLine()
+	imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 0})
+	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
+	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
+	imgui.PushStyleColor(imgui.StyleColorBorder, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
+	if imgui.ButtonV(ceid, imgui.Vec2{X: 0, Y: 0}) {
+		*bValue = !*bValue
+	}
+	imgui.PopStyleColorV(4)
+	// TODO: color picker
+	// if *bValue {
+	// 	this->componentColorPicker->show(title.c_str(), bValue, (float*)vValue, true)
+	// }
 }
 
 // AddControlsSliderSameLine ...

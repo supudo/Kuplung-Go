@@ -1,9 +1,13 @@
 package rendering
 
 import (
+	"fmt"
+
 	"github.com/go-gl/mathgl/mgl32"
+	"github.com/sadlil/go-trigger"
 	"github.com/supudo/Kuplung-Go/engine/parsers"
 	"github.com/supudo/Kuplung-Go/interfaces"
+	"github.com/supudo/Kuplung-Go/meshes"
 	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
@@ -28,16 +32,33 @@ type RenderManager struct {
 	fileParser *parsers.ParserManager
 
 	systemModels map[string]types.MeshModel
+
+	MeshModelFaces []*meshes.ModelFace
+	LightSources   []*objects.Light
+
+	UIAmbientLightX, UIAmbientLightY, UIAmbientLightZ float32
+
+	SolidLightDirectionX, SolidLightDirectionY, SolidLightDirectionZ float32
+
+	SolidLightMaterialColor, SolidLightAmbient mgl32.Vec3
+	SolidLightDiffuse, SolidLightSpecular      mgl32.Vec3
+
+	SolidLightAmbientStrength, SolidLightDiffuseStrength, SolidLightSpecularStrength float32
+
+	SolidLightMaterialColorColorPicker, SolidLightAmbientColorPicker bool
+	SolidLightDiffuseColorPicker, SolidLightSpecularColorPicker      bool
 }
 
 // NewRenderManager will return an instance of the rendering manager
 func NewRenderManager(window interfaces.Window, doProgress func(float32)) *RenderManager {
 	rsett := settings.GetRenderingSettings()
 	ahPosition := float32(rsett.Grid.WorldGridSizeSquares)
+
 	rm := &RenderManager{}
 	rm.window = window
-	rm.gridSize = rsett.Grid.WorldGridSizeSquares
 	rm.doProgress = doProgress
+
+	rm.initSettings()
 	rm.initParserManager()
 	rm.initSystemModels()
 	rm.initCamera()
@@ -47,7 +68,23 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm.initCameraModel()
 	rm.initMiniAxis()
 	rm.initSkyBox()
+
+	trigger.On("addShape", rm.addShape)
+	trigger.On("addLight", rm.addLight)
+
 	return rm
+}
+
+// ResetSettings ..
+func (rm *RenderManager) ResetSettings() {
+	settings.ResetRenderSettings()
+	rm.initSettings()
+	rm.Camera.InitProperties()
+	rm.CameraModel.InitProperties()
+	rm.wgrid.InitProperties()
+	for i := 0; i < len(rm.LightSources); i++ {
+		rm.LightSources[i].InitProperties(rm.LightSources[i].LightType)
+	}
 }
 
 // Render handles rendering of all scene objects
@@ -86,6 +123,14 @@ func (rm *RenderManager) Render() {
 	rm.CameraModel.Render(rm.wgrid.MatrixModel)
 	rm.miniAxis.Render()
 	rm.SkyBox.Render()
+
+	for i := 0; i < len(rm.MeshModelFaces); i++ {
+		rm.MeshModelFaces[i].Render()
+	}
+
+	for i := 0; i < len(rm.LightSources); i++ {
+		rm.LightSources[i].Render()
+	}
 }
 
 // Dispose will cleanup everything
@@ -97,6 +142,40 @@ func (rm *RenderManager) Dispose() {
 	rm.CameraModel.Dispose()
 	rm.miniAxis.Dispose()
 	rm.SkyBox.Dispose()
+	for i := 0; i < len(rm.MeshModelFaces); i++ {
+		rm.MeshModelFaces[i].Dispose()
+	}
+	for i := 0; i < len(rm.LightSources); i++ {
+		rm.LightSources[i].Dispose()
+	}
+}
+
+func (rm *RenderManager) initSettings() {
+	rsett := settings.GetRenderingSettings()
+
+	rm.gridSize = rsett.Grid.WorldGridSizeSquares
+
+	rm.UIAmbientLightX = 0.2
+	rm.UIAmbientLightY = 0.2
+	rm.UIAmbientLightZ = 0.2
+
+	rm.SolidLightDirectionX = 0.0
+	rm.SolidLightDirectionY = 1.0
+	rm.SolidLightDirectionZ = 0.0
+
+	rm.SolidLightMaterialColor = mgl32.Vec3{0.0, 0.7, 0.0}
+	rm.SolidLightAmbient = mgl32.Vec3{1.0}
+	rm.SolidLightDiffuse = mgl32.Vec3{1.0}
+	rm.SolidLightSpecular = mgl32.Vec3{1.0}
+
+	rm.SolidLightAmbientStrength = 0.3
+	rm.SolidLightDiffuseStrength = 1.0
+	rm.SolidLightSpecularStrength = 0.0
+
+	rm.SolidLightMaterialColorColorPicker = false
+	rm.SolidLightAmbientColorPicker = false
+	rm.SolidLightDiffuseColorPicker = false
+	rm.SolidLightSpecularColorPicker = false
 }
 
 func (rm *RenderManager) initParserManager() {
@@ -157,4 +236,69 @@ func (rm *RenderManager) initMiniAxis() {
 func (rm *RenderManager) initSkyBox() {
 	rm.SkyBox = objects.InitSkyBox(rm.window)
 	rm.SkyBox.InitBuffers()
+}
+
+func (rm *RenderManager) addShape(shape types.ShapeType) {
+	shapeName := ""
+	switch shape {
+	case types.ShapeTypeCone:
+		shapeName = "cone"
+	case types.ShapeTypeCube:
+		shapeName = "cube"
+	case types.ShapeTypeCylinder:
+		shapeName = "cylinder"
+	case types.ShapeTypeGrid:
+		shapeName = "grid"
+	case types.ShapeTypeIcoSphere:
+		shapeName = "ico_sphere"
+	case types.ShapeTypeMonkeyHead:
+		shapeName = "monkey_head"
+	case types.ShapeTypePlane:
+		shapeName = "plane"
+	case types.ShapeTypeTriangle:
+		shapeName = "triangle"
+	case types.ShapeTypeTorus:
+		shapeName = "torus"
+	case types.ShapeTypeTube:
+		shapeName = "tube"
+	case types.ShapeTypeUVSphere:
+		shapeName = "uv_sphere"
+	case types.ShapeTypeBrickWall:
+		shapeName = "brick_wall"
+	case types.ShapeTypePlaneObjects:
+		shapeName = "plane_objects"
+	case types.ShapeTypePlaneObjectsLargePlane:
+		shapeName = "plane_objects_large"
+	case types.ShapeTypeMaterialBall:
+		shapeName = "MaterialBall"
+	case types.ShapeTypeMaterialBallBlender:
+		shapeName = "MaterialBallBlender"
+	case types.ShapeTypeEpcot:
+		shapeName = "epcot"
+	}
+	sett := settings.GetSettings()
+	mmodel := rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/shapes/"+shapeName+".obj", nil)[0]
+	mesh := meshes.NewModelFace(rm.window, mmodel)
+	rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
+}
+
+func (rm *RenderManager) addLight(shape types.LightSourceType) {
+	lightObject := objects.InitLight(rm.window)
+	lightObject.InitProperties(shape)
+	switch shape {
+	case types.LightSourceTypeDirectional:
+		lightObject.Title = fmt.Sprintf("Directional %v", len(rm.LightSources)+1)
+		lightObject.Description = "Directional area light source"
+		lightObject.SetModel(rm.systemModels["light_directional"])
+	case types.LightSourceTypePoint:
+		lightObject.Title = fmt.Sprintf("Point %v", len(rm.LightSources)+1)
+		lightObject.Description = "Omnidirectional point light source"
+		lightObject.SetModel(rm.systemModels["light_point"])
+	case types.LightSourceTypeSpot:
+		lightObject.Title = fmt.Sprintf("Spot %v", len(rm.LightSources)+1)
+		lightObject.Description = "Directional cone light source"
+		lightObject.SetModel(rm.systemModels["light_spot"])
+	}
+	lightObject.InitBuffers()
+	rm.LightSources = append(rm.LightSources, lightObject)
 }

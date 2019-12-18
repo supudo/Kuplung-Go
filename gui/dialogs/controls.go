@@ -1,11 +1,13 @@
 package dialogs
 
 import (
+	"github.com/go-gl/mathgl/mgl32"
 	"github.com/inkyblackness/imgui-go"
 	"github.com/sadlil/go-trigger"
 	"github.com/supudo/Kuplung-Go/gui/helpers"
 	"github.com/supudo/Kuplung-Go/rendering"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 )
 
 // ViewControls ...
@@ -18,6 +20,7 @@ type ViewControls struct {
 	fovAnimated bool
 
 	tabCamera1, tabCamera2, tabCamera3 bool
+	lockCameraWithLight                bool
 }
 
 // NewViewControls ...
@@ -53,8 +56,7 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: .4, Y: .2, Z: .2, W: 1})
 	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: .9, Y: .2, Z: .2, W: 1})
 	if imgui.ButtonV("Reset values to default", imgui.Vec2{X: -1, Y: 0}) {
-		settings.ResetRenderSettings()
-		// TODO: reset settings in objects
+		rm.ResetSettings()
 	}
 	imgui.PopStyleColorV(3)
 
@@ -97,10 +99,26 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 				view.selectedObjectLight = -1
 			}
 		case 6:
-			if imgui.SelectableV("Lights", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
-				view.selectedObject = i
-				view.selectedObjectLight = -1
-				// TODO: enumerate light sources and add sub-items for each one
+			if len(rm.LightSources) == 0 {
+				if imgui.SelectableV("Lights", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
+					view.selectedObject = i
+					view.selectedObjectLight = -1
+				}
+			} else {
+				if imgui.TreeNodeV("Lights", imgui.TreeNodeFlagsCollapsingHeader) {
+					var j int
+					for j = 0; j < len(rm.LightSources); j++ {
+						lsopen := false
+						if view.selectedObjectLight == j {
+							lsopen = true
+						}
+						if imgui.SelectableV(rm.LightSources[j].Title, lsopen, 0, imgui.Vec2{X: 0, Y: 0}) {
+							view.selectedObjectLight = j
+							view.selectedObject = i
+						}
+					}
+					imgui.TreePop()
+				}
 			}
 		}
 	}
@@ -301,6 +319,36 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 		imgui.Checkbox("Grid fixed with World", &rsett.Grid.WorldGridFixedWithWorld)
 		imgui.Checkbox("Show Grid", &rsett.Grid.ShowGrid)
 		imgui.Checkbox("Act as mirror", &rsett.Grid.ActAsMirror)
+	case 4:
+		imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+		imgui.Text("Scene Ambient Lights")
+		imgui.PopStyleColor()
+		helpers.AddControlsSliderSameLine("X", 1, 0.001, 0.0, 1.0, false, nil, &rm.UIAmbientLightX, true, isFrame)
+		helpers.AddControlsSliderSameLine("Y", 2, 0.001, 0.0, 1.0, false, nil, &rm.UIAmbientLightY, true, isFrame)
+		helpers.AddControlsSliderSameLine("Z", 3, 0.001, 0.0, 1.0, false, nil, &rm.UIAmbientLightZ, true, isFrame)
+		imgui.Separator()
+
+		imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+		imgui.Text("Solid Skin Light")
+		imgui.PopStyleColor()
+
+		helpers.AddControlColor3("Ambient", &rm.SolidLightAmbient, &rm.SolidLightAmbientColorPicker)
+		helpers.AddControlsSlider("Intensity", 4, 0.01, 0.0, 1.0, false, nil, &rm.SolidLightAmbientStrength, true, isFrame)
+
+		helpers.AddControlColor3("Diffuse", &rm.SolidLightDiffuse, &rm.SolidLightDiffuseColorPicker)
+		helpers.AddControlsSlider("Intensity", 5, 0.01, 0.0, 1.0, false, nil, &rm.SolidLightDiffuseStrength, true, isFrame)
+
+		helpers.AddControlColor3("Specular", &rm.SolidLightSpecular, &rm.SolidLightSpecularColorPicker)
+		helpers.AddControlsSlider("Intensity", 6, 0.01, 0.0, 1.0, false, nil, &rm.SolidLightSpecularStrength, true, isFrame)
+		imgui.Separator()
+
+		helpers.AddControlColor3("Material Color", &rm.SolidLightMaterialColor, &rm.SolidLightMaterialColorColorPicker)
+		imgui.Separator()
+
+		imgui.Text("Direction")
+		helpers.AddControlsSliderSameLine("X##407", 7, 0.0, 0.0, 10.0, false, nil, &rm.SolidLightDirectionX, true, isFrame)
+		helpers.AddControlsSliderSameLine("Y##408", 8, 1.0, 0.0, 10.0, false, nil, &rm.SolidLightDirectionY, true, isFrame)
+		helpers.AddControlsSliderSameLine("Z##409", 9, 0.0, 0.0, 10.0, false, nil, &rm.SolidLightDirectionZ, true, isFrame)
 	case 5:
 		imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
 		imgui.Text("Skybox")
@@ -318,11 +366,123 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 			}
 			imgui.EndCombo()
 		}
+	case 6:
+		if imgui.BeginTabBarV("sceneLightsTab", imgui.TabBarFlagsNoCloseWithMiddleMouseButton|imgui.TabBarFlagsNoTooltip) {
+			if view.selectedObjectLight > -1 {
+				if imgui.BeginTabItem("General") {
+					imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+					imgui.Text("Properties")
+					imgui.PopStyleColor()
+					imgui.Text(rm.LightSources[view.selectedObjectLight].Description)
+					imgui.Checkbox("Lamp", &rm.LightSources[view.selectedObjectLight].ShowLampObject)
+					imgui.Checkbox("Direction", &rm.LightSources[view.selectedObjectLight].ShowLampDirection)
+					imgui.Checkbox("Wire", &rm.LightSources[view.selectedObjectLight].ShowInWire)
+					imgui.Checkbox("Lock with Camera", &view.lockCameraWithLight)
+					if imgui.ButtonV("View from Here", imgui.Vec2{X: -1, Y: 0}) {
+						view.lockCameraOnce(rm)
+					}
+					imgui.Separator()
+					if imgui.ButtonV("Delete Light Source", imgui.Vec2{X: -1, Y: 0}) {
+						view.selectedObject = 0
+						copy(rm.LightSources[view.selectedObjectLight:], rm.LightSources[view.selectedObjectLight+1:])
+						rm.LightSources[len(rm.LightSources)-1] = nil
+						rm.LightSources = rm.LightSources[:len(rm.LightSources)-1]
+						view.selectedObjectLight = -1
+					}
+					imgui.EndTabItem()
+				}
+				if imgui.BeginTabItem("Scale") {
+					imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+					imgui.Text("Scale Object")
+					imgui.PopStyleColor()
+					helpers.AddControlsSliderSameLine("X", 10, 0.05, 0.0, float32(rsett.Grid.WorldGridSizeSquares), true, &rm.LightSources[view.selectedObjectLight].ScaleX.Animate, &rm.LightSources[view.selectedObjectLight].ScaleX.Point, true, isFrame)
+					helpers.AddControlsSliderSameLine("Y", 11, 0.05, 0.0, float32(rsett.Grid.WorldGridSizeSquares), true, &rm.LightSources[view.selectedObjectLight].ScaleY.Animate, &rm.LightSources[view.selectedObjectLight].ScaleY.Point, true, isFrame)
+					helpers.AddControlsSliderSameLine("Z", 12, 0.05, 0.0, float32(rsett.Grid.WorldGridSizeSquares), true, &rm.LightSources[view.selectedObjectLight].ScaleZ.Animate, &rm.LightSources[view.selectedObjectLight].ScaleZ.Point, true, isFrame)
+					imgui.EndTabItem()
+				}
+				if imgui.BeginTabItem("Rotate") {
+					imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+					imgui.Text("Around Axis")
+					imgui.PopStyleColor()
+					helpers.AddControlsSliderSameLine("X", 4, 1.0, -180.0, 180.0, true, &rm.LightSources[view.selectedObjectLight].RotateCenterX.Animate, &rm.LightSources[view.selectedObjectLight].RotateCenterX.Point, true, isFrame)
+					helpers.AddControlsSliderSameLine("Y", 5, 1.0, -180.0, 180.0, true, &rm.LightSources[view.selectedObjectLight].RotateCenterY.Animate, &rm.LightSources[view.selectedObjectLight].RotateCenterY.Point, true, isFrame)
+					helpers.AddControlsSliderSameLine("Z", 6, 1.0, -180.0, 180.0, true, &rm.LightSources[view.selectedObjectLight].RotateCenterZ.Animate, &rm.LightSources[view.selectedObjectLight].RotateCenterZ.Point, true, isFrame)
+
+					imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+					imgui.Text("Around World Center")
+					imgui.PopStyleColor()
+					helpers.AddControlsSliderSameLine("X", 13, 1.0, -180.0, 180.0, true, &rm.LightSources[view.selectedObjectLight].RotateX.Animate, &rm.LightSources[view.selectedObjectLight].RotateX.Point, true, isFrame)
+					helpers.AddControlsSliderSameLine("Y", 14, 1.0, -180.0, 180.0, true, &rm.LightSources[view.selectedObjectLight].RotateY.Animate, &rm.LightSources[view.selectedObjectLight].RotateY.Point, true, isFrame)
+					helpers.AddControlsSliderSameLine("Z", 15, 1.0, -180.0, 180.0, true, &rm.LightSources[view.selectedObjectLight].RotateZ.Animate, &rm.LightSources[view.selectedObjectLight].RotateZ.Point, true, isFrame)
+
+					imgui.EndTabItem()
+				}
+				if imgui.BeginTabItem("Translate") {
+					imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+					imgui.Text("Move Object by Axis")
+					imgui.PopStyleColor()
+					helpers.AddControlsSliderSameLine("X", 16, 0.5, float32(-1*rsett.Grid.WorldGridSizeSquares), float32(rsett.Grid.WorldGridSizeSquares), true, &rm.LightSources[view.selectedObjectLight].PositionX.Animate, &rm.LightSources[view.selectedObjectLight].PositionX.Point, true, isFrame)
+					helpers.AddControlsSliderSameLine("Y", 17, 1.0, float32(-1*rsett.Grid.WorldGridSizeSquares), float32(rsett.Grid.WorldGridSizeSquares), true, &rm.LightSources[view.selectedObjectLight].PositionY.Animate, &rm.LightSources[view.selectedObjectLight].PositionY.Point, true, isFrame)
+					helpers.AddControlsSliderSameLine("Z", 18, 1.0, float32(-1*rsett.Grid.WorldGridSizeSquares), float32(rsett.Grid.WorldGridSizeSquares), true, &rm.LightSources[view.selectedObjectLight].PositionZ.Animate, &rm.LightSources[view.selectedObjectLight].PositionZ.Point, true, isFrame)
+					imgui.EndTabItem()
+				}
+				if imgui.BeginTabItem("Colors") {
+					imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: 1})
+					imgui.Text("Light Colors")
+					imgui.PopStyleColor()
+
+					helpers.AddControlColor3("Ambient Color", &rm.LightSources[view.selectedObjectLight].Ambient.Color, &rm.LightSources[view.selectedObjectLight].Ambient.ColorPickerOpen)
+					helpers.AddControlsSlider("Ambient Intensity", 19, 0.01, 0.0, 1.0, true, &rm.LightSources[view.selectedObjectLight].Ambient.Animate, &rm.LightSources[view.selectedObjectLight].Ambient.Strength, true, isFrame)
+
+					helpers.AddControlColor3("Diffuse Color", &rm.LightSources[view.selectedObjectLight].Diffuse.Color, &rm.LightSources[view.selectedObjectLight].Diffuse.ColorPickerOpen)
+					helpers.AddControlsSlider("Diffuse Intensity", 20, 0.01, 0.0, 1.0, true, &rm.LightSources[view.selectedObjectLight].Diffuse.Animate, &rm.LightSources[view.selectedObjectLight].Diffuse.Strength, true, isFrame)
+
+					helpers.AddControlColor3("Specular Color", &rm.LightSources[view.selectedObjectLight].Specular.Color, &rm.LightSources[view.selectedObjectLight].Specular.ColorPickerOpen)
+					helpers.AddControlsSlider("Specular Intensity", 21, 0.01, 0.0, 1.0, true, &rm.LightSources[view.selectedObjectLight].Specular.Animate, &rm.LightSources[view.selectedObjectLight].Specular.Strength, true, isFrame)
+
+					imgui.Separator()
+
+					if rm.LightSources[view.selectedObjectLight].LightType != types.LightSourceTypeDirectional {
+						helpers.AddControlsSlider("Constant", 22, 0.01, 0.0, 1.0, true, &rm.LightSources[view.selectedObjectLight].LConstant.Animate, &rm.LightSources[view.selectedObjectLight].LConstant.Point, true, isFrame)
+						helpers.AddControlsSlider("Literal", 23, 0.01, 0.0, 1.0, true, &rm.LightSources[view.selectedObjectLight].LLinear.Animate, &rm.LightSources[view.selectedObjectLight].LLinear.Point, true, isFrame)
+						helpers.AddControlsSlider("Quadratic", 24, 0.01, 0.0, 1.0, true, &rm.LightSources[view.selectedObjectLight].LQuadratic.Animate, &rm.LightSources[view.selectedObjectLight].LQuadratic.Point, true, isFrame)
+					}
+
+					switch rm.LightSources[view.selectedObjectLight].LightType {
+					case types.LightSourceTypeSpot:
+						imgui.Separator()
+						helpers.AddControlsSlider("CutOff", 25, 1.0, -180.0, 180.0, true, &rm.LightSources[view.selectedObjectLight].LCutOff.Animate, &rm.LightSources[view.selectedObjectLight].LCutOff.Point, true, isFrame)
+						helpers.AddControlsSlider("Outer CutOff", 26, 1.0, -180.0, 180.0, true, &rm.LightSources[view.selectedObjectLight].LOuterCutOff.Animate, &rm.LightSources[view.selectedObjectLight].LOuterCutOff.Point, true, isFrame)
+					}
+					imgui.EndTabItem()
+				}
+			}
+			imgui.EndTabBar()
+		}
 	}
 	imgui.PopItemWidth()
 	imgui.EndChild()
 
 	imgui.End()
+}
+
+func (view *ViewControls) lockCameraOnce(rm *rendering.RenderManager) {
+	view.lockCameraWithLight = true
+	view.lockCamera(rm)
+	view.lockCameraWithLight = false
+}
+
+func (view *ViewControls) lockCamera(rm *rendering.RenderManager) {
+	if view.lockCameraWithLight {
+		rm.Camera.PositionX.Point = rm.LightSources[view.selectedObjectLight].PositionX.Point
+		rm.Camera.PositionY.Point = rm.LightSources[view.selectedObjectLight].PositionY.Point
+		rm.Camera.PositionZ.Point = rm.LightSources[view.selectedObjectLight].PositionZ.Point
+		rm.Camera.RotateX.Point = rm.LightSources[view.selectedObjectLight].RotateX.Point + 90.0
+		rm.Camera.RotateY.Point = rm.LightSources[view.selectedObjectLight].RotateY.Point + 180.0
+		rm.Camera.RotateZ.Point = rm.LightSources[view.selectedObjectLight].RotateZ.Point
+		rm.Camera.CameraPosition = mgl32.Vec3{rm.LightSources[view.selectedObjectLight].MatrixModel[4*3+0], rm.LightSources[view.selectedObjectLight].MatrixModel[4*3+1], rm.LightSources[view.selectedObjectLight].MatrixModel[4*3+2]}
+		rm.Camera.MatrixCamera = rm.LightSources[view.selectedObjectLight].MatrixModel
+	}
 }
 
 func (view *ViewControls) setSelectedObject(s int) {

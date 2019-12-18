@@ -11,7 +11,7 @@ type Camera struct {
 	window interfaces.Window
 
 	MatrixCamera   mgl32.Mat4
-	cameraPosition mgl32.Vec3
+	CameraPosition mgl32.Vec3
 
 	EyeSettings                                 types.ObjectEye
 	PositionX, PositionY, PositionZ             types.ObjectCoordinate
@@ -23,7 +23,12 @@ type Camera struct {
 func InitCamera(window interfaces.Window) *Camera {
 	camera := &Camera{}
 	camera.window = window
+	camera.InitProperties()
+	return camera
+}
 
+// InitProperties ...
+func (camera *Camera) InitProperties() {
 	camera.EyeSettings = types.ObjectEye{}
 	camera.EyeSettings.ViewEye = mgl32.Vec3{0, 0, 10}
 	camera.EyeSettings.ViewCenter = mgl32.Vec3{0, 0, 0}
@@ -42,8 +47,6 @@ func InitCamera(window interfaces.Window) *Camera {
 	camera.RotateCenterZ = types.ObjectCoordinate{Animate: false, Point: 0}
 
 	camera.MatrixCamera = mgl32.Ident4()
-
-	return camera
 }
 
 // Dispose ...
@@ -66,5 +69,5 @@ func (camera *Camera) Render() {
 	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.RotateCenterY.Point, mgl32.Vec3{0, 1, 0}))
 	camera.MatrixCamera = camera.MatrixCamera.Mul4(mgl32.HomogRotate3D(camera.RotateCenterZ.Point, mgl32.Vec3{0, 0, 1}))
 
-	camera.cameraPosition = mgl32.Vec3{camera.MatrixCamera[4*3+0], camera.MatrixCamera[4*3+1], camera.MatrixCamera[4*3+2]}
+	camera.CameraPosition = mgl32.Vec3{camera.MatrixCamera[4*3+0], camera.MatrixCamera[4*3+1], camera.MatrixCamera[4*3+2]}
 }
