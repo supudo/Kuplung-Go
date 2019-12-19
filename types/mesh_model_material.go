@@ -2,6 +2,7 @@ package types
 
 import "github.com/go-gl/mathgl/mgl32"
 
+// MeshModelMaterial ...
 type MeshModelMaterial struct {
 	MaterialID    uint32
 	MaterialTitle string

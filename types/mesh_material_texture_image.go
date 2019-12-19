@@ -1,5 +1,6 @@
 package types
 
+// MeshMaterialTextureImage ...
 type MeshMaterialTextureImage struct {
 	Width  int32
 	Height int32
