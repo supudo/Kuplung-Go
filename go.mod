@@ -8,6 +8,6 @@ require (
 	github.com/inkyblackness/imgui-go v1.11.0
 	github.com/sadlil/go-trigger v0.0.0-20170328161825-cfc3d83007cd
 	github.com/veandco/go-sdl2 v0.3.3
-	golang.org/x/image v0.0.0-20190321063152-3fc05d484e9f
+	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
 	gopkg.in/yaml.v2 v2.2.4
 )
