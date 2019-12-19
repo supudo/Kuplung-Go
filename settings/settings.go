@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"sync"
 
 	"gopkg.in/yaml.v2"
@@ -13,7 +14,7 @@ import (
 type ApplicationSettings struct {
 	App struct {
 		ApplicationVersion string `yaml:"appVersion"`
-		CurrentPath        string `yaml:"currentFolder"`
+		CurrentPath        string
 	} `yaml:"App"`
 	AppWindow struct {
 		SDLWindowWidth  float32 `yaml:"SDL_Window_Width"`
@@ -55,7 +56,16 @@ func InitSettings() ApplicationSettings {
 		log.Fatalf("Settings error: %v", err)
 	}
 
-	appConfig, err := ioutil.ReadFile(dir + "/../Resources/resources/Kuplung_Settings.yaml")
+	if runtime.GOOS == "darwin" {
+		appSettings.App.CurrentPath = dir + "/../Resources/resources/"
+	} else if runtime.GOOS == "windows" {
+		appSettings.App.CurrentPath = dir + "./"
+	} else {
+		// TODO: other platforms
+		appSettings.App.CurrentPath = dir
+	}
+
+	appConfig, err := ioutil.ReadFile(appSettings.App.CurrentPath + "Kuplung_Settings.yaml")
 	if err != nil {
 		log.Fatalf("Settings error: %v", err)
 	}
@@ -65,7 +75,6 @@ func InitSettings() ApplicationSettings {
 		log.Fatalf("Settings error: %v", err)
 	}
 
-	appSettings.App.CurrentPath = dir
 	appSettings.MemSettings.QuitApplication = false
 	appSettings.MemSettings.LogBuffer = ""
 	appSettings.MemSettings.LogBufferLimit = 15360
@@ -85,17 +94,12 @@ func InitSettings() ApplicationSettings {
 func SaveSettings() {
 	var sett = GetSettings()
 
-	dir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("Settings error: %v", err)
-	}
-
 	data, err := yaml.Marshal(&sett)
 	if err != nil {
 		log.Fatalf("Settings save error: %v", err)
 	}
 
-	err = ioutil.WriteFile(dir+"/../Resources/resources/Kuplung_Settings.yaml", data, 0644)
+	err = ioutil.WriteFile(sett.App.CurrentPath+"Kuplung_Settings.yaml", data, 0644)
 	if err != nil {
 		log.Fatalf("Settings save error: %v", err)
 	}

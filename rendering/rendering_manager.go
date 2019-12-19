@@ -185,16 +185,16 @@ func (rm *RenderManager) initParserManager() {
 func (rm *RenderManager) initSystemModels() {
 	sett := settings.GetSettings()
 	rm.systemModels = make(map[string]types.MeshModel)
-	rm.systemModels["axis_x_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/x_plus.obj", nil)[0]
-	rm.systemModels["axis_x_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/x_minus.obj", nil)[0]
-	rm.systemModels["axis_y_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/y_plus.obj", nil)[0]
-	rm.systemModels["axis_y_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/y_minus.obj", nil)[0]
-	rm.systemModels["axis_z_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/z_plus.obj", nil)[0]
-	rm.systemModels["axis_z_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/axis_helpers/z_minus.obj", nil)[0]
-	rm.systemModels["camera"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/gui/camera.obj", nil)[0]
-	rm.systemModels["light_directional"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/gui/light_directional.obj", nil)[0]
-	rm.systemModels["light_point"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/gui/light_point.obj", nil)[0]
-	rm.systemModels["light_spot"] = rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/gui/light_spot.obj", nil)[0]
+	rm.systemModels["axis_x_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/x_plus.obj", nil)[0]
+	rm.systemModels["axis_x_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/x_minus.obj", nil)[0]
+	rm.systemModels["axis_y_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/y_plus.obj", nil)[0]
+	rm.systemModels["axis_y_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/y_minus.obj", nil)[0]
+	rm.systemModels["axis_z_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/z_plus.obj", nil)[0]
+	rm.systemModels["axis_z_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/z_minus.obj", nil)[0]
+	rm.systemModels["camera"] = rm.fileParser.Parse(sett.App.CurrentPath+"gui/camera.obj", nil)[0]
+	rm.systemModels["light_directional"] = rm.fileParser.Parse(sett.App.CurrentPath+"gui/light_directional.obj", nil)[0]
+	rm.systemModels["light_point"] = rm.fileParser.Parse(sett.App.CurrentPath+"gui/light_point.obj", nil)[0]
+	rm.systemModels["light_spot"] = rm.fileParser.Parse(sett.App.CurrentPath+"gui/light_spot.obj", nil)[0]
 }
 
 func (rm *RenderManager) initCamera() {
@@ -277,7 +277,7 @@ func (rm *RenderManager) addShape(shape types.ShapeType) {
 		shapeName = "epcot"
 	}
 	sett := settings.GetSettings()
-	mmodel := rm.fileParser.Parse(sett.App.CurrentPath+"/../Resources/resources/shapes/"+shapeName+".obj", nil)[0]
+	mmodel := rm.fileParser.Parse(sett.App.CurrentPath+"shapes/"+shapeName+".obj", nil)[0]
 	mesh := meshes.NewModelFace(rm.window, mmodel)
 	rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
 }

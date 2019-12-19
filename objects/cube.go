@@ -136,7 +136,7 @@ void main() {
 	gl.GLBindFragDataLocation(cube.program, 0, gl.Str("outputColor\x00"))
 
 	// Load the texture
-	cube.texture = engine.LoadTexture(gl, sett.App.CurrentPath+"/../Resources/resources/textures/square.png")
+	cube.texture = engine.LoadTexture(gl, sett.App.CurrentPath+"textures/square.png")
 
 	// Configure the vertex data
 	cube.vao = gl.GenVertexArrays(1)[0]

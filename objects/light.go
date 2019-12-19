@@ -56,8 +56,8 @@ func InitLight(window interfaces.Window) *Light {
 	lightModel := &Light{}
 	lightModel.window = window
 
-	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/light.vert")
-	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/light.frag")
+	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/light.vert")
+	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/light.frag")
 
 	var err error
 	lightModel.shaderProgram, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)
@@ -180,7 +180,7 @@ func (l *Light) InitBuffers() {
 
 		if len(l.model.ModelMaterial.TextureDiffuse.Image) > 0 {
 			sett := settings.GetSettings()
-			file := sett.App.CurrentPath + "/../Resources/resources/gui/" + l.model.ModelMaterial.TextureDiffuse.Image
+			file := sett.App.CurrentPath + "gui/" + l.model.ModelMaterial.TextureDiffuse.Image
 			imgFile, err := os.Open(file)
 			if err != nil {
 				settings.LogError("[Light] Texture file not found: %v", err)

@@ -35,8 +35,8 @@ func InitAxisLabels(window interfaces.Window) *AxisLabels {
 	axisLabels := &AxisLabels{}
 	axisLabels.window = window
 
-	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/axis_labels.vert")
-	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/axis_labels.frag")
+	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/axis_labels.vert")
+	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/axis_labels.frag")
 
 	var err error
 	axisLabels.shaderProgram, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)

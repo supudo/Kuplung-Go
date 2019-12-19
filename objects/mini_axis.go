@@ -31,8 +31,8 @@ func InitMiniAxis(window interfaces.Window) *MiniAxis {
 	miniAxis := &MiniAxis{}
 	miniAxis.window = window
 
-	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/axis.vert")
-	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/axis.frag")
+	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/axis.vert")
+	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/axis.frag")
 
 	var err error
 	miniAxis.shaderProgram, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)

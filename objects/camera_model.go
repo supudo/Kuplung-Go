@@ -42,8 +42,8 @@ func InitCameraModel(window interfaces.Window, model types.MeshModel) *CameraMod
 	cameraModel.window = window
 	cameraModel.model = model
 
-	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/camera.vert")
-	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "/../Resources/resources/shaders/camera.frag")
+	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/camera.vert")
+	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/camera.frag")
 
 	var err error
 	cameraModel.shaderProgram, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)

@@ -295,7 +295,7 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextPa
 	}
 
 	sett := settings.GetSettings()
-	fileFA := sett.App.CurrentPath + "/../Resources/resources/fonts/fontawesome-webfont.ttf"
+	fileFA := sett.App.CurrentPath + "fonts/fontawesome-webfont.ttf"
 	fontConfigFA := imgui.NewFontConfig()
 	fontConfigFA.SetGlyphMaxAdvanceX(float32(fonts.FA_ICON_MIN))
 	fontConfigFA.SetGlyphMinAdvanceX(float32(fonts.FA_ICON_MAX))
@@ -307,7 +307,7 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextPa
 	context.fontFA = fontAtlas.AddFontFromFileTTFV(fileFA, 14, fontConfigFA, rangesFA.GlyphRanges)
 	fontConfigFA.Delete()
 
-	fileMD := sett.App.CurrentPath + "/../Resources/resources/fonts/material-icons-regular.ttf"
+	fileMD := sett.App.CurrentPath + "fonts/material-icons-regular.ttf"
 	fontConfigMD := imgui.NewFontConfig()
 	fontConfigMD.SetGlyphMaxAdvanceX(float32(fonts.MD_ICON_MIN))
 	fontConfigMD.SetGlyphMinAdvanceX(float32(fonts.MD_ICON_MAX))

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"sync"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -81,7 +82,15 @@ func InitRenderingSettings() RenderingSettings {
 		LogError("Rendering Settings error: %v", err)
 	}
 
-	appConfig, err := ioutil.ReadFile(dir + "/../Resources/resources/Kuplung_RenderingSettings.yaml")
+	if runtime.GOOS == "darwin" {
+		dir += "/../Resources/resources/"
+	} else if runtime.GOOS == "windows" {
+		dir += "./"
+	} else {
+		// TODO: other platforms
+	}
+
+	appConfig, err := ioutil.ReadFile(dir + "Kuplung_RenderingSettings.yaml")
 	if err != nil {
 		LogError("Rendering Settings error: %v", err)
 	}
@@ -157,12 +166,20 @@ func SaveRenderingSettings() {
 		LogError("Rendering Settings error: %v", err)
 	}
 
+	if runtime.GOOS == "darwin" {
+		dir += "/../Resources/resources/"
+	} else if runtime.GOOS == "windows" {
+		dir += "./"
+	} else {
+		// TODO: other platforms
+	}
+
 	data, err := yaml.Marshal(&rsett)
 	if err != nil {
 		LogError("Rendering Settings save error: %v", err)
 	}
 
-	err = ioutil.WriteFile(dir+"/../Resources/resources/Kuplung_RenderingSettings.yaml", data, 0644)
+	err = ioutil.WriteFile(dir+"Kuplung_RenderingSettings.yaml", data, 0644)
 	if err != nil {
 		LogError("Rendering Settings save error: %v", err)
 	}

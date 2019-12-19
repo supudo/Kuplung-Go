@@ -129,7 +129,7 @@ func LoadCubemapTexture(gl interfaces.OpenGL, images []string) uint32 {
 
 	sett := settings.GetSettings()
 	for i := 0; i < len(images); i++ {
-		file := sett.App.CurrentPath + "/../Resources/resources/skybox/" + images[i]
+		file := sett.App.CurrentPath + "skybox/" + images[i]
 		imgFile, err := os.Open(file)
 		if err != nil {
 			settings.LogError("Cubemap texture (%v) - file not found: %v", file, err)
