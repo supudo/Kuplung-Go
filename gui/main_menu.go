@@ -4,7 +4,9 @@ import (
 	"os"
 
 	"github.com/inkyblackness/imgui-go"
+	"github.com/sadlil/go-trigger"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 )
 
 // DrawMainMenu ...
@@ -20,6 +22,7 @@ func (context *Context) DrawMainMenu() {
 		// lbl += fmt.Sprintf("%#U", unicode.ToLower(fonts.FA_ICON_FILE_O)) + " "
 		// lbl += "New"
 		if imgui.MenuItem("New") {
+			_, _ = trigger.Fire(types.ActionGuiActionFileNew)
 		}
 		imgui.Separator()
 		if imgui.MenuItemV("Quit", "Cmd+Q", false, true) {

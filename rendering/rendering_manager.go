@@ -69,8 +69,9 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm.initMiniAxis()
 	rm.initSkyBox()
 
-	trigger.On("addShape", rm.addShape)
-	trigger.On("addLight", rm.addLight)
+	trigger.On(types.ActionGuiAddShape, rm.addShape)
+	trigger.On(types.ActionGuiAddLight, rm.addLight)
+	trigger.On(types.ActionGuiActionFileNew, rm.clearScene)
 
 	return rm
 }
@@ -301,4 +302,17 @@ func (rm *RenderManager) addLight(shape types.LightSourceType) {
 	}
 	lightObject.InitBuffers()
 	rm.LightSources = append(rm.LightSources, lightObject)
+}
+
+func (rm *RenderManager) clearScene() {
+	for i := 0; i < len(rm.MeshModelFaces); i++ {
+		rm.MeshModelFaces[i].Dispose()
+	}
+	for i := 0; i < len(rm.LightSources); i++ {
+		rm.LightSources[i].Dispose()
+	}
+	rm.MeshModelFaces = nil
+	rm.LightSources = nil
+	rm.ResetSettings()
+	_, _ = trigger.Fire(types.ActionClearGuiControls)
 }

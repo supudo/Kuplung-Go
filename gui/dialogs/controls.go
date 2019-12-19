@@ -37,8 +37,9 @@ func NewViewControls() *ViewControls {
 		tabCamera2: false,
 		tabCamera3: false,
 	}
-	trigger.On("selectedObject", view.setSelectedObject)
-	trigger.On("selectedObjectLight", view.setSelectedObjectLight)
+	trigger.On(types.ActionSelectedObject, view.setSelectedObject)
+	trigger.On(types.ActionSelectedObjectLight, view.setSelectedObjectLight)
+	trigger.On(types.ActionClearGuiControls, view.clearScene)
 	return view
 }
 
@@ -491,4 +492,9 @@ func (view *ViewControls) setSelectedObject(s int) {
 
 func (view *ViewControls) setSelectedObjectLight(s int) {
 	view.selectedObjectLight = s
+}
+
+func (view *ViewControls) clearScene() {
+	view.selectedObject = -1
+	view.selectedObjectLight = -1
 }

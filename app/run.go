@@ -8,13 +8,14 @@ import (
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 )
 
 // Run ...
 func Run(initializer func(interfaces.Window), title string, deferrer <-chan func()) (err error) {
 	runtime.LockOSThread()
 
-	trigger.On("log", addToLog)
+	trigger.On(types.ActionLog, addToLog)
 
 	var window *engine.KuplungWindow
 	window = engine.NewKuplungWindow(title)
