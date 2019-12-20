@@ -31,6 +31,28 @@ func LinkNewProgram(gl interfaces.OpenGL, shaders ...uint32) (program uint32, er
 	return
 }
 
+// LinkMultiProgram creates a new shader program based on the provided shaders.
+func LinkMultiProgram(gl interfaces.OpenGL, vertexShaderSource, tcsShaderSource, tesShaderSource, geomShaderSource, fragmentShaderSource string) (program uint32, err error) {
+	vertexShader, vertexErr := CompileNewShader(gl, oglconsts.VERTEX_SHADER, vertexShaderSource)
+	defer gl.DeleteShader(vertexShader)
+	tcsShader, tcsErr := CompileNewShader(gl, oglconsts.TESS_EVALUATION_SHADER, tcsShaderSource)
+	defer gl.DeleteShader(tcsShader)
+	tesShader, tesErr := CompileNewShader(gl, oglconsts.TESS_CONTROL_SHADER, tesShaderSource)
+	defer gl.DeleteShader(tesShader)
+	geomShader, geomErr := CompileNewShader(gl, oglconsts.GEOMETRY_SHADER, geomShaderSource)
+	defer gl.DeleteShader(geomShader)
+	fragmentShader, fragmentErr := CompileNewShader(gl, oglconsts.FRAGMENT_SHADER, fragmentShaderSource)
+	defer gl.DeleteShader(fragmentShader)
+
+	if (vertexErr == nil) && (tcsErr == nil) && (tesErr == nil) && (geomErr == nil) && (fragmentErr == nil) {
+		program, err = LinkNewProgram(gl, vertexShader, tcsShader, tesShader, geomShader, fragmentShader)
+	} else {
+		err = fmt.Errorf("[OpenGL Utils] Error compiling shaders:\nVertex = %v\nTSC = %v\nTES = %v\nGEOM = %v\nFragment = %v", vertexErr, tcsErr, tesErr, geomErr, fragmentErr)
+	}
+
+	return
+}
+
 // LinkNewStandardProgram creates a new shader based on two shader sources.
 func LinkNewStandardProgram(gl interfaces.OpenGL, vertexShaderSource, fragmentShaderSource string) (program uint32, err error) {
 	vertexShader, vertexErr := CompileNewShader(gl, oglconsts.VERTEX_SHADER, vertexShaderSource)
@@ -41,7 +63,7 @@ func LinkNewStandardProgram(gl interfaces.OpenGL, vertexShaderSource, fragmentSh
 	if (vertexErr == nil) && (fragmentErr == nil) {
 		program, err = LinkNewProgram(gl, vertexShader, fragmentShader)
 	} else {
-		err = fmt.Errorf("vertexShader: %v\nfragmentShader: %v", vertexErr, fragmentErr)
+		err = fmt.Errorf("[OpenGL Utils] Error compiling shaders:\n%v\n%v", vertexErr, fragmentErr)
 	}
 
 	return
@@ -68,7 +90,7 @@ func CompileNewShader(gl interfaces.OpenGL, shaderType uint32, source string) (s
 func GetShaderSource(filename string) string {
 	source, err := ioutil.ReadFile(filename)
 	if err != nil {
-		settings.LogWarn("Can't load shader source for %v", filename)
+		settings.LogWarn("[OpenGL Utils] Can't load shader source for %v", filename)
 		return ""
 	}
 	return string(source) + "\x00"
@@ -78,16 +100,16 @@ func GetShaderSource(filename string) string {
 func LoadTexture(gl interfaces.OpenGL, file string) uint32 {
 	imgFile, err := os.Open(file)
 	if err != nil {
-		settings.LogError("Texture file not found: %v", err)
+		settings.LogError("[OpenGL Utils] Texture file not found: %v", err)
 	}
 	img, _, err := image.Decode(imgFile)
 	if err != nil {
-		settings.LogError("Can't decode texture: %v", err)
+		settings.LogError("[OpenGL Utils] Can't decode texture: %v", err)
 	}
 
 	rgba := image.NewRGBA(img.Bounds())
 	if rgba.Stride != rgba.Rect.Size().X*4 {
-		settings.LogError("Texture unsupported stride!")
+		settings.LogError("[OpenGL Utils] Texture unsupported stride!")
 	}
 	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
 
@@ -98,6 +120,44 @@ func LoadTexture(gl interfaces.OpenGL, file string) uint32 {
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.LINEAR)
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_S, oglconsts.CLAMP_TO_EDGE)
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_T, oglconsts.CLAMP_TO_EDGE)
+	gl.TexImage2D(
+		oglconsts.TEXTURE_2D,
+		0,
+		oglconsts.RGBA,
+		int32(rgba.Rect.Size().X),
+		int32(rgba.Rect.Size().Y),
+		0,
+		oglconsts.RGBA,
+		oglconsts.UNSIGNED_BYTE,
+		gl.Ptr(rgba.Pix))
+
+	return texture
+}
+
+// LoadTextureRepeat ...
+func LoadTextureRepeat(gl interfaces.OpenGL, file string) uint32 {
+	imgFile, err := os.Open(file)
+	if err != nil {
+		settings.LogError("[OpenGL Utils] Texture file not found: %v", err)
+	}
+	img, _, err := image.Decode(imgFile)
+	if err != nil {
+		settings.LogError("[OpenGL Utils] Can't decode texture: %v", err)
+	}
+
+	rgba := image.NewRGBA(img.Bounds())
+	if rgba.Stride != rgba.Rect.Size().X*4 {
+		settings.LogError("[OpenGL Utils] Texture unsupported stride!")
+	}
+	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
+
+	texture := gl.GenTextures(1)[0]
+	gl.ActiveTexture(oglconsts.TEXTURE0)
+	gl.BindTexture(oglconsts.TEXTURE_2D, texture)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MIN_FILTER, oglconsts.LINEAR)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.LINEAR)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_S, oglconsts.REPEAT)
+	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_WRAP_T, oglconsts.REPEAT)
 	gl.TexImage2D(
 		oglconsts.TEXTURE_2D,
 		0,
@@ -132,16 +192,16 @@ func LoadCubemapTexture(gl interfaces.OpenGL, images []string) uint32 {
 		file := sett.App.CurrentPath + "skybox/" + images[i]
 		imgFile, err := os.Open(file)
 		if err != nil {
-			settings.LogError("Cubemap texture (%v) - file not found: %v", file, err)
+			settings.LogError("[OpenGL Utils] Cubemap texture (%v) - file not found: %v", file, err)
 		}
 		img, _, err := image.Decode(imgFile)
 		if err != nil {
-			settings.LogError("Cubemap texture (%v) - can't decode texture: %v", file, err)
+			settings.LogError("[OpenGL Utils] Cubemap texture (%v) - can't decode texture: %v", file, err)
 		}
 
 		rgba := image.NewRGBA(img.Bounds())
 		if rgba.Stride != rgba.Rect.Size().X*4 {
-			settings.LogError("Cubemap texture (%v) - unsupported stride!", file)
+			settings.LogError("[OpenGL Utils] Cubemap texture (%v) - unsupported stride!", file)
 		}
 		draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
 

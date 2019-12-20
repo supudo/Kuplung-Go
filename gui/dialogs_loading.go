@@ -17,7 +17,7 @@ func (context *Context) showParsing(open *bool) {
 	imgui.SetNextWindowFocus()
 	if imgui.BeginPopupModalV("Kuplung Parsing", open, imgui.WindowFlagsAlwaysAutoResize|imgui.WindowFlagsNoResize|imgui.WindowFlagsNoTitleBar) {
 		imgui.PushStyleColor(imgui.StyleColorPlotHistogram, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
-		imgui.Text(fmt.Sprintf("Processing ... %v%%", context.GuiVars.ParsingPercentage))
+		imgui.Text(fmt.Sprintf("Processing ... %.2f%%", context.GuiVars.ParsingPercentage))
 		imgui.ProgressBarV(context.GuiVars.ParsingPercentage/100.0, imgui.Vec2{X: 0.0, Y: 0.0}, "")
 		imgui.PopStyleColor()
 		imgui.EndPopup()

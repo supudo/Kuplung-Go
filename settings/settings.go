@@ -15,6 +15,7 @@ type ApplicationSettings struct {
 	App struct {
 		ApplicationVersion string `yaml:"appVersion"`
 		CurrentPath        string
+		RendererType       uint32 `yaml:"RendererType"`
 	} `yaml:"App"`
 	AppWindow struct {
 		SDLWindowWidth  float32 `yaml:"SDL_Window_Width"`

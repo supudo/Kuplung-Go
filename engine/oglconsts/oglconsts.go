@@ -3,9 +3,10 @@ package oglconsts
 // Buffer Bits
 // nolint: golint,megacheck
 const (
-	DEPTH_BUFFER_BIT   uint32 = 0x00000100
-	STENCIL_BUFFER_BIT        = 0x00000400
-	COLOR_BUFFER_BIT          = 0x00004000
+	DEPTH_BUFFER_BIT     uint32 = 0x00000100
+	STENCIL_BUFFER_BIT          = 0x00000400
+	COLOR_BUFFER_BIT            = 0x00004000
+	QUERY_BY_REGION_WAIT        = 0x8E15
 )
 
 // Draw Types
@@ -16,6 +17,7 @@ const (
 	LINES                 = 0x0001
 	LINE_LOOP             = 0x0002
 	LINE_STRIP            = 0x0003
+	PATCHES               = 0x000E
 	TRIANGLES             = 0x0004
 	TRIANGLE_STRIP        = 0x0005
 	TRIANGLE_FAN          = 0x0006
@@ -24,8 +26,11 @@ const (
 // Shader Types
 // nolint: golint,megacheck
 const (
-	FRAGMENT_SHADER uint32 = 0x8B30
-	VERTEX_SHADER          = 0x8B31
+	FRAGMENT_SHADER        uint32 = 0x8B30
+	TESS_EVALUATION_SHADER        = 0x8E87
+	TESS_CONTROL_SHADER           = 0x8E88
+	GEOMETRY_SHADER               = 0x8DD9
+	VERTEX_SHADER                 = 0x8B31
 )
 
 // Status Values

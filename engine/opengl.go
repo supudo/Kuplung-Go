@@ -191,6 +191,13 @@ func (native *OpenGL) GenVertexArrays(n int32) []uint32 {
 	return ids
 }
 
+// GenQueries implements the interfaces.OpenGL interface.
+func (native *OpenGL) GenQueries(n int32) []uint32 {
+	ids := make([]uint32, n)
+	gl.GenQueries(n, &ids[0])
+	return ids
+}
+
 // GetAttribLocation implements the interfaces.OpenGL interface.
 func (native *OpenGL) GetAttribLocation(program uint32, name string) int32 {
 	return gl.GetAttribLocation(program, gl.Str(name+"\x00"))
@@ -298,6 +305,11 @@ func (native *OpenGL) TexParameteri(target uint32, pname uint32, param int32) {
 // Uniform1i implements the interfaces.OpenGL interface.
 func (native *OpenGL) Uniform1i(location int32, value int32) {
 	gl.Uniform1i(location, value)
+}
+
+// Uniform1f implements the interfaces.OpenGL interface.
+func (native *OpenGL) Uniform1f(location int32, value1 float32) {
+	gl.Uniform1f(location, value1)
 }
 
 // Uniform3f implements the interfaces.OpenGL interface.
@@ -464,4 +476,14 @@ func (native *OpenGL) LineWidth(lw float32) {
 // DepthMask will set the depth mask
 func (native *OpenGL) DepthMask(mask bool) {
 	gl.DepthMask(mask)
+}
+
+// BeginConditionalRender will set the depth mask
+func (native *OpenGL) BeginConditionalRender(id uint32, mode uint32) {
+	gl.BeginConditionalRender(id, mode)
+}
+
+// EndConditionalRender will set the depth mask
+func (native *OpenGL) EndConditionalRender() {
+	gl.EndConditionalRender()
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/meshes"
 	"github.com/supudo/Kuplung-Go/objects"
+	"github.com/supudo/Kuplung-Go/rendering/renderers"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
 )
@@ -17,14 +18,19 @@ import (
 type RenderManager struct {
 	window interfaces.Window
 
-	Camera *objects.Camera
-
+	Camera      *objects.Camera
 	cube        *objects.Cube
 	wgrid       *objects.WorldGrid
 	axisLabels  *objects.AxisLabels
 	CameraModel *objects.CameraModel
 	miniAxis    *objects.MiniAxis
 	SkyBox      *objects.SkyBox
+
+	rendererDefered              *renderers.RendererDefered
+	rendererForward              *renderers.RendererForward
+	rendererForwardShadowMapping *renderers.RendererForwardShadowMapping
+	rendererShadowMapping        *renderers.RendererShadowMapping
+	rendererSimple               *renderers.RendererSimple
 
 	gridSize int32
 
@@ -36,17 +42,7 @@ type RenderManager struct {
 	MeshModelFaces []*meshes.ModelFace
 	LightSources   []*objects.Light
 
-	UIAmbientLightX, UIAmbientLightY, UIAmbientLightZ float32
-
-	SolidLightDirectionX, SolidLightDirectionY, SolidLightDirectionZ float32
-
-	SolidLightMaterialColor, SolidLightAmbient mgl32.Vec3
-	SolidLightDiffuse, SolidLightSpecular      mgl32.Vec3
-
-	SolidLightAmbientStrength, SolidLightDiffuseStrength, SolidLightSpecularStrength float32
-
-	SolidLightMaterialColorColorPicker, SolidLightAmbientColorPicker bool
-	SolidLightDiffuseColorPicker, SolidLightSpecularColorPicker      bool
+	RenderProps types.RenderProperties
 }
 
 // NewRenderManager will return an instance of the rendering manager
@@ -68,6 +64,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm.initCameraModel()
 	rm.initMiniAxis()
 	rm.initSkyBox()
+	rm.initRenderers()
 
 	trigger.On(types.ActionGuiAddShape, rm.addShape)
 	trigger.On(types.ActionGuiAddLight, rm.addLight)
@@ -90,6 +87,7 @@ func (rm *RenderManager) ResetSettings() {
 
 // Render handles rendering of all scene objects
 func (rm *RenderManager) Render() {
+	sett := settings.GetSettings()
 	rsett := settings.GetRenderingSettings()
 
 	w, h := rm.window.Size()
@@ -125,12 +123,21 @@ func (rm *RenderManager) Render() {
 	rm.miniAxis.Render()
 	rm.SkyBox.Render()
 
-	for i := 0; i < len(rm.MeshModelFaces); i++ {
-		rm.MeshModelFaces[i].Render()
-	}
-
 	for i := 0; i < len(rm.LightSources); i++ {
 		rm.LightSources[i].Render()
+	}
+
+	switch sett.App.RendererType {
+	case types.InAppRendererTypeDeferred:
+		rm.rendererDefered.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
+	case types.InAppRendererTypeForward:
+		rm.rendererForward.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
+	case types.InAppRendererTypeForwardShadowMapping:
+		rm.rendererForwardShadowMapping.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
+	case types.InAppRendererTypeShadowMapping:
+		rm.rendererShadowMapping.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
+	case types.InAppRendererTypeSimple:
+		rm.rendererSimple.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
 	}
 }
 
@@ -149,6 +156,7 @@ func (rm *RenderManager) Dispose() {
 	for i := 0; i < len(rm.LightSources); i++ {
 		rm.LightSources[i].Dispose()
 	}
+	rm.rendererSimple.Dispose()
 }
 
 func (rm *RenderManager) initSettings() {
@@ -156,27 +164,27 @@ func (rm *RenderManager) initSettings() {
 
 	rm.gridSize = rsett.Grid.WorldGridSizeSquares
 
-	rm.UIAmbientLightX = 0.2
-	rm.UIAmbientLightY = 0.2
-	rm.UIAmbientLightZ = 0.2
+	rm.RenderProps.UIAmbientLightX = 0.2
+	rm.RenderProps.UIAmbientLightY = 0.2
+	rm.RenderProps.UIAmbientLightZ = 0.2
 
-	rm.SolidLightDirectionX = 0.0
-	rm.SolidLightDirectionY = 1.0
-	rm.SolidLightDirectionZ = 0.0
+	rm.RenderProps.SolidLightDirectionX = 0.0
+	rm.RenderProps.SolidLightDirectionY = 1.0
+	rm.RenderProps.SolidLightDirectionZ = 0.0
 
-	rm.SolidLightMaterialColor = mgl32.Vec3{0.0, 0.7, 0.0}
-	rm.SolidLightAmbient = mgl32.Vec3{1.0}
-	rm.SolidLightDiffuse = mgl32.Vec3{1.0}
-	rm.SolidLightSpecular = mgl32.Vec3{1.0}
+	rm.RenderProps.SolidLightMaterialColor = mgl32.Vec3{0.0, 0.7, 0.0}
+	rm.RenderProps.SolidLightAmbient = mgl32.Vec3{1.0}
+	rm.RenderProps.SolidLightDiffuse = mgl32.Vec3{1.0}
+	rm.RenderProps.SolidLightSpecular = mgl32.Vec3{1.0}
 
-	rm.SolidLightAmbientStrength = 0.3
-	rm.SolidLightDiffuseStrength = 1.0
-	rm.SolidLightSpecularStrength = 0.0
+	rm.RenderProps.SolidLightAmbientStrength = 0.3
+	rm.RenderProps.SolidLightDiffuseStrength = 1.0
+	rm.RenderProps.SolidLightSpecularStrength = 0.0
 
-	rm.SolidLightMaterialColorColorPicker = false
-	rm.SolidLightAmbientColorPicker = false
-	rm.SolidLightDiffuseColorPicker = false
-	rm.SolidLightSpecularColorPicker = false
+	rm.RenderProps.SolidLightMaterialColorColorPicker = false
+	rm.RenderProps.SolidLightAmbientColorPicker = false
+	rm.RenderProps.SolidLightDiffuseColorPicker = false
+	rm.RenderProps.SolidLightSpecularColorPicker = false
 }
 
 func (rm *RenderManager) initParserManager() {
@@ -240,10 +248,22 @@ func (rm *RenderManager) initSkyBox() {
 }
 
 func (rm *RenderManager) addShape(shape types.ShapeType) {
-	go rm.addShapeAsync(shape)
+	parsingChan := make(chan types.MeshModel)
+	go rm.addShapeAsync(parsingChan, shape)
+	mmodel := <-parsingChan
+	mesh := meshes.NewModelFace(rm.window, mmodel)
+	mesh.InitProperties()
+	mesh.InitBuffers()
+	rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
+	sett := settings.GetSettings()
+	sett.MemSettings.TotalVertices += mesh.MeshModel.CountVertices
+	sett.MemSettings.TotalIndices += mesh.MeshModel.CountIndices
+	sett.MemSettings.TotalTriangles += mesh.MeshModel.CountVertices / 3
+	sett.MemSettings.TotalFaces += mesh.MeshModel.CountVertices / 6
+	sett.MemSettings.TotalObjects++
 }
 
-func (rm *RenderManager) addShapeAsync(shape types.ShapeType) {
+func (rm *RenderManager) addShapeAsync(parsingChannel chan types.MeshModel, shape types.ShapeType) {
 	_, _ = trigger.Fire(types.ActionParsingShow)
 	shapeName := ""
 	switch shape {
@@ -284,14 +304,8 @@ func (rm *RenderManager) addShapeAsync(shape types.ShapeType) {
 	}
 	sett := settings.GetSettings()
 	mmodel := rm.fileParser.Parse(sett.App.CurrentPath+"shapes/"+shapeName+".obj", nil)[0]
-	mesh := meshes.NewModelFace(rm.window, mmodel)
-	rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
-	sett.MemSettings.TotalVertices += mesh.Model.CountVertices
-	sett.MemSettings.TotalIndices += mesh.Model.CountIndices
-	sett.MemSettings.TotalTriangles += mesh.Model.CountVertices / 3
-	sett.MemSettings.TotalFaces += mesh.Model.CountVertices / 6
-	sett.MemSettings.TotalObjects++
 	_, _ = trigger.Fire(types.ActionParsingHide)
+	parsingChannel <- mmodel
 }
 
 func (rm *RenderManager) addLight(shape types.LightSourceType) {
@@ -332,4 +346,12 @@ func (rm *RenderManager) clearScene() {
 	sett.MemSettings.TotalObjects = 0
 	rm.ResetSettings()
 	_, _ = trigger.Fire(types.ActionClearGuiControls)
+}
+
+func (rm *RenderManager) initRenderers() {
+	rm.rendererDefered = renderers.NewRendererDefered(rm.window)
+	rm.rendererForward = renderers.NewRendererForward(rm.window)
+	rm.rendererForwardShadowMapping = renderers.NewRendererForwardShadowMapping(rm.window)
+	rm.rendererShadowMapping = renderers.NewRendererShadowMapping(rm.window)
+	rm.rendererSimple = renderers.NewRendererSimple(rm.window)
 }

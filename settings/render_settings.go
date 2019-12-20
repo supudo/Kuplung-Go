@@ -42,6 +42,8 @@ type RenderingSettings struct {
 		RayDirectionXS     string
 		RayDirectionYS     string
 		RayDirectionZS     string
+
+		OcclusionCulling bool
 	} `yaml:"General"`
 
 	Axis struct {
@@ -106,6 +108,7 @@ func InitRenderingSettings() RenderingSettings {
 	rSettings.General.RayDirectionXS = fmt.Sprintf("%f", rSettings.General.RayDirectionX)
 	rSettings.General.RayDirectionYS = fmt.Sprintf("%f", rSettings.General.RayDirectionY)
 	rSettings.General.RayDirectionZS = fmt.Sprintf("%f", rSettings.General.RayDirectionZ)
+	rSettings.General.OcclusionCulling = false
 
 	rSettings.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rSettings.General.Fov), rSettings.General.RatioWidth/rSettings.General.RatioHeight, rSettings.General.PlaneClose, rSettings.General.PlaneFar)
 	rSettings.MatrixCamera = mgl32.Ident4()
@@ -155,6 +158,8 @@ func ResetRenderSettings() {
 
 	rSettings.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rSettings.General.Fov), rSettings.General.RatioWidth/rSettings.General.RatioHeight, rSettings.General.PlaneClose, rSettings.General.PlaneFar)
 	rSettings.MatrixCamera = mgl32.Ident4()
+
+	rSettings.General.OcclusionCulling = false
 }
 
 // SaveRenderingSettings will save the settings back to yaml file

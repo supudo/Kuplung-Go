@@ -72,7 +72,7 @@ func (context *Context) DrawMainMenu() {
 		imgui.EndMenu()
 	}
 
-	imgui.Text(fmt.Sprintf("  | [%.4f] %d objs, %d verts, %d indices (%d tris, %d faces)", sett.MemSettings.NbResult, sett.MemSettings.TotalObjects, sett.MemSettings.TotalVertices, sett.MemSettings.TotalIndices, sett.MemSettings.TotalTriangles, sett.MemSettings.TotalFaces))
+	imgui.Text(fmt.Sprintf("  | [%.4f ms/frame] %d objs, %d verts, %d indices (%d tris, %d faces)", sett.MemSettings.NbResult, sett.MemSettings.TotalObjects, sett.MemSettings.TotalVertices, sett.MemSettings.TotalIndices, sett.MemSettings.TotalTriangles, sett.MemSettings.TotalFaces))
 
 	imgui.EndMainMenuBar()
 }

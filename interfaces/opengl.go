@@ -43,6 +43,7 @@ type OpenGL interface {
 	GenBuffers(n int32) []uint32
 	GenTextures(n int32) []uint32
 	GenVertexArrays(n int32) []uint32
+	GenQueries(n int32) []uint32
 
 	GetAttribLocation(program uint32, name string) int32
 	GetError() uint32
@@ -69,6 +70,7 @@ type OpenGL interface {
 	TexParameteri(target uint32, pname uint32, param int32)
 
 	Uniform1i(location int32, value int32)
+	Uniform1f(location int32, value1 float32)
 	Uniform3f(location int32, value1 float32, value2 float32, value3 float32)
 	Uniform4fv(location int32, value *[4]float32)
 	UniformMatrix4fv(location int32, transpose bool, value *[16]float32)
@@ -106,4 +108,7 @@ type OpenGL interface {
 
 	LineWidth(float32)
 	DepthMask(bool)
+
+	BeginConditionalRender(id uint32, mode uint32)
+	EndConditionalRender()
 }
