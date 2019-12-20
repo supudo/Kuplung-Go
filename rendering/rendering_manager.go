@@ -240,6 +240,11 @@ func (rm *RenderManager) initSkyBox() {
 }
 
 func (rm *RenderManager) addShape(shape types.ShapeType) {
+	go rm.addShapeAsync(shape)
+}
+
+func (rm *RenderManager) addShapeAsync(shape types.ShapeType) {
+	_, _ = trigger.Fire(types.ActionParsingShow)
 	shapeName := ""
 	switch shape {
 	case types.ShapeTypeCone:
@@ -281,6 +286,7 @@ func (rm *RenderManager) addShape(shape types.ShapeType) {
 	mmodel := rm.fileParser.Parse(sett.App.CurrentPath+"shapes/"+shapeName+".obj", nil)[0]
 	mesh := meshes.NewModelFace(rm.window, mmodel)
 	rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
+	_, _ = trigger.Fire(types.ActionParsingHide)
 }
 
 func (rm *RenderManager) addLight(shape types.LightSourceType) {

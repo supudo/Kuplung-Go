@@ -116,6 +116,7 @@ func (kapp *KuplungApp) initRenderingManager() {
 func (kapp *KuplungApp) DoProgress(progress float32) {
 	// TODO: implement messaging for progress
 	settings.LogWarn("[Progress] %v", math.Round(float64(progress)*100)/100)
+	kapp.guiContext.GuiVars.ParsingPercentage = progress
 }
 
 func (kapp *KuplungApp) onWindowClosed() {

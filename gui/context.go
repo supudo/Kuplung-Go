@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/inkyblackness/imgui-go"
+	"github.com/sadlil/go-trigger"
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/gui/components"
@@ -13,6 +14,7 @@ import (
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/rendering"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -70,6 +72,10 @@ type WindowVariables struct {
 	showAboutImGui   bool
 	showAboutKuplung bool
 	showMetrics      bool
+
+	showParsing bool
+
+	ParsingPercentage float32
 }
 
 // NewContext initializes a new UI context based on the provided OpenGL window.
@@ -97,6 +103,10 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 	context.GuiVars.showAboutKuplung = false
 	context.GuiVars.showMetrics = false
 
+	context.GuiVars.showParsing = false
+
+	context.GuiVars.ParsingPercentage = 0.0
+
 	err := context.createDeviceObjects(param)
 	if err != nil {
 		context.Destroy()
@@ -105,6 +115,13 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 	}
 
 	context.setKeyMapping()
+
+	trigger.On(types.ActionParsingShow, func() {
+		context.GuiVars.showParsing = true
+	})
+	trigger.On(types.ActionParsingHide, func() {
+		context.GuiVars.showParsing = false
+	})
 
 	return context
 }
@@ -200,6 +217,10 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 
 	if context.GuiVars.showMetrics {
 		context.showMetrics(&context.GuiVars.showMetrics)
+	}
+
+	if context.GuiVars.showParsing {
+		context.showParsing(&context.GuiVars.showParsing)
 	}
 }
 

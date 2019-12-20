@@ -118,10 +118,14 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 		}
 		if ev.Y > 0 {
 			deltaY++
+			//if !imgui.IsItemHoveredV(imgui.HoveredFlagsAnyWindow) {
 			rsett.General.Fov -= 1.0
+			//}
 		} else if ev.Y < 0 {
 			deltaY--
+			//if !imgui.IsItemHoveredV(imgui.HoveredFlagsAnyWindow) {
 			rsett.General.Fov += 1.0
+			//}
 		}
 		io.AddMouseWheelDelta(deltaX, deltaY)
 	case *sdl.TextInputEvent:
