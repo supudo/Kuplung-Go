@@ -286,6 +286,11 @@ func (rm *RenderManager) addShapeAsync(shape types.ShapeType) {
 	mmodel := rm.fileParser.Parse(sett.App.CurrentPath+"shapes/"+shapeName+".obj", nil)[0]
 	mesh := meshes.NewModelFace(rm.window, mmodel)
 	rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
+	sett.MemSettings.TotalVertices += mesh.Model.CountVertices
+	sett.MemSettings.TotalIndices += mesh.Model.CountIndices
+	sett.MemSettings.TotalTriangles += mesh.Model.CountVertices / 3
+	sett.MemSettings.TotalFaces += mesh.Model.CountVertices / 6
+	sett.MemSettings.TotalObjects++
 	_, _ = trigger.Fire(types.ActionParsingHide)
 }
 
@@ -319,6 +324,12 @@ func (rm *RenderManager) clearScene() {
 	}
 	rm.MeshModelFaces = nil
 	rm.LightSources = nil
+	sett := settings.GetSettings()
+	sett.MemSettings.TotalVertices = 0
+	sett.MemSettings.TotalIndices = 0
+	sett.MemSettings.TotalTriangles = 0
+	sett.MemSettings.TotalFaces = 0
+	sett.MemSettings.TotalObjects = 0
 	rm.ResetSettings()
 	_, _ = trigger.Fire(types.ActionClearGuiControls)
 }

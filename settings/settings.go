@@ -30,8 +30,19 @@ type ApplicationSettings struct {
 	} `yaml:"AppGui"`
 	MemSettings struct {
 		QuitApplication bool
-		LogBuffer       string
-		LogBufferLimit  int
+
+		LogBuffer      string
+		LogBufferLimit int
+
+		NbLastTime uint32
+		NbFrames   uint32
+		NbResult   float32
+
+		TotalVertices  int32
+		TotalIndices   int32
+		TotalTriangles int32
+		TotalFaces     int32
+		TotalObjects   int32
 	}
 }
 
@@ -78,6 +89,14 @@ func InitSettings() ApplicationSettings {
 	appSettings.MemSettings.QuitApplication = false
 	appSettings.MemSettings.LogBuffer = ""
 	appSettings.MemSettings.LogBufferLimit = 15360
+	appSettings.MemSettings.NbLastTime = 0
+	appSettings.MemSettings.NbFrames = 0
+	appSettings.MemSettings.NbResult = 0.0
+	appSettings.MemSettings.TotalVertices = 0
+	appSettings.MemSettings.TotalIndices = 0
+	appSettings.MemSettings.TotalTriangles = 0
+	appSettings.MemSettings.TotalFaces = 0
+	appSettings.MemSettings.TotalObjects = 0
 
 	if appSettings.Rendering.FramesPerSecond == 0.0 {
 		appSettings.Rendering.FramesPerSecond = 30.0

@@ -61,6 +61,14 @@ func (kapp *KuplungApp) initWindowCallbacks() {
 func (kapp *KuplungApp) render() {
 	sett := settings.GetSettings()
 	if !sett.MemSettings.QuitApplication {
+		currentTime := kapp.window.GetTicks()
+		sett.MemSettings.NbFrames++
+		if currentTime-sett.MemSettings.NbLastTime >= 1000.0 {
+			sett.MemSettings.NbResult = 1000.0 / float32(sett.MemSettings.NbFrames)
+			sett.MemSettings.NbFrames = 0
+			sett.MemSettings.NbLastTime += 1000
+		}
+
 		kapp.guiContext.NewFrame()
 		kapp.gl.Clear(oglconsts.COLOR_BUFFER_BIT | oglconsts.DEPTH_BUFFER_BIT | oglconsts.STENCIL_BUFFER_BIT)
 		kapp.guiContext.DrawGUI(true, kapp.renderManager)
@@ -114,7 +122,6 @@ func (kapp *KuplungApp) initRenderingManager() {
 
 // DoProgress ...
 func (kapp *KuplungApp) DoProgress(progress float32) {
-	// TODO: implement messaging for progress
 	settings.LogWarn("[Progress] %v", math.Round(float64(progress)*100)/100)
 	kapp.guiContext.GuiVars.ParsingPercentage = progress
 }

@@ -25,14 +25,14 @@ type ModelFace struct {
 
 	occQuery uint32
 
-	model types.MeshModel
+	Model types.MeshModel
 }
 
 // NewModelFace ...
 func NewModelFace(window interfaces.Window, model types.MeshModel) *ModelFace {
 	mesh := &ModelFace{}
 	mesh.window = window
-	mesh.model = model
+	mesh.Model = model
 	return mesh
 }
 

@@ -68,4 +68,7 @@ type Window interface {
 	OnKey(callback KeyCallback)
 	// OnModifier registers a callback function for change of modifier events.
 	OnModifier(callback ModifierCallback)
+
+	// GetTicks will return the SDL ticks
+	GetTicks() uint32
 }

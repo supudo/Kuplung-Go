@@ -84,6 +84,10 @@ func NewKuplungWindow(title string) (window *KuplungWindow) {
 
 	window.OnClosed(window.onClosed)
 
+	sett.MemSettings.NbLastTime = sdl.GetTicks()
+	sett.MemSettings.NbFrames = 0
+	sett.MemSettings.NbResult = 0.0
+
 	settings.LogInfo("[Window] Window initialized.")
 
 	return
@@ -240,6 +244,11 @@ func (window *KuplungWindow) SetFullScreen(on bool) {
 		window.sdlWindow.SetSize(int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight))
 		settings.LogInfo("[Window] Window initialized.")
 	}
+}
+
+// GetTicks will return the SDL ticks
+func (window *KuplungWindow) GetTicks() uint32 {
+	return sdl.GetTicks()
 }
 
 func (window *KuplungWindow) onClosed() {

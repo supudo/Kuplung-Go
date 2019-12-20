@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/inkyblackness/imgui-go"
@@ -11,6 +12,7 @@ import (
 
 // DrawMainMenu ...
 func (context *Context) DrawMainMenu() {
+	sett := settings.GetSettings()
 	rsett := settings.GetRenderingSettings()
 
 	// Main Menu
@@ -69,6 +71,8 @@ func (context *Context) DrawMainMenu() {
 		}
 		imgui.EndMenu()
 	}
+
+	imgui.Text(fmt.Sprintf("  | [%.4f] %d objs, %d verts, %d indices (%d tris, %d faces)", sett.MemSettings.NbResult, sett.MemSettings.TotalObjects, sett.MemSettings.TotalVertices, sett.MemSettings.TotalIndices, sett.MemSettings.TotalTriangles, sett.MemSettings.TotalFaces))
 
 	imgui.EndMainMenuBar()
 }
