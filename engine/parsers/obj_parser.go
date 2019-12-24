@@ -26,65 +26,65 @@ type ObjParser struct {
 	vectorIndices                 []uint32
 
 	// current object name
-	id_objTitle string
+	idObjTitle string
 	// vertex coordinates
-	id_geometricVertices string
+	idGeometricVertices string
 	// texture coordinates
-	id_textureCoordinates string
+	idTextureCoordinates string
 	// normals
-	id_vertexNormals string
+	idVertexNormals string
 	// space vertices
-	id_spaceVertices string
+	idSpaceVertices string
 	// polygon faces
-	id_face string
+	idFace string
 	// material file
-	id_materialFile string
+	idMaterialFile string
 	// material name for the current object
-	id_useMaterial string
+	idUseMaterial string
 
 	// material
-	id_materialNew string
+	idMaterialNew string
 
 	// To specify the ambient reflectivity of the current material, you can use the "Ka" statement,
 	// the "Ka spectral" statement, or the "Ka xyz" statement.
-	id_materialAmbientColor string
+	idMaterialAmbientColor string
 	// To specify the diffuse reflectivity of the current material, you can use the "Kd" statement,
 	// the "Kd spectral" statement, or the "Kd xyz" statement.
-	id_materialDiffuseColor string
+	idMaterialDiffuseColor string
 	// To specify the specular reflectivity of the current material, you can use the "Ks" statement,
 	// the "Ks spectral" statement, or the "Ks xyz" statement.
-	id_materialSpecularColor string
+	idMaterialSpecularColor string
 	// The emission constant color of the material
-	id_materialEmissionColor string
+	idMaterialEmissionColor string
 	// Specifies the specular exponent for the current material. This defines the focus of the specular highlight.
-	id_materialSpecularExp string
+	idMaterialSpecularExp string
 	// Specifies the dissolve for the current material.  Tr or d, depending on the formats. Transperancy
-	id_materialTransperant1 string
-	id_materialTransperant2 string
+	idMaterialTransperant1 string
+	idMaterialTransperant2 string
 	// Specifies the optical density for the surface. This is also known as index of refraction.
-	id_materialOpticalDensity string
+	idMaterialOpticalDensity string
 	// The "illum" statement specifies the illumination model to use in the material.
 	// Illumination models are mathematical equations that represent various material lighting and shading effects.
-	id_materialIllumination string
+	idMaterialIllumination string
 	// Specifies that a color texture file or a color procedural texture file is applied to the ambient reflectivity of the material.
 	// During rendering, the "map_Ka" value is multiplied by the "Ka" value.
-	id_materialTextureAmbient string
+	idMaterialTextureAmbient string
 	// Specifies that a color texture file or color procedural texture file is linked to the diffuse reflectivity of the material.
 	// During rendering, the map_Kd value is multiplied by the Kd value.
-	id_materialTextureDiffuse string
+	idMaterialTextureDiffuse string
 	// Bump map
-	id_materialTextureBump string
+	idMaterialTextureBump string
 	// Displacement map
-	id_materialTextureDisplacement string
+	idMaterialTextureDisplacement string
 	// Specifies that a color texture file or color procedural texture file is linked to the specular reflectivity of the material.
 	// During rendering, the map_Ks value is multiplied by the Ks value.
-	id_materialTextureSpecular string
+	idMaterialTextureSpecular string
 	// Specifies that a scalar texture file or scalar procedural texture file is linked to the specular exponent of the material.
 	// During rendering, the map_Ns value is multiplied by the Ns value.
-	id_materialTextureSpecularExp string
+	idMaterialTextureSpecularExp string
 	// Specifies that a scalar texture file or scalar procedural texture file is linked to the dissolve of the material.
 	// During rendering, the map_d value is multiplied by the d value.
-	id_materialTextureDissolve string
+	idMaterialTextureDissolve string
 }
 
 // NewObjParser ...
@@ -94,32 +94,32 @@ func NewObjParser(doProgress func(float32)) *ObjParser {
 	objp.doProgress = doProgress
 	objp.objFileLinesCount = 0
 
-	objp.id_objTitle = "o "
-	objp.id_geometricVertices = "v "
-	objp.id_textureCoordinates = "vt "
-	objp.id_vertexNormals = "vn "
-	objp.id_spaceVertices = "vp "
-	objp.id_face = "f "
-	objp.id_materialFile = "mtllib "
-	objp.id_useMaterial = "usemtl "
-	objp.id_materialNew = "newmtl "
+	objp.idObjTitle = "o "
+	objp.idGeometricVertices = "v "
+	objp.idTextureCoordinates = "vt "
+	objp.idVertexNormals = "vn "
+	objp.idSpaceVertices = "vp "
+	objp.idFace = "f "
+	objp.idMaterialFile = "mtllib "
+	objp.idUseMaterial = "usemtl "
+	objp.idMaterialNew = "newmtl "
 
-	objp.id_materialAmbientColor = "Ka "
-	objp.id_materialDiffuseColor = "Kd "
-	objp.id_materialSpecularColor = "Ks "
-	objp.id_materialEmissionColor = "Ke "
-	objp.id_materialSpecularExp = "Ns "
-	objp.id_materialTransperant1 = "Tr "
-	objp.id_materialTransperant2 = "d "
-	objp.id_materialOpticalDensity = "Ni "
-	objp.id_materialIllumination = "illum "
-	objp.id_materialTextureAmbient = "map_Ka "
-	objp.id_materialTextureDiffuse = "map_Kd "
-	objp.id_materialTextureBump = "map_Bump "
-	objp.id_materialTextureDisplacement = "disp "
-	objp.id_materialTextureSpecular = "map_Ks "
-	objp.id_materialTextureSpecularExp = "map_Ns "
-	objp.id_materialTextureDissolve = "map_d "
+	objp.idMaterialAmbientColor = "Ka "
+	objp.idMaterialDiffuseColor = "Kd "
+	objp.idMaterialSpecularColor = "Ks "
+	objp.idMaterialEmissionColor = "Ke "
+	objp.idMaterialSpecularExp = "Ns "
+	objp.idMaterialTransperant1 = "Tr "
+	objp.idMaterialTransperant2 = "d "
+	objp.idMaterialOpticalDensity = "Ni "
+	objp.idMaterialIllumination = "illum "
+	objp.idMaterialTextureAmbient = "map_Ka "
+	objp.idMaterialTextureDiffuse = "map_Kd "
+	objp.idMaterialTextureBump = "map_Bump "
+	objp.idMaterialTextureDisplacement = "disp "
+	objp.idMaterialTextureSpecular = "map_Ks "
+	objp.idMaterialTextureSpecularExp = "map_Ns "
+	objp.idMaterialTextureDissolve = "map_d "
 
 	return objp
 }
@@ -149,10 +149,10 @@ func (objp *ObjParser) Parse(filename string, psettings []string) []types.MeshMo
 	for scanner.Scan() {
 		singleLine = scanner.Text()
 
-		if strings.HasPrefix(singleLine, objp.id_materialFile) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialFile, "")
+		if strings.HasPrefix(singleLine, objp.idMaterialFile) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialFile, "")
 			objp.loadMaterialFile(singleLine)
-		} else if strings.HasPrefix(singleLine, objp.id_objTitle) {
+		} else if strings.HasPrefix(singleLine, objp.idObjTitle) {
 			currentModelID = modelCounter
 			entityModel := types.MeshModel{
 				File:                    objp.filename,
@@ -163,43 +163,43 @@ func (objp *ObjParser) Parse(filename string, psettings []string) []types.MeshMo
 				CountNormals:            0,
 				CountIndices:            0,
 			}
-			entityModel.ModelTitle = strings.ReplaceAll(entityModel.ModelTitle, objp.id_objTitle, "")
+			entityModel.ModelTitle = strings.ReplaceAll(entityModel.ModelTitle, objp.idObjTitle, "")
 			modelCounter++
 			objp.models = append(objp.models, entityModel)
-		} else if strings.HasPrefix(singleLine, objp.id_geometricVertices) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_geometricVertices, "")
+		} else if strings.HasPrefix(singleLine, objp.idGeometricVertices) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idGeometricVertices, "")
 			fmt.Sscanf(singleLine, "%f %f %f", &x, &y, &z)
 			vVertices = append(vVertices, mgl32.Vec3{x, y, z})
-		} else if strings.HasPrefix(singleLine, objp.id_textureCoordinates) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_textureCoordinates, "")
+		} else if strings.HasPrefix(singleLine, objp.idTextureCoordinates) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idTextureCoordinates, "")
 			fmt.Sscanf(singleLine, "%f %f", &x, &y)
 			vTextureCoordinates = append(vTextureCoordinates, mgl32.Vec2{x, y})
-		} else if strings.HasPrefix(singleLine, objp.id_vertexNormals) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_vertexNormals, "")
+		} else if strings.HasPrefix(singleLine, objp.idVertexNormals) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idVertexNormals, "")
 			fmt.Sscanf(singleLine, "%f %f %f", &x, &y, &z)
 			vNormals = append(vNormals, mgl32.Vec3{x, y, z})
-		} else if strings.HasPrefix(singleLine, objp.id_useMaterial) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_useMaterial, "")
+		} else if strings.HasPrefix(singleLine, objp.idUseMaterial) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idUseMaterial, "")
 			objp.models[currentModelID].ModelMaterial = *objp.materials[singleLine]
 			objp.models[currentModelID].MaterialTitle = objp.models[currentModelID].ModelMaterial.MaterialTitle
-		} else if strings.HasPrefix(singleLine, objp.id_face) {
+		} else if strings.HasPrefix(singleLine, objp.idFace) {
 			var ft []string
 			ft = strings.Split(singleLine, " ")
 			if len(ft) == 5 {
-				var tri_vertexIndex, tri_uvIndex, tri_normalIndex [4]uint32
-				face := objp.id_face + "%v/%v/%v %v/%v/%v %v/%v/%v %v/%v/%v"
+				var triVertexIndex, triUvIndex, triNormalIndex [4]uint32
+				face := objp.idFace + "%v/%v/%v %v/%v/%v %v/%v/%v %v/%v/%v"
 				matches, _ := fmt.Sscanf(singleLine, face,
-					&tri_vertexIndex[0], &tri_uvIndex[0], &tri_normalIndex[0],
-					&tri_vertexIndex[1], &tri_uvIndex[1], &tri_normalIndex[1],
-					&tri_vertexIndex[2], &tri_uvIndex[2], &tri_normalIndex[2],
-					&tri_vertexIndex[3], &tri_uvIndex[3], &tri_normalIndex[3])
+					&triVertexIndex[0], &triUvIndex[0], &triNormalIndex[0],
+					&triVertexIndex[1], &triUvIndex[1], &triNormalIndex[1],
+					&triVertexIndex[2], &triUvIndex[2], &triNormalIndex[2],
+					&triVertexIndex[3], &triUvIndex[3], &triNormalIndex[3])
 				if matches != 12 {
-					face = objp.id_face + "%v//%v %v//%v %v//%v %v//%v"
+					face = objp.idFace + "%v//%v %v//%v %v//%v %v//%v"
 					matches, _ := fmt.Sscanf(singleLine, face,
-						&tri_vertexIndex[0], &tri_normalIndex[0],
-						&tri_vertexIndex[1], &tri_normalIndex[1],
-						&tri_vertexIndex[2], &tri_normalIndex[2],
-						&tri_vertexIndex[3], &tri_normalIndex[3])
+						&triVertexIndex[0], &triNormalIndex[0],
+						&triVertexIndex[1], &triNormalIndex[1],
+						&triVertexIndex[2], &triNormalIndex[2],
+						&triVertexIndex[3], &triNormalIndex[3])
 					if matches != 8 {
 						settings.LogWarn("[OBJ Parser] OBJ file is in wrong format: %v", objp.filename)
 						return objp.models
@@ -208,37 +208,37 @@ func (objp *ObjParser) Parse(filename string, psettings []string) []types.MeshMo
 				indexModels = append(indexModels, currentModelID)
 				indexModels = append(indexModels, currentModelID)
 				indexModels = append(indexModels, currentModelID)
-				indexVertices = append(indexVertices, tri_vertexIndex[0])
-				indexVertices = append(indexVertices, tri_vertexIndex[1])
-				indexVertices = append(indexVertices, tri_vertexIndex[2])
-				indexTexture = append(indexTexture, tri_uvIndex[0])
-				indexTexture = append(indexTexture, tri_uvIndex[1])
-				indexTexture = append(indexTexture, tri_uvIndex[2])
-				indexNormals = append(indexNormals, tri_normalIndex[0])
-				indexNormals = append(indexNormals, tri_normalIndex[1])
-				indexNormals = append(indexNormals, tri_normalIndex[2])
+				indexVertices = append(indexVertices, triVertexIndex[0])
+				indexVertices = append(indexVertices, triVertexIndex[1])
+				indexVertices = append(indexVertices, triVertexIndex[2])
+				indexTexture = append(indexTexture, triUvIndex[0])
+				indexTexture = append(indexTexture, triUvIndex[1])
+				indexTexture = append(indexTexture, triUvIndex[2])
+				indexNormals = append(indexNormals, triNormalIndex[0])
+				indexNormals = append(indexNormals, triNormalIndex[1])
+				indexNormals = append(indexNormals, triNormalIndex[2])
 
 				indexModels = append(indexModels, currentModelID)
 				indexModels = append(indexModels, currentModelID)
 				indexModels = append(indexModels, currentModelID)
-				indexVertices = append(indexVertices, tri_vertexIndex[2])
-				indexVertices = append(indexVertices, tri_vertexIndex[3])
-				indexVertices = append(indexVertices, tri_vertexIndex[0])
-				indexTexture = append(indexTexture, tri_uvIndex[2])
-				indexTexture = append(indexTexture, tri_uvIndex[3])
-				indexTexture = append(indexTexture, tri_uvIndex[0])
-				indexNormals = append(indexNormals, tri_normalIndex[2])
-				indexNormals = append(indexNormals, tri_normalIndex[3])
-				indexNormals = append(indexNormals, tri_normalIndex[0])
+				indexVertices = append(indexVertices, triVertexIndex[2])
+				indexVertices = append(indexVertices, triVertexIndex[3])
+				indexVertices = append(indexVertices, triVertexIndex[0])
+				indexTexture = append(indexTexture, triUvIndex[2])
+				indexTexture = append(indexTexture, triUvIndex[3])
+				indexTexture = append(indexTexture, triUvIndex[0])
+				indexNormals = append(indexNormals, triNormalIndex[2])
+				indexNormals = append(indexNormals, triNormalIndex[3])
+				indexNormals = append(indexNormals, triNormalIndex[0])
 			} else {
 				var vertexIndex, uvIndex, normalIndex [3]uint32
-				face := objp.id_face + "%v/%v/%v %v/%v/%v %v/%v/%v"
+				face := objp.idFace + "%v/%v/%v %v/%v/%v %v/%v/%v"
 				matches, _ := fmt.Sscanf(singleLine, face,
 					&vertexIndex[0], &uvIndex[0], &normalIndex[0],
 					&vertexIndex[1], &uvIndex[1], &normalIndex[1],
 					&vertexIndex[2], &uvIndex[2], &normalIndex[2])
 				if matches != 9 {
-					face = objp.id_face + "%v//%v %v//%v %v//%v"
+					face = objp.idFace + "%v//%v %v//%v %v//%v"
 					matches, _ := fmt.Sscanf(singleLine, face,
 						&vertexIndex[0], &normalIndex[0],
 						&vertexIndex[1], &normalIndex[1],
@@ -271,15 +271,15 @@ func (objp *ObjParser) Parse(filename string, psettings []string) []types.MeshMo
 		settings.LogWarn("[OBJ Parser] Scanner error: %v", err)
 	}
 
-	Setting_Axis_Forward := int32(4)
+	SettingAxisForward := int32(4)
 	if len(psettings) > 0 && len(psettings[0]) != 0 {
 		i64, _ := strconv.ParseUint(psettings[0], 10, 32)
-		Setting_Axis_Forward = int32(i64)
+		SettingAxisForward = int32(i64)
 	}
-	Setting_Axis_Up := int32(5)
+	SettingAxisUp := int32(5)
 	if len(psettings) > 1 && len(psettings[1]) != 0 {
 		i64, _ := strconv.ParseUint(psettings[1], 10, 32)
-		Setting_Axis_Up = int32(i64)
+		SettingAxisUp = int32(i64)
 	}
 
 	if len(objp.models) > 0 {
@@ -291,8 +291,8 @@ func (objp *ObjParser) Parse(filename string, psettings []string) []types.MeshMo
 			vertexIndex := indexVertices[i]
 			normalIndex := indexNormals[i]
 
-			vertex := FixVectorAxis(vVertices[vertexIndex-1], Setting_Axis_Forward, Setting_Axis_Up)
-			normal := FixVectorAxis(vNormals[normalIndex-1], Setting_Axis_Forward, Setting_Axis_Up)
+			vertex := FixVectorAxis(vVertices[vertexIndex-1], SettingAxisForward, SettingAxisUp)
+			normal := FixVectorAxis(vNormals[normalIndex-1], SettingAxisForward, SettingAxisUp)
 
 			objp.models[modelIndex].Vertices = append(objp.models[modelIndex].Vertices, vertex)
 			objp.models[modelIndex].CountVertices++
@@ -324,9 +324,9 @@ func (objp *ObjParser) Parse(filename string, psettings []string) []types.MeshMo
 			for j := 0; j < len(m.Vertices); j++ {
 				var packed types.PackedVertex
 				if len(m.TextureCoordinates) > 0 {
-					packed = types.PackedVertex{m.Vertices[j], m.TextureCoordinates[j], m.Normals[j]}
+					packed = types.PackedVertex{Position: m.Vertices[j], UV: m.TextureCoordinates[j], Normal: m.Normals[j]}
 				} else {
-					packed = types.PackedVertex{m.Vertices[j], mgl32.Vec2{0, 0}, m.Normals[j]}
+					packed = types.PackedVertex{Position: m.Vertices[j], UV: mgl32.Vec2{0, 0}, Normal: m.Normals[j]}
 				}
 
 				index, found := objp.getSimilarVertexIndex(packed, vertexToOutIndex)
@@ -379,9 +379,9 @@ func (objp *ObjParser) loadMaterialFile(materialFile string) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		singleLine = scanner.Text()
-		if strings.HasPrefix(singleLine, objp.id_materialNew) {
+		if strings.HasPrefix(singleLine, objp.idMaterialNew) {
 			currentMaterialTitle = singleLine
-			currentMaterialTitle = strings.ReplaceAll(currentMaterialTitle, objp.id_materialNew, "")
+			currentMaterialTitle = strings.ReplaceAll(currentMaterialTitle, objp.idMaterialNew, "")
 			entityMaterial := types.MeshModelMaterial{
 				MaterialID:       MaterialID,
 				MaterialTitle:    currentMaterialTitle,
@@ -395,64 +395,64 @@ func (objp *ObjParser) loadMaterialFile(materialFile string) {
 				EmissionColor:    mgl32.Vec3{0, 0, 0}}
 			MaterialID++
 			objp.materials[currentMaterialTitle] = &entityMaterial
-		} else if strings.HasPrefix(singleLine, objp.id_materialAmbientColor) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialAmbientColor, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialAmbientColor) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialAmbientColor, "")
 			fmt.Sscanf(singleLine, "%f %f %f", &r, &g, &b)
 			mat := objp.materials[currentMaterialTitle]
 			mat.AmbientColor = mgl32.Vec3{r, g, b}
 			objp.materials[currentMaterialTitle].AmbientColor = mgl32.Vec3{r, g, b}
-		} else if strings.HasPrefix(singleLine, objp.id_materialDiffuseColor) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialDiffuseColor, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialDiffuseColor) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialDiffuseColor, "")
 			fmt.Sscanf(singleLine, "%f %f %f", &r, &g, &b)
 			objp.materials[currentMaterialTitle].DiffuseColor = mgl32.Vec3{r, g, b}
-		} else if strings.HasPrefix(singleLine, objp.id_materialSpecularColor) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialSpecularColor, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialSpecularColor) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialSpecularColor, "")
 			fmt.Sscanf(singleLine, "%f %f %f", &r, &g, &b)
 			objp.materials[currentMaterialTitle].SpecularColor = mgl32.Vec3{r, g, b}
-		} else if strings.HasPrefix(singleLine, objp.id_materialEmissionColor) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialEmissionColor, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialEmissionColor) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialEmissionColor, "")
 			fmt.Sscanf(singleLine, "%f %f %f", &r, &g, &b)
 			objp.materials[currentMaterialTitle].EmissionColor = mgl32.Vec3{r, g, b}
-		} else if strings.HasPrefix(singleLine, objp.id_materialSpecularExp) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialSpecularExp, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialSpecularExp) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialSpecularExp, "")
 			f64, _ := strconv.ParseFloat(singleLine, 32)
 			objp.materials[currentMaterialTitle].SpecularExp = float32(f64)
-		} else if strings.HasPrefix(singleLine, objp.id_materialTransperant1) || strings.HasPrefix(singleLine, objp.id_materialTransperant2) {
-			if strings.HasPrefix(singleLine, objp.id_materialTransperant1) {
-				singleLine = strings.ReplaceAll(singleLine, objp.id_materialTransperant1, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialTransperant1) || strings.HasPrefix(singleLine, objp.idMaterialTransperant2) {
+			if strings.HasPrefix(singleLine, objp.idMaterialTransperant1) {
+				singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTransperant1, "")
 			} else {
-				singleLine = strings.ReplaceAll(singleLine, objp.id_materialTransperant2, "")
+				singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTransperant2, "")
 			}
 			f64, _ := strconv.ParseFloat(singleLine, 32)
 			objp.materials[currentMaterialTitle].Transparency = float32(f64)
-		} else if strings.HasPrefix(singleLine, objp.id_materialOpticalDensity) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialOpticalDensity, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialOpticalDensity) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialOpticalDensity, "")
 			f64, _ := strconv.ParseFloat(singleLine, 32)
 			objp.materials[currentMaterialTitle].OpticalDensity = float32(f64)
-		} else if strings.HasPrefix(singleLine, objp.id_materialIllumination) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialIllumination, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialIllumination) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialIllumination, "")
 			i64, _ := strconv.ParseUint(singleLine, 10, 32)
 			objp.materials[currentMaterialTitle].IlluminationMode = uint32(i64)
-		} else if strings.HasPrefix(singleLine, objp.id_materialTextureAmbient) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialTextureAmbient, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialTextureAmbient) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTextureAmbient, "")
 			objp.materials[currentMaterialTitle].TextureAmbient = objp.parseTextureImage(singleLine)
-		} else if strings.HasPrefix(singleLine, objp.id_materialTextureBump) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialTextureBump, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialTextureBump) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTextureBump, "")
 			objp.materials[currentMaterialTitle].TextureBump = objp.parseTextureImage(singleLine)
-		} else if strings.HasPrefix(singleLine, objp.id_materialTextureDiffuse) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialTextureDiffuse, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialTextureDiffuse) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTextureDiffuse, "")
 			objp.materials[currentMaterialTitle].TextureDiffuse = objp.parseTextureImage(singleLine)
-		} else if strings.HasPrefix(singleLine, objp.id_materialTextureDisplacement) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialTextureDisplacement, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialTextureDisplacement) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTextureDisplacement, "")
 			objp.materials[currentMaterialTitle].TextureDisplacement = objp.parseTextureImage(singleLine)
-		} else if strings.HasPrefix(singleLine, objp.id_materialTextureDissolve) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialTextureDissolve, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialTextureDissolve) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTextureDissolve, "")
 			objp.materials[currentMaterialTitle].TextureDissolve = objp.parseTextureImage(singleLine)
-		} else if strings.HasPrefix(singleLine, objp.id_materialTextureSpecular) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialTextureSpecular, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialTextureSpecular) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTextureSpecular, "")
 			objp.materials[currentMaterialTitle].TextureSpecular = objp.parseTextureImage(singleLine)
-		} else if strings.HasPrefix(singleLine, objp.id_materialTextureSpecularExp) {
-			singleLine = strings.ReplaceAll(singleLine, objp.id_materialTextureSpecularExp, "")
+		} else if strings.HasPrefix(singleLine, objp.idMaterialTextureSpecularExp) {
+			singleLine = strings.ReplaceAll(singleLine, objp.idMaterialTextureSpecularExp, "")
 			objp.materials[currentMaterialTitle].TextureSpecularExp = objp.parseTextureImage(singleLine)
 		}
 	}
