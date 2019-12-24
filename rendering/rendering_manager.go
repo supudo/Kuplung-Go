@@ -251,10 +251,12 @@ func (rm *RenderManager) addShape(shape types.ShapeType) {
 	parsingChan := make(chan types.MeshModel)
 	go rm.addShapeAsync(parsingChan, shape)
 	mmodel := <-parsingChan
+
 	mesh := meshes.NewModelFace(rm.window, mmodel)
 	mesh.InitProperties()
 	mesh.InitBuffers()
 	rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
+
 	sett := settings.GetSettings()
 	sett.MemSettings.TotalVertices += mesh.MeshModel.CountVertices
 	sett.MemSettings.TotalIndices += mesh.MeshModel.CountIndices
