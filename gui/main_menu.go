@@ -8,6 +8,7 @@ import (
 	"github.com/sadlil/go-trigger"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
+	"github.com/supudo/Kuplung-Go/utilities"
 )
 
 // DrawMainMenu ...
@@ -72,7 +73,7 @@ func (context *Context) DrawMainMenu() {
 		imgui.EndMenu()
 	}
 
-	imgui.Text(fmt.Sprintf("  | [%.4f ms/frame] %d objs, %d verts, %d indices (%d tris, %d faces)", sett.MemSettings.NbResult, sett.MemSettings.TotalObjects, sett.MemSettings.TotalVertices, sett.MemSettings.TotalIndices, sett.MemSettings.TotalTriangles, sett.MemSettings.TotalFaces))
+	imgui.Text(fmt.Sprintf("  | [%.4f ms/frame] %d objs, %d verts, %d indices (%d tris, %d faces) | %v", sett.MemSettings.NbResult, sett.MemSettings.TotalObjects, sett.MemSettings.TotalVertices, sett.MemSettings.TotalIndices, sett.MemSettings.TotalTriangles, sett.MemSettings.TotalFaces, utilities.GetUsage()))
 
 	imgui.EndMainMenuBar()
 }

@@ -29,6 +29,16 @@ type ApplicationSettings struct {
 	AppGui struct {
 		GUIClearColor []float32 `yaml:"guiClearColor"`
 	} `yaml:"AppGui"`
+	Consumption struct {
+		ConsumptionIntervalCPU    int64 `yaml:"Consumption_Interval_CPU"`
+		ConsumptionTimerCPU       int64
+		ConsumptionCounterCPU     int64
+		ConsumptionCPU            string
+		ConsumptionIntervalMemory int64 `yaml:"Consumption_Interval_Memory"`
+		ConsumptionTimerMemory    int64
+		ConsumptionCounterMemory  int64
+		ConsumptionMemory         string
+	} `yaml:"Consumption"`
 	MemSettings struct {
 		QuitApplication bool
 
@@ -102,6 +112,13 @@ func InitSettings() ApplicationSettings {
 	if appSettings.Rendering.FramesPerSecond == 0.0 {
 		appSettings.Rendering.FramesPerSecond = 30.0
 	}
+
+	appSettings.Consumption.ConsumptionCPU = ""
+	appSettings.Consumption.ConsumptionCounterCPU = 0
+	appSettings.Consumption.ConsumptionTimerCPU = 0
+	appSettings.Consumption.ConsumptionMemory = ""
+	appSettings.Consumption.ConsumptionTimerMemory = 0
+	appSettings.Consumption.ConsumptionCounterMemory = 0
 
 	for idx, num := range appSettings.AppGui.GUIClearColor {
 		appSettings.AppGui.GUIClearColor[idx] = num / 255.0

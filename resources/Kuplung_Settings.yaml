@@ -19,3 +19,8 @@ Rendering:
 # GUI - clear color
 AppGui:
   guiClearColor: [70.0, 70.0, 70.0, 255.0]
+
+# Consumption refresh interval in seconds
+Consumption:
+  Consumption_Interval_CPU: 5
+  Consumption_Interval_Memory: 5

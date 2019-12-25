@@ -16,14 +16,14 @@ func LogError(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
 	_, fn, line, _ := runtime.Caller(1)
 	_, _ = trigger.Fire(types.ActionLog, msg)
-	log.Fatalf("[Kuplung] %s:%d - %v", fn, line, msg)
+	log.Fatalf("[Kuplung] [%v] %s:%d - %v", time.Now().String(), fn, line, msg)
 	os.Exit(3)
 }
 
 // LogWarn logs a warning
 func LogWarn(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	fmt.Println("[Kuplung] " + msg)
+	fmt.Println("[Kuplung] [" + time.Now().String() + "] " + msg)
 	_, _ = trigger.Fire(types.ActionLog, msg)
 }
 
