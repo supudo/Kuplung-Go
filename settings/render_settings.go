@@ -221,26 +221,26 @@ func KuplungPrintObjModels(models []types.MeshModel, byIndices, shouldExit bool)
 				v := m.Vertices[j]
 				verts += fmt.Sprintf("[%v, %v, %v], ", v.X(), v.Y(), v.Z())
 			}
-			LogWarn("m.vertices : %v", verts)
+			LogWarn("model.vertices : %v", verts)
 
 			var uvs string
 			for j := 0; j < len(m.TextureCoordinates); j++ {
 				uvs += fmt.Sprintf("[%v, %v], ", m.TextureCoordinates[j].X(), m.TextureCoordinates[j].Y())
 			}
-			LogWarn("m.texture_coordinates : %v", uvs)
+			LogWarn("model.texture_coordinates : %v", uvs)
 
 			var normals string
 			for j := 0; j < len(m.Normals); j++ {
 				n := m.Normals[j]
 				normals += fmt.Sprintf("[%f, %f, %f], ", n.X(), n.Y(), n.Z())
 			}
-			LogWarn("m.normals : %v", normals)
+			LogWarn("model.normals : %v", normals)
 
 			var indices string
 			for j := 0; j < len(m.Indices); j++ {
 				indices += fmt.Sprintf("%v, ", m.Indices[j])
 			}
-			LogWarn("m.indices : %v", indices)
+			LogWarn("model.indices : %v", indices)
 		}
 
 		LogWarn("model.ModelMaterial.MaterialID = %v", m.ModelMaterial.MaterialID)

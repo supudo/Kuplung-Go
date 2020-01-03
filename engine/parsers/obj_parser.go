@@ -356,7 +356,7 @@ func (objp *ObjParser) Parse(filename string, psettings []string) []types.MeshMo
 	}
 
 	// if objp.models[0].ModelTitle == "XPlus" {
-	// 	types.KuplungPrintObjModels(objp.models, false, true)
+	// settings.KuplungPrintObjModels(objp.models, false, false)
 	// }
 
 	return objp.models
@@ -483,8 +483,7 @@ func (objp *ObjParser) parseTextureImage(textureLine string) types.MeshMaterialT
 	}
 	strings.TrimSpace(materialImage.Image)
 
-	folderPath := objp.filename
-	folderPath = strings.ReplaceAll(folderPath, objp.filename, "")
+	folderPath := filepath.Dir(objp.filename) + "/"
 
 	if !objp.fileExists(materialImage.Image) {
 		materialImage.Image = folderPath + materialImage.Image

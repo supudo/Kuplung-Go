@@ -258,14 +258,14 @@ func (mesh *ModelFace) InitBuffers() {
 		// tangents
 		vboTangents := gl.GenBuffers(1)[0]
 		gl.BindBuffer(oglconsts.ARRAY_BUFFER, vboTangents)
-		gl.BufferData(oglconsts.ARRAY_BUFFER, len(tangents)*3*4, &tangents[0], oglconsts.STATIC_DRAW)
+		gl.BufferData(oglconsts.ARRAY_BUFFER, len(tangents)*3*4, gl.Ptr(tangents), oglconsts.STATIC_DRAW)
 		gl.EnableVertexAttribArray(3)
 		gl.VertexAttribPointer(3, 3, oglconsts.FLOAT, false, 3*4, gl.PtrOffset(0))
 
 		// bitangents
 		vboBitangents := gl.GenBuffers(1)[0]
 		gl.BindBuffer(oglconsts.ARRAY_BUFFER, vboBitangents)
-		gl.BufferData(oglconsts.ARRAY_BUFFER, len(bitangents)*3*4, &bitangents[0], oglconsts.STATIC_DRAW)
+		gl.BufferData(oglconsts.ARRAY_BUFFER, len(bitangents)*3*4, gl.Ptr(bitangents), oglconsts.STATIC_DRAW)
 		gl.EnableVertexAttribArray(4)
 		gl.VertexAttribPointer(4, 3, oglconsts.FLOAT, false, 3*4, gl.PtrOffset(0))
 	}

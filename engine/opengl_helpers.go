@@ -35,9 +35,9 @@ func LinkNewProgram(gl interfaces.OpenGL, shaders ...uint32) (program uint32, er
 func LinkMultiProgram(gl interfaces.OpenGL, vertexShaderSource, tcsShaderSource, tesShaderSource, geomShaderSource, fragmentShaderSource string) (program uint32, err error) {
 	vertexShader, vertexErr := CompileNewShader(gl, oglconsts.VERTEX_SHADER, vertexShaderSource)
 	defer gl.DeleteShader(vertexShader)
-	tcsShader, tcsErr := CompileNewShader(gl, oglconsts.TESS_EVALUATION_SHADER, tcsShaderSource)
+	tcsShader, tcsErr := CompileNewShader(gl, oglconsts.TESS_CONTROL_SHADER, tcsShaderSource)
 	defer gl.DeleteShader(tcsShader)
-	tesShader, tesErr := CompileNewShader(gl, oglconsts.TESS_CONTROL_SHADER, tesShaderSource)
+	tesShader, tesErr := CompileNewShader(gl, oglconsts.TESS_EVALUATION_SHADER, tesShaderSource)
 	defer gl.DeleteShader(tesShader)
 	geomShader, geomErr := CompileNewShader(gl, oglconsts.GEOMETRY_SHADER, geomShaderSource)
 	defer gl.DeleteShader(geomShader)
@@ -138,16 +138,16 @@ func LoadTexture(gl interfaces.OpenGL, file string) uint32 {
 func LoadTextureRepeat(gl interfaces.OpenGL, file string) uint32 {
 	imgFile, err := os.Open(file)
 	if err != nil {
-		settings.LogError("[OpenGL Utils] Texture file not found: %v", err)
+		settings.LogError("[OpenGL Utils] Texture file (%v) not found: %v", file, err)
 	}
 	img, _, err := image.Decode(imgFile)
 	if err != nil {
-		settings.LogError("[OpenGL Utils] Can't decode texture: %v", err)
+		settings.LogError("[OpenGL Utils] Can't decode texture (%v): %v", file, err)
 	}
 
 	rgba := image.NewRGBA(img.Bounds())
 	if rgba.Stride != rgba.Rect.Size().X*4 {
-		settings.LogError("[OpenGL Utils] Texture unsupported stride!")
+		settings.LogError("[OpenGL Utils] Texture unsupported stride! (%v)", file)
 	}
 	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
 

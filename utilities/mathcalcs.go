@@ -3,7 +3,12 @@ package utilities
 import "github.com/go-gl/mathgl/mgl32"
 
 // ComputeTangentBasis ...
-func ComputeTangentBasis(uvs []mgl32.Vec2, vertices, normals []mgl32.Vec3) (tangents, bitangents []mgl32.Vec3) {
+func ComputeTangentBasis(uvs []mgl32.Vec2, vertices, normals []mgl32.Vec3) (t, b []mgl32.Vec3) {
+	tangents := make([]mgl32.Vec3, len(vertices))
+	bitangents := make([]mgl32.Vec3, len(vertices))
+
+	tangents = append(tangents, mgl32.Vec3{1.2, 1.3, 1.4})
+
 	for i := 0; i < len(vertices); i += 3 {
 		// Shortcuts for vertices
 		v0 := vertices[i+0]
