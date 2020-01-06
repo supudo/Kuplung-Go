@@ -9,6 +9,7 @@ import (
 	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
+	"math"
 )
 
 // RendererForward ...
@@ -333,330 +334,328 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 
 		gl.GLUniformMatrix4fv(rend.glVS_WorldMatrix, 1, false, &matrixModel[0])
 
-		// // blending
-		// if mfd.MeshModel.ModelMaterial.Transparency < 1.0 || mfd.SettingAlpha < 1.0 {
-		// 	gl.Disable(oglconsts.DEPTH_TEST)
-		// 	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
-		// 	gl.Enable(oglconsts.BLEND)
-		// 	if mfd.MeshModel.ModelMaterial.Transparency < 1.0 {
-		// 		gl.Uniform1f(rend.glFS_AlphaBlending, mfd.MeshModel.ModelMaterial.Transparency)
-		// 	} else {
-		// 		gl.Uniform1f(rend.glFS_AlphaBlending, mfd.SettingAlpha)
-		// 	}
-		// } else {
-		// 	gl.Enable(oglconsts.DEPTH_TEST)
-		// 	gl.DepthFunc(oglconsts.LESS)
-		// 	gl.Disable(oglconsts.BLEND)
-		// 	gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
-		// 	gl.Uniform1f(rend.glFS_AlphaBlending, 1.0)
-		// }
+		// blending
+		if mfd.MeshModel.ModelMaterial.Transparency < 1.0 || mfd.SettingAlpha < 1.0 {
+			gl.Disable(oglconsts.DEPTH_TEST)
+			gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
+			gl.Enable(oglconsts.BLEND)
+			if mfd.MeshModel.ModelMaterial.Transparency < 1.0 {
+				gl.Uniform1f(rend.glFS_AlphaBlending, mfd.MeshModel.ModelMaterial.Transparency)
+			} else {
+				gl.Uniform1f(rend.glFS_AlphaBlending, mfd.SettingAlpha)
+			}
+		} else {
+			gl.Enable(oglconsts.DEPTH_TEST)
+			gl.DepthFunc(oglconsts.LESS)
+			gl.Disable(oglconsts.BLEND)
+			gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
+			gl.Uniform1f(rend.glFS_AlphaBlending, 1.0)
+		}
 
-		// // depth color
-		// pc := float32(1.0)
-		// if rsett.General.PlaneClose >= 1.0 {
-		// 	pc = rsett.General.PlaneClose
-		// }
-		// gl.Uniform1f(rend.glFS_planeClose, pc)
-		// gl.Uniform1f(rend.glFS_planeFar, rsett.General.PlaneFar/100.0)
-		// if rsett.General.RenderingDepth {
-		// 	gl.Uniform1i(rend.glFS_showDepthColor, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glFS_showDepthColor, 0)
-		// }
-		// gl.Uniform1i(rend.glFS_ShadowPass, 0)
+		// depth color
+		pc := float32(1.0)
+		if rsett.General.PlaneClose >= 1.0 {
+			pc = rsett.General.PlaneClose
+		}
+		gl.Uniform1f(rend.glFS_planeClose, pc)
+		gl.Uniform1f(rend.glFS_planeFar, rsett.General.PlaneFar/100.0)
+		if rsett.General.RenderingDepth {
+			gl.Uniform1i(rend.glFS_showDepthColor, 1)
+		} else {
+			gl.Uniform1i(rend.glFS_showDepthColor, 0)
+		}
+		gl.Uniform1i(rend.glFS_ShadowPass, 0)
 
-		// // tessellation
-		// if mfd.SettingUseCullFace {
-		// 	gl.Uniform1i(rend.glTCS_UseCullFace, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glTCS_UseCullFace, 0)
-		// }
-		// if mfd.SettingUseTessellation {
-		// 	gl.Uniform1i(rend.glTCS_UseTessellation, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glTCS_UseTessellation, 0)
-		// }
-		// gl.Uniform1i(rend.glTCS_TessellationSubdivision, int32(mfd.SettingTessellationSubdivision))
+		// tessellation
+		if mfd.SettingUseCullFace {
+			gl.Uniform1i(rend.glTCS_UseCullFace, 1)
+		} else {
+			gl.Uniform1i(rend.glTCS_UseCullFace, 0)
+		}
+		if mfd.SettingUseTessellation {
+			gl.Uniform1i(rend.glTCS_UseTessellation, 1)
+		} else {
+			gl.Uniform1i(rend.glTCS_UseTessellation, 0)
+		}
+		gl.Uniform1i(rend.glTCS_TessellationSubdivision, int32(mfd.SettingTessellationSubdivision))
 
-		// // cel-shading
-		// if mfd.SettingCelShading {
-		// 	gl.Uniform1i(rend.glFS_CelShading, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glFS_CelShading, 0)
-		// }
+		// cel-shading
+		if mfd.SettingCelShading {
+			gl.Uniform1i(rend.glFS_CelShading, 1)
+		} else {
+			gl.Uniform1i(rend.glFS_CelShading, 0)
+		}
 
-		// // camera position
-		// gl.Uniform3f(rend.glFS_CameraPosition, camPos.X(), camPos.Y(), camPos.Z())
+		// camera position
+		gl.Uniform3f(rend.glFS_CameraPosition, camPos.X(), camPos.Y(), camPos.Z())
 
-		// // screen size
-		// w, h := rend.window.Size()
-		// gl.Uniform1f(rend.glFS_ScreenResX, float32(w))
-		// gl.Uniform1f(rend.glFS_ScreenResY, float32(h))
+		// screen size
+		w, h := rend.window.Size()
+		gl.Uniform1f(rend.glFS_ScreenResX, float32(w))
+		gl.Uniform1f(rend.glFS_ScreenResY, float32(h))
 
-		// // Outline color
-		// gl.Uniform3f(rend.glFS_OutlineColor, mfd.OutlineColor.X(), mfd.OutlineColor.Y(), mfd.OutlineColor.Z())
+		// Outline color
+		gl.Uniform3f(rend.glFS_OutlineColor, mfd.OutlineColor.X(), mfd.OutlineColor.Y(), mfd.OutlineColor.Z())
 
-		// // ambient color for editor
-		// gl.Uniform3f(rend.glFS_UIAmbient, rend.uiAmbientLight.X(), rend.uiAmbientLight.Y(), rend.uiAmbientLight.Z())
+		// ambient color for editor
+		gl.Uniform3f(rend.glFS_UIAmbient, rend.uiAmbientLight.X(), rend.uiAmbientLight.Y(), rend.uiAmbientLight.Z())
 
-		// // geometry shader displacement
-		// gl.Uniform3f(rend.glGS_GeomDisplacementLocation, mfd.DisplaceX.Point, mfd.DisplaceY.Point, mfd.DisplaceZ.Point)
+		// geometry shader displacement
+		gl.Uniform3f(rend.glGS_GeomDisplacementLocation, mfd.DisplaceX.Point, mfd.DisplaceY.Point, mfd.DisplaceZ.Point)
 
-		// // mapping
-		// if mfd.SettingParallaxMapping {
-		// 	gl.Uniform1i(rend.glMaterial_ParallaxMapping, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glMaterial_ParallaxMapping, 0)
-		// }
+		// mapping
+		if mfd.SettingParallaxMapping {
+			gl.Uniform1i(rend.glMaterial_ParallaxMapping, 1)
+		} else {
+			gl.Uniform1i(rend.glMaterial_ParallaxMapping, 0)
+		}
 
-		// // gamma correction
-		// gl.Uniform1f(rend.glFS_GammaCoeficient, rsett.General.GammaCoeficient)
+		// gamma correction
+		gl.Uniform1f(rend.glFS_GammaCoeficient, rsett.General.GammaCoeficient)
 
-		// // render skin
-		// gl.Uniform1i(rend.gl_ModelViewSkin, int32(mfd.SettingModelViewSkin))
-		// gl.Uniform3f(rend.glFS_solidSkin_materialColor, mfd.SolidLightSkinMaterialColor.X(), mfd.SolidLightSkinMaterialColor.Y(), mfd.SolidLightSkinMaterialColor.Z())
+		// render skin
+		gl.Uniform1i(rend.gl_ModelViewSkin, int32(mfd.SettingModelViewSkin))
+		gl.Uniform3f(rend.glFS_solidSkin_materialColor, mfd.SolidLightSkinMaterialColor.X(), mfd.SolidLightSkinMaterialColor.Y(), mfd.SolidLightSkinMaterialColor.Z())
 
-		// // shadows
-		// gl.Uniform1i(rend.glFS_showShadows, 0)
+		// shadows
+		gl.Uniform1i(rend.glFS_showShadows, 0)
 
-		// gl.Uniform1i(rend.solidLight.InUse, 1)
-		// gl.Uniform3f(rend.solidLight.Direction, rp.SolidLightDirectionX, rp.SolidLightDirectionY, rp.SolidLightDirectionZ)
-		// gl.Uniform3f(rend.solidLight.Ambient, rp.SolidLightAmbient.X(), rp.SolidLightAmbient.Y(), rp.SolidLightAmbient.Z())
-		// gl.Uniform3f(rend.solidLight.Diffuse, rp.SolidLightDiffuse.X(), rp.SolidLightDiffuse.Y(), rp.SolidLightDiffuse.Z())
-		// gl.Uniform3f(rend.solidLight.Specular, rp.SolidLightSpecular.X(), rp.SolidLightSpecular.Y(), rp.SolidLightSpecular.Z())
-		// gl.Uniform1f(rend.solidLight.StrengthAmbient, rp.SolidLightAmbientStrength)
-		// gl.Uniform1f(rend.solidLight.StrengthDiffuse, rp.SolidLightDiffuseStrength)
-		// gl.Uniform1f(rend.solidLight.StrengthSpecular, rp.SolidLightSpecularStrength)
+		gl.Uniform1i(rend.solidLight.InUse, 1)
+		gl.Uniform3f(rend.solidLight.Direction, rp.SolidLightDirectionX, rp.SolidLightDirectionY, rp.SolidLightDirectionZ)
+		gl.Uniform3f(rend.solidLight.Ambient, rp.SolidLightAmbient.X(), rp.SolidLightAmbient.Y(), rp.SolidLightAmbient.Z())
+		gl.Uniform3f(rend.solidLight.Diffuse, rp.SolidLightDiffuse.X(), rp.SolidLightDiffuse.Y(), rp.SolidLightDiffuse.Z())
+		gl.Uniform3f(rend.solidLight.Specular, rp.SolidLightSpecular.X(), rp.SolidLightSpecular.Y(), rp.SolidLightSpecular.Z())
+		gl.Uniform1f(rend.solidLight.StrengthAmbient, rp.SolidLightAmbientStrength)
+		gl.Uniform1f(rend.solidLight.StrengthDiffuse, rp.SolidLightDiffuseStrength)
+		gl.Uniform1f(rend.solidLight.StrengthSpecular, rp.SolidLightSpecularStrength)
 
-		// // lights
-		// lightsCountDirectional := uint32(0)
-		// lightsCountPoint := uint32(0)
-		// lightsCountSpot := uint32(0)
-		// for j := 0; j < len(lightSources); j++ {
-		// 	light := lightSources[j]
-		// 	switch light.LightType {
-		// 	case types.LightSourceTypeDirectional:
-		// 		{
-		// 			if lightsCountDirectional < rend.GLSL_LightSourceNumber_Directional {
-		// 				f := rend.mfLights_Directional[lightsCountDirectional]
+		// lights
+		lightsCountDirectional := uint32(0)
+		lightsCountPoint := uint32(0)
+		lightsCountSpot := uint32(0)
+		for j := 0; j < len(lightSources); j++ {
+			light := lightSources[j]
+			switch light.LightType {
+			case types.LightSourceTypeDirectional:
+				{
+					if lightsCountDirectional < rend.GLSL_LightSourceNumber_Directional {
+						f := rend.mfLights_Directional[lightsCountDirectional]
 
-		// 				gl.Uniform1i(f.InUse, 1)
+						gl.Uniform1i(f.InUse, 1)
 
-		// 				// light
-		// 				gl.Uniform3f(f.Direction, light.PositionX.Point, light.PositionY.Point, light.PositionZ.Point)
+						// light
+						gl.Uniform3f(f.Direction, light.PositionX.Point, light.PositionY.Point, light.PositionZ.Point)
 
-		// 				// color
-		// 				gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
-		// 				gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
-		// 				gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
+						// color
+						gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
+						gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
+						gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
 
-		// 				// light factors
-		// 				gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
-		// 				gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
-		// 				gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
+						// light factors
+						gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
+						gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
+						gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
 
-		// 				lightsCountDirectional++
-		// 			}
-		// 		}
-		// 	case types.LightSourceTypePoint:
-		// 		{
-		// 			if lightsCountPoint < rend.GLSL_LightSourceNumber_Point {
-		// 				f := rend.mfLights_Point[lightsCountPoint]
+						lightsCountDirectional++
+					}
+				}
+			case types.LightSourceTypePoint:
+				{
+					if lightsCountPoint < rend.GLSL_LightSourceNumber_Point {
+						f := rend.mfLights_Point[lightsCountPoint]
 
-		// 				gl.Uniform1i(f.InUse, 1)
+						gl.Uniform1i(f.InUse, 1)
 
-		// 				// light
-		// 				gl.Uniform3f(f.Position, light.MatrixModel[4*3+0], light.MatrixModel[4*3+1], light.MatrixModel[4*3+2])
+						// light
+						gl.Uniform3f(f.Position, light.MatrixModel[4*3+0], light.MatrixModel[4*3+1], light.MatrixModel[4*3+2])
 
-		// 				// factors
-		// 				gl.Uniform1f(f.Constant, light.LConstant.Point)
-		// 				gl.Uniform1f(f.Linear, light.LLinear.Point)
-		// 				gl.Uniform1f(f.Quadratic, light.LQuadratic.Point)
+						// factors
+						gl.Uniform1f(f.Constant, light.LConstant.Point)
+						gl.Uniform1f(f.Linear, light.LLinear.Point)
+						gl.Uniform1f(f.Quadratic, light.LQuadratic.Point)
 
-		// 				// color
-		// 				gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
-		// 				gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
-		// 				gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
+						// color
+						gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
+						gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
+						gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
 
-		// 				// light factors
-		// 				gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
-		// 				gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
-		// 				gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
+						// light factors
+						gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
+						gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
+						gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
 
-		// 				lightsCountPoint++
-		// 			}
-		// 		}
-		// 	case types.LightSourceTypeSpot:
-		// 		{
-		// 			if lightsCountSpot < rend.GLSL_LightSourceNumber_Spot {
-		// 				f := rend.mfLights_Spot[lightsCountSpot]
+						lightsCountPoint++
+					}
+				}
+			case types.LightSourceTypeSpot:
+				{
+					if lightsCountSpot < rend.GLSL_LightSourceNumber_Spot {
+						f := rend.mfLights_Spot[lightsCountSpot]
 
-		// 				gl.Uniform1i(f.InUse, 1)
+						gl.Uniform1i(f.InUse, 1)
 
-		// 				// light
-		// 				gl.Uniform3f(f.Direction, light.PositionX.Point, light.PositionY.Point, light.PositionZ.Point)
-		// 				gl.Uniform3f(f.Position, light.MatrixModel[4*3+0], light.MatrixModel[4*3+1], light.MatrixModel[4*3+2])
+						// light
+						gl.Uniform3f(f.Direction, light.PositionX.Point, light.PositionY.Point, light.PositionZ.Point)
+						gl.Uniform3f(f.Position, light.MatrixModel[4*3+0], light.MatrixModel[4*3+1], light.MatrixModel[4*3+2])
 
-		// 				// cutoff
-		// 				gl.Uniform1f(f.CutOff, float32(math.Cos(float64(mgl32.DegToRad(light.LCutOff.Point)))))
-		// 				gl.Uniform1f(f.OuterCutOff, float32(math.Cos(float64(mgl32.DegToRad(light.LOuterCutOff.Point)))))
+						// cutoff
+						gl.Uniform1f(f.CutOff, float32(math.Cos(float64(mgl32.DegToRad(light.LCutOff.Point)))))
+						gl.Uniform1f(f.OuterCutOff, float32(math.Cos(float64(mgl32.DegToRad(light.LOuterCutOff.Point)))))
 
-		// 				// factors
-		// 				gl.Uniform1f(f.Constant, light.LConstant.Point)
-		// 				gl.Uniform1f(f.Linear, light.LLinear.Point)
-		// 				gl.Uniform1f(f.Quadratic, light.LQuadratic.Point)
+						// factors
+						gl.Uniform1f(f.Constant, light.LConstant.Point)
+						gl.Uniform1f(f.Linear, light.LLinear.Point)
+						gl.Uniform1f(f.Quadratic, light.LQuadratic.Point)
 
-		// 				// color
-		// 				gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
-		// 				gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
-		// 				gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
+						// color
+						gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
+						gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
+						gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
 
-		// 				// light factors
-		// 				gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
-		// 				gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
-		// 				gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
+						// light factors
+						gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
+						gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
+						gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
 
-		// 				lightsCountSpot++
-		// 			}
-		// 		}
-		// 	}
-		// }
+						lightsCountSpot++
+					}
+				}
+			}
+		}
 
-		// for j := lightsCountDirectional; j < rend.GLSL_LightSourceNumber_Directional; j++ {
-		// 	gl.Uniform1i(rend.mfLights_Directional[j].InUse, 0)
-		// }
+		for j := lightsCountDirectional; j < rend.GLSL_LightSourceNumber_Directional; j++ {
+			gl.Uniform1i(rend.mfLights_Directional[j].InUse, 0)
+		}
 
-		// for j := lightsCountPoint; j < rend.GLSL_LightSourceNumber_Point; j++ {
-		// 	gl.Uniform1i(rend.mfLights_Point[j].InUse, 0)
-		// }
+		for j := lightsCountPoint; j < rend.GLSL_LightSourceNumber_Point; j++ {
+			gl.Uniform1i(rend.mfLights_Point[j].InUse, 0)
+		}
 
-		// for j := lightsCountSpot; j < rend.GLSL_LightSourceNumber_Spot; j++ {
-		// 	gl.Uniform1i(rend.mfLights_Spot[j].InUse, 0)
-		// }
+		for j := lightsCountSpot; j < rend.GLSL_LightSourceNumber_Spot; j++ {
+			gl.Uniform1i(rend.mfLights_Spot[j].InUse, 0)
+		}
 
-		// // material
-		// gl.Uniform1f(rend.glMaterial_Refraction, mfd.SettingMaterialRefraction.Point)
-		// gl.Uniform1f(rend.glMaterial_SpecularExp, mfd.SettingMaterialSpecularExp.Point)
-		// gl.Uniform1i(rend.glMaterial_IlluminationModel, int32(mfd.MaterialIlluminationModel))
-		// gl.Uniform1f(rend.glMaterial_HeightScale, mfd.DisplacementHeightScale.Point)
-		// gl.Uniform3f(rend.glMaterial_Ambient, mfd.MaterialAmbient.Color.X(), mfd.MaterialAmbient.Color.Y(), mfd.MaterialAmbient.Color.Z())
-		// gl.Uniform3f(rend.glMaterial_Diffuse, mfd.MaterialDiffuse.Color.X(), mfd.MaterialDiffuse.Color.Y(), mfd.MaterialDiffuse.Color.Z())
-		// gl.Uniform3f(rend.glMaterial_Specular, mfd.MaterialSpecular.Color.X(), mfd.MaterialSpecular.Color.Y(), mfd.MaterialSpecular.Color.Z())
-		// gl.Uniform3f(rend.glMaterial_Emission, mfd.MaterialEmission.Color.X(), mfd.MaterialEmission.Color.Y(), mfd.MaterialEmission.Color.Z())
+		// material
+		gl.Uniform1f(rend.glMaterial_Refraction, mfd.SettingMaterialRefraction.Point)
+		gl.Uniform1f(rend.glMaterial_SpecularExp, mfd.SettingMaterialSpecularExp.Point)
+		gl.Uniform1i(rend.glMaterial_IlluminationModel, int32(mfd.MaterialIlluminationModel))
+		gl.Uniform1f(rend.glMaterial_HeightScale, mfd.DisplacementHeightScale.Point)
+		gl.Uniform3f(rend.glMaterial_Ambient, mfd.MaterialAmbient.Color.X(), mfd.MaterialAmbient.Color.Y(), mfd.MaterialAmbient.Color.Z())
+		gl.Uniform3f(rend.glMaterial_Diffuse, mfd.MaterialDiffuse.Color.X(), mfd.MaterialDiffuse.Color.Y(), mfd.MaterialDiffuse.Color.Z())
+		gl.Uniform3f(rend.glMaterial_Specular, mfd.MaterialSpecular.Color.X(), mfd.MaterialSpecular.Color.Y(), mfd.MaterialSpecular.Color.Z())
+		gl.Uniform3f(rend.glMaterial_Emission, mfd.MaterialEmission.Color.X(), mfd.MaterialEmission.Color.Y(), mfd.MaterialEmission.Color.Z())
 
-		// if mfd.HasTextureAmbient && mfd.MeshModel.ModelMaterial.TextureAmbient.UseTexture {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureAmbient, 1)
-		// 	gl.Uniform1i(rend.glMaterial_SamplerAmbient, 0)
-		// 	gl.ActiveTexture(oglconsts.TEXTURE0)
-		// 	gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureAmbient)
-		// } else {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureAmbient, 0)
-		// }
+		if mfd.HasTextureAmbient && mfd.MeshModel.ModelMaterial.TextureAmbient.UseTexture {
+			gl.Uniform1i(rend.glMaterial_HasTextureAmbient, 1)
+			gl.Uniform1i(rend.glMaterial_SamplerAmbient, 0)
+			gl.ActiveTexture(oglconsts.TEXTURE0)
+			gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureAmbient)
+		} else {
+			gl.Uniform1i(rend.glMaterial_HasTextureAmbient, 0)
+		}
 
-		// if mfd.HasTextureDiffuse && mfd.MeshModel.ModelMaterial.TextureDiffuse.UseTexture {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureDiffuse, 1)
-		// 	gl.Uniform1i(rend.glMaterial_SamplerDiffuse, 1)
-		// 	gl.ActiveTexture(oglconsts.TEXTURE1)
-		// 	gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureDiffuse)
-		// } else {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureDiffuse, 0)
-		// }
+		if mfd.HasTextureDiffuse && mfd.MeshModel.ModelMaterial.TextureDiffuse.UseTexture {
+			gl.Uniform1i(rend.glMaterial_HasTextureDiffuse, 1)
+			gl.Uniform1i(rend.glMaterial_SamplerDiffuse, 1)
+			gl.ActiveTexture(oglconsts.TEXTURE1)
+			gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureDiffuse)
+		} else {
+			gl.Uniform1i(rend.glMaterial_HasTextureDiffuse, 0)
+		}
 
-		// if mfd.HasTextureSpecular && mfd.MeshModel.ModelMaterial.TextureSpecular.UseTexture {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureSpecular, 1)
-		// 	gl.Uniform1i(rend.glMaterial_SamplerSpecular, 2)
-		// 	gl.ActiveTexture(oglconsts.TEXTURE2)
-		// 	gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureSpecular)
-		// } else {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureSpecular, 0)
-		// }
+		if mfd.HasTextureSpecular && mfd.MeshModel.ModelMaterial.TextureSpecular.UseTexture {
+			gl.Uniform1i(rend.glMaterial_HasTextureSpecular, 1)
+			gl.Uniform1i(rend.glMaterial_SamplerSpecular, 2)
+			gl.ActiveTexture(oglconsts.TEXTURE2)
+			gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureSpecular)
+		} else {
+			gl.Uniform1i(rend.glMaterial_HasTextureSpecular, 0)
+		}
 
-		// if mfd.HasTextureSpecularExp && mfd.MeshModel.ModelMaterial.TextureSpecularExp.UseTexture {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureSpecularExp, 1)
-		// 	gl.Uniform1i(rend.glMaterial_SamplerSpecularExp, 3)
-		// 	gl.ActiveTexture(oglconsts.TEXTURE3)
-		// 	gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureSpecularExp)
-		// } else {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureSpecularExp, 0)
-		// }
+		if mfd.HasTextureSpecularExp && mfd.MeshModel.ModelMaterial.TextureSpecularExp.UseTexture {
+			gl.Uniform1i(rend.glMaterial_HasTextureSpecularExp, 1)
+			gl.Uniform1i(rend.glMaterial_SamplerSpecularExp, 3)
+			gl.ActiveTexture(oglconsts.TEXTURE3)
+			gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureSpecularExp)
+		} else {
+			gl.Uniform1i(rend.glMaterial_HasTextureSpecularExp, 0)
+		}
 
-		// if mfd.HasTextureDissolve && mfd.MeshModel.ModelMaterial.TextureDissolve.UseTexture {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureDissolve, 1)
-		// 	gl.Uniform1i(rend.glMaterial_SamplerDissolve, 4)
-		// 	gl.ActiveTexture(oglconsts.TEXTURE4)
-		// 	gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureDissolve)
-		// } else {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureDissolve, 0)
-		// }
+		if mfd.HasTextureDissolve && mfd.MeshModel.ModelMaterial.TextureDissolve.UseTexture {
+			gl.Uniform1i(rend.glMaterial_HasTextureDissolve, 1)
+			gl.Uniform1i(rend.glMaterial_SamplerDissolve, 4)
+			gl.ActiveTexture(oglconsts.TEXTURE4)
+			gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureDissolve)
+		} else {
+			gl.Uniform1i(rend.glMaterial_HasTextureDissolve, 0)
+		}
 
-		// if mfd.HasTextureBump && mfd.MeshModel.ModelMaterial.TextureBump.UseTexture {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureBump, 1)
-		// 	gl.Uniform1i(rend.glMaterial_SamplerBump, 5)
-		// 	gl.ActiveTexture(oglconsts.TEXTURE5)
-		// 	gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureBump)
-		// } else {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureBump, 0)
-		// }
+		if mfd.HasTextureBump && mfd.MeshModel.ModelMaterial.TextureBump.UseTexture {
+			gl.Uniform1i(rend.glMaterial_HasTextureBump, 1)
+			gl.Uniform1i(rend.glMaterial_SamplerBump, 5)
+			gl.ActiveTexture(oglconsts.TEXTURE5)
+			gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureBump)
+		} else {
+			gl.Uniform1i(rend.glMaterial_HasTextureBump, 0)
+		}
 
-		// if mfd.HasTextureDisplacement && mfd.MeshModel.ModelMaterial.TextureDisplacement.UseTexture {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureDisplacement, 1)
-		// 	gl.Uniform1i(rend.glMaterial_SamplerDisplacement, 6)
-		// 	gl.ActiveTexture(oglconsts.TEXTURE6)
-		// 	gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureDisplacement)
-		// } else {
-		// 	gl.Uniform1i(rend.glMaterial_HasTextureDisplacement, 0)
-		// }
+		if mfd.HasTextureDisplacement && mfd.MeshModel.ModelMaterial.TextureDisplacement.UseTexture {
+			gl.Uniform1i(rend.glMaterial_HasTextureDisplacement, 1)
+			gl.Uniform1i(rend.glMaterial_SamplerDisplacement, 6)
+			gl.ActiveTexture(oglconsts.TEXTURE6)
+			gl.BindTexture(oglconsts.TEXTURE_2D, mfd.VboTextureDisplacement)
+		} else {
+			gl.Uniform1i(rend.glMaterial_HasTextureDisplacement, 0)
+		}
 
-		// // effects - gaussian blur
-		// gl.Uniform1i(rend.glEffect_GB_Mode, mfd.EffectGBlurMode-1)
-		// gl.Uniform1f(rend.glEffect_GB_W, mfd.EffectGBlurWidth.Point)
-		// gl.Uniform1f(rend.glEffect_GB_Radius, mfd.EffectGBlurRadius.Point)
+		// effects - gaussian blur
+		gl.Uniform1i(rend.glEffect_GB_Mode, mfd.EffectGBlurMode-1)
+		gl.Uniform1f(rend.glEffect_GB_W, mfd.EffectGBlurWidth.Point)
+		gl.Uniform1f(rend.glEffect_GB_Radius, mfd.EffectGBlurRadius.Point)
 
-		// // effects - bloom
-		// // TODO: Bloom effect
-		// if mfd.EffectBloomDoBloom {
-		// 	gl.Uniform1i(rend.glEffect_Bloom_doBloom, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glEffect_Bloom_doBloom, 0)
-		// }
-		// gl.Uniform1f(rend.glEffect_Bloom_WeightA, mfd.EffectBloomWeightA)
-		// gl.Uniform1f(rend.glEffect_Bloom_WeightB, mfd.EffectBloomWeightB)
-		// gl.Uniform1f(rend.glEffect_Bloom_WeightC, mfd.EffectBloomWeightC)
-		// gl.Uniform1f(rend.glEffect_Bloom_WeightD, mfd.EffectBloomWeightD)
-		// gl.Uniform1f(rend.glEffect_Bloom_Vignette, mfd.EffectBloomVignette)
-		// gl.Uniform1f(rend.glEffect_Bloom_VignetteAtt, mfd.EffectBloomVignetteAtt)
+		// effects - bloom
+		// TODO: Bloom effect
+		if mfd.EffectBloomDoBloom {
+			gl.Uniform1i(rend.glEffect_Bloom_doBloom, 1)
+		} else {
+			gl.Uniform1i(rend.glEffect_Bloom_doBloom, 0)
+		}
+		gl.Uniform1f(rend.glEffect_Bloom_WeightA, mfd.EffectBloomWeightA)
+		gl.Uniform1f(rend.glEffect_Bloom_WeightB, mfd.EffectBloomWeightB)
+		gl.Uniform1f(rend.glEffect_Bloom_WeightC, mfd.EffectBloomWeightC)
+		gl.Uniform1f(rend.glEffect_Bloom_WeightD, mfd.EffectBloomWeightD)
+		gl.Uniform1f(rend.glEffect_Bloom_Vignette, mfd.EffectBloomVignette)
+		gl.Uniform1f(rend.glEffect_Bloom_VignetteAtt, mfd.EffectBloomVignetteAtt)
 
-		// // effects - tone mapping
-		// if mfd.EffectToneMappingACESFilmRec2020 {
-		// 	gl.Uniform1i(rend.glEffect_ToneMapping_ACESFilmRec2020, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glEffect_ToneMapping_ACESFilmRec2020, 0)
-		// }
-		// if mfd.EffectHDRTonemapping {
-		// 	gl.Uniform1i(rend.glEffect_HDR_Tonemapping, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glEffect_HDR_Tonemapping, 0)
-		// }
+		// effects - tone mapping
+		if mfd.EffectToneMappingACESFilmRec2020 {
+			gl.Uniform1i(rend.glEffect_ToneMapping_ACESFilmRec2020, 1)
+		} else {
+			gl.Uniform1i(rend.glEffect_ToneMapping_ACESFilmRec2020, 0)
+		}
+		if mfd.EffectHDRTonemapping {
+			gl.Uniform1i(rend.glEffect_HDR_Tonemapping, 1)
+		} else {
+			gl.Uniform1i(rend.glEffect_HDR_Tonemapping, 0)
+		}
 
-		// // PBR
-		// if mfd.SettingRenderingPBR {
-		// 	gl.Uniform1i(rend.glPBR_UsePBR, 1)
-		// } else {
-		// 	gl.Uniform1i(rend.glPBR_UsePBR, 0)
-		// }
-		// gl.Uniform1f(rend.glPBR_Metallic, mfd.SettingRenderingPBRMetallic)
-		// gl.Uniform1f(rend.glPBR_Rougness, mfd.SettingRenderingPBRRoughness)
-		// gl.Uniform1f(rend.glPBR_AO, mfd.SettingRenderingPBRAO)
+		// PBR
+		if mfd.SettingRenderingPBR {
+			gl.Uniform1i(rend.glPBR_UsePBR, 1)
+		} else {
+			gl.Uniform1i(rend.glPBR_UsePBR, 0)
+		}
+		gl.Uniform1f(rend.glPBR_Metallic, mfd.SettingRenderingPBRMetallic)
+		gl.Uniform1f(rend.glPBR_Rougness, mfd.SettingRenderingPBRRoughness)
+		gl.Uniform1f(rend.glPBR_AO, mfd.SettingRenderingPBRAO)
 
-		// gl.Uniform1f(rend.glVS_IsBorder, 0.0)
+		gl.Uniform1f(rend.glVS_IsBorder, 0.0)
 
 		mtxModel := mgl32.Ident4()
 
 		// model draw
 		gl.Uniform1f(rend.glVS_IsBorder, 0.0)
 		mtxModel = matrixModel.Mul4(mgl32.Scale3D(1.0, 1.0, 1.0))
-		mvpMatrixDraw := rend.matrixProjection.Mul4(rend.matrixCamera.Mul4(mtxModel))
-		gl.GLUniformMatrix4fv(rend.glVS_MVPMatrix, 1, false, &mvpMatrixDraw[0])
 		gl.GLUniformMatrix4fv(rend.glFS_MMatrix, 1, false, &mtxModel[0])
 
 		mfd.VertexSphereVisible = rsett.General.VertexSphereVisible
@@ -669,29 +668,6 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		mfd.Render(true)
 	}
 
-	//   // edit mode wireframe
-	//   if (mfd->getOptionsSelected() && mfd->Setting_EditMode) {
-	//     mfd->Setting_Wireframe = true;
-	//     matrixModel = glm::scale(matrixModel, glm::vec3(mfd->scaleX.Point + 0.01f, mfd->scaleY.Point + 0.01f, mfd->scaleZ.Point + 0.01f))
-
-	//     mvpMatrix = rend.matrixProjection * rend.matrixCamera * matrixModel;
-	//     matrixModelView = rend.matrixCamera * matrixModel;
-	//     matrixNormal = glm::inverseTranspose(glm::mat3(rend.matrixCamera * matrixModel))
-	//     gl.UniformMatrix4fv(rend.glVS_MVPMatrix, 1, GL_FALSE, glm::value_ptr(mvpMatrix))
-	//     gl.UniformMatrix4fv(rend.glFS_MMatrix, 1, GL_FALSE, glm::value_ptr(matrixModel))
-	//     gl.UniformMatrix4fv(rend.glFS_MVMatrix, 1, GL_FALSE, glm::value_ptr(matrixModelView))
-	//     gl.UniformMatrix3fv(rend.glVS_NormalMatrix, 1, GL_FALSE, glm::value_ptr(matrixNormal))
-	//     gl.UniformMatrix4fv(rend.glVS_WorldMatrix, 1, GL_FALSE, glm::value_ptr(matrixModel))
-
-	//     gl.Uniform1i(rend.gl_ModelViewSkin, ViewModelSkin_Solid)
-	//     //TODO: put in settings
-	//     gl.Uniform3f(rend.glFS_solidSkin_materialColor, 1.0f, 0.522f, 0.0f)
-
-	//     mfd->renderModel(true)
-	//     mfd->Setting_Wireframe = false;
-	//   }
-	// }
-
 	gl.EndQuery(oglconsts.TIME_ELAPSED)
 
 	if gl.IsQuery(queries[(currentQuery+1)%querycount]) {
@@ -700,49 +676,6 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		settings.LogWarn("[RenderingForward - renderModels] OccQuery = %v ms/frame", (result * 1.e6))
 	}
 	currentQuery = (currentQuery + 1) % querycount
-
-	// // edit mode
-	// if (rend.managerObjects->VertexEditorMode != glm::vec3(0.0) && selectedModelID > -1) {
-	//   ImGuizmo::Enable(true)
-
-	//   ModelFaceData* mfd = meshModelFaces[static_cast<size_t>(selectedModelID)];
-
-	//   glm::vec4 v0 = glm::vec4(rend.managerObjects->VertexEditorMode, 1.0)
-	//   v0 = mfd->matrixModel * v0;
-	//   glm::mat4 matrixVertex = mfd->matrixModel;
-	//   matrixVertex[3] = v0;
-
-	//   glm::mat4 mtx = glm::mat4(1.0)
-
-	//   ImGuiIO& io = ImGui::GetIO()
-	//   ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y)
-	//   ImGuizmo::Manipulate(glm::value_ptr(rend.managerObjects->camera->matrixCamera), glm::value_ptr(rend.managerObjects->matrixProjection), ImGuizmo::TRANSLATE, ImGuizmo::WORLD, glm::value_ptr(matrixVertex), glm::value_ptr(mtx))
-
-	//   glm::vec3 scale;
-	//   glm::quat rotation;
-	//   glm::vec3 translation;
-	//   glm::vec3 skew;
-	//   glm::vec4 perspective;
-	//   glm::decompose(mtx, scale, rotation, translation, skew, perspective)
-
-	//   // glm::vec3 v = rend.managerObjects->VertexEditorMode;
-	//   rend.managerObjects->VertexEditorMode.x += translation.x;
-	//   rend.managerObjects->VertexEditorMode.y += -1.0f * translation.y;
-	//   rend.managerObjects->VertexEditorMode.z += translation.z;
-	//   if (rend.managerObjects->Setting_GeometryEditMode == GeometryEditMode_Vertex)
-	//     mfd->meshModel.vertices[static_cast<size_t>(rend.managerObjects->VertexEditorModeID)] = rend.managerObjects->VertexEditorMode;
-	//   else if (rend.managerObjects->Setting_GeometryEditMode == GeometryEditMode_Line) {
-	//   }
-	//   // else if (rend.managerObjects->Setting_GeometryEditMode == GeometryEditMode_Face) {
-	//   //   for (size_t i = 0; i < mfd->meshModel.vertices.size() i++) {
-	//   //     if (mfd->meshModel.vertices[i] == v)
-	//   //       mfd->meshModel.vertices[i] = v;
-	//   //   }
-	//   // }
-	//   //TODO: not good for drawing... reuploading the buffers again .... should find a better way - immediate draw or GL_STREAM_DRAW?
-	//   mfd->initBuffers()
-	//   mfd->Setting_EditMode = true;
-	// }
 
 	gl.UseProgram(0)
 }
