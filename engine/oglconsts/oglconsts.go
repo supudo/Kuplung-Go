@@ -1,5 +1,12 @@
 package oglconsts
 
+// General
+// nolint: golint,megacheck
+const (
+	ANY_SAMPLES_PASSED = 0x8C2F
+	TIME_ELAPSED       = 0x88BF
+)
+
 // Buffer Bits
 // nolint: golint,megacheck
 const (
@@ -18,6 +25,7 @@ const (
 	LINE_LOOP             = 0x0002
 	LINE_STRIP            = 0x0003
 	PATCHES               = 0x000E
+	PATCH_VERTICES        = 0x8E72
 	TRIANGLES             = 0x0004
 	TRIANGLE_STRIP        = 0x0005
 	TRIANGLE_FAN          = 0x0006
@@ -41,6 +49,15 @@ const (
 	INFO_LOG_LENGTH        = 0x8B84
 	TRUE                   = 1
 	FALSE                  = 0
+)
+
+// Queries
+// nolint: golint,megacheck
+const (
+	QUERY_COUNTER_BITS     = 0x8864
+	CURRENT_QUERY          = 0x8865
+	QUERY_RESULT           = 0x8866
+	QUERY_RESULT_AVAILABLE = 0x8867
 )
 
 // Buffer Types
@@ -117,6 +134,15 @@ const (
 	TEXTURE_2D uint32 = 0x0DE1
 
 	TEXTURE0 = 0x84C0
+	TEXTURE1 = 0x84C1
+	TEXTURE2 = 0x84C2
+	TEXTURE3 = 0x84C3
+	TEXTURE4 = 0x84C4
+	TEXTURE5 = 0x84C5
+	TEXTURE6 = 0x84C6
+	TEXTURE7 = 0x84C7
+	TEXTURE8 = 0x84C8
+	TEXTURE9 = 0x84C9
 
 	TEXTURE_CUBE_MAP            = 0x8513
 	TEXTURE_CUBE_MAP_POSITIVE_X = 0x8515

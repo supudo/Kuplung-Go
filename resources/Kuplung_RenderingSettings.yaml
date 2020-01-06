@@ -18,6 +18,7 @@ General:
   RayDirectionX: 0.0
   RayDirectionY: 0.0
   RayDirectionZ: 0.0
+  UseOcclusionCulling: true
 
 Axis:
   ShowAxisHelpers: true

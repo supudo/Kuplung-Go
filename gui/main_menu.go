@@ -35,6 +35,43 @@ func (context *Context) DrawMainMenu() {
 	}
 
 	if imgui.BeginMenu("Scene") {
+		if imgui.BeginMenu("Add Light") {
+			if imgui.MenuItem("Directional (Sun)") {
+				_, _ = trigger.Fire(types.ActionGuiAddLight, types.LightSourceTypeDirectional)
+			}
+			if imgui.MenuItem("Point (Light bulb)") {
+				_, _ = trigger.Fire(types.ActionGuiAddLight, types.LightSourceTypePoint)
+			}
+			if imgui.MenuItem("Spot (Flashlight)") {
+				_, _ = trigger.Fire(types.ActionGuiAddLight, types.LightSourceTypeSpot)
+			}
+			imgui.EndMenu()
+		}
+		imgui.Separator()
+		if imgui.BeginMenu("Scene Rendering") {
+			if imgui.MenuItemV("Solid", "", rsett.General.SelectedViewModelSkin == types.ViewModelSkinSolid, true) {
+				rsett.General.SelectedViewModelSkin = types.ViewModelSkinSolid
+			}
+			if imgui.MenuItemV("Material", "", rsett.General.SelectedViewModelSkin == types.ViewModelSkinMaterial, true) {
+				rsett.General.SelectedViewModelSkin = types.ViewModelSkinMaterial
+			}
+			if imgui.MenuItemV("Texture", "", rsett.General.SelectedViewModelSkin == types.ViewModelSkinTexture, true) {
+				rsett.General.SelectedViewModelSkin = types.ViewModelSkinTexture
+			}
+			if imgui.MenuItemV("Wireframe", "", rsett.General.SelectedViewModelSkin == types.ViewModelSkinWireframe, true) {
+				rsett.General.SelectedViewModelSkin = types.ViewModelSkinWireframe
+			}
+			if imgui.MenuItemV("Rendered", "", rsett.General.SelectedViewModelSkin == types.ViewModelSkinRendered, true) {
+				rsett.General.SelectedViewModelSkin = types.ViewModelSkinRendered
+			}
+			imgui.Separator()
+			imgui.MenuItemV("Render - Depth", "", rsett.General.RenderingDepth, true)
+			imgui.EndMenu()
+		}
+		imgui.Separator()
+		imgui.MenuItemV("Render Image", "", context.GuiVars.showImageSave, true)
+		imgui.MenuItemV("Renderer UI", "", context.GuiVars.showRendererUI, true)
+
 		imgui.EndMenu()
 	}
 

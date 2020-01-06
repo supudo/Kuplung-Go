@@ -43,6 +43,8 @@ type RenderManager struct {
 	LightSources   []*objects.Light
 
 	RenderProps types.RenderProperties
+
+	SceneSelectedModelObject int32
 }
 
 // NewRenderManager will return an instance of the rendering manager
@@ -53,6 +55,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm := &RenderManager{}
 	rm.window = window
 	rm.doProgress = doProgress
+	rm.SceneSelectedModelObject = -1
 
 	rm.initSettings()
 	rm.initParserManager()
@@ -131,7 +134,7 @@ func (rm *RenderManager) Render() {
 	case types.InAppRendererTypeDeferred:
 		rm.rendererDefered.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
 	case types.InAppRendererTypeForward:
-		rm.rendererForward.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
+		rm.rendererForward.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources)
 	case types.InAppRendererTypeForwardShadowMapping:
 		rm.rendererForwardShadowMapping.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
 	case types.InAppRendererTypeShadowMapping:
@@ -185,6 +188,8 @@ func (rm *RenderManager) initSettings() {
 	rm.RenderProps.SolidLightAmbientColorPicker = false
 	rm.RenderProps.SolidLightDiffuseColorPicker = false
 	rm.RenderProps.SolidLightSpecularColorPicker = false
+
+	rm.SceneSelectedModelObject = -1
 }
 
 func (rm *RenderManager) initParserManager() {

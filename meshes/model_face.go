@@ -15,7 +15,7 @@ type ModelFace struct {
 	window interfaces.Window
 
 	shaderProgram uint32
-	glVAO         uint32
+	GLVAO         uint32
 
 	VertexSphereVisible, VertexSphereIsSphere, VertexSphereShowWireframes bool
 
@@ -33,9 +33,11 @@ type ModelFace struct {
 	HasTextureSpecularExp, HasTextureDissolve bool
 	HasTextureBump, HasTextureDisplacement    bool
 
-	occQuery uint32
+	OccQuery uint32
 
 	AssetsFolder string
+
+	ModelViewSkin types.ViewModelSkin
 
 	MeshModel   types.MeshModel
 	MatrixModel mgl32.Mat4
@@ -46,6 +48,7 @@ type ModelFace struct {
 	SettingUseTessellation bool
 	SettingUseCullFace     bool
 	ShowMaterialEditor     bool
+	IsModelSelected        bool
 
 	SettingAlpha                    float32
 	SettingTessellationSubdivision  uint32
@@ -62,6 +65,9 @@ type ModelFace struct {
 	SettingLightAmbient   mgl32.Vec3
 	SettingLightDiffuse   mgl32.Vec3
 	SettingLightSpecular  mgl32.Vec3
+
+	OutlineColor     mgl32.Vec4
+	OutlineThickness float32
 
 	SettingLightStrengthAmbient  float32
 	SettingLightStrengthDiffuse  float32
@@ -81,7 +87,7 @@ type ModelFace struct {
 	EffectGBlurRadius types.ObjectCoordinate
 	EffectGBlurWidth  types.ObjectCoordinate
 
-	EffectBloomdoBloom     bool
+	EffectBloomDoBloom     bool
 	EffectBloomWeightA     float32
 	EffectBloomWeightB     float32
 	EffectBloomWeightC     float32
@@ -98,6 +104,17 @@ type ModelFace struct {
 	SettingRenderingPBRMetallic  float32
 	SettingRenderingPBRRoughness float32
 	SettingRenderingPBRAO        float32
+
+	// view skin
+	SettingModelViewSkin        types.ViewModelSkin
+	SolidLightSkinMaterialColor mgl32.Vec3
+	SolidLightSkinAmbient       mgl32.Vec3
+	SolidLightSkinDiffuse       mgl32.Vec3
+	SolidLightSkinSpecular      mgl32.Vec3
+
+	SolidLightSkinAmbientStrength float32
+	SolidLightSkinDiffuseStrength float32
+	SlidLightSkinSpecularStrength float32
 }
 
 // NewModelFace ...
@@ -158,6 +175,8 @@ func (mesh *ModelFace) InitProperties() {
 	mesh.SettingLightStrengthSpecular = 1.0
 	mesh.SettingTessellationSubdivision = 1
 	mesh.SettingLightingPassDrawMode = 1
+	mesh.OutlineColor = mgl32.Vec4{0.0, 0.0, 0.0, 0.0}
+	mesh.OutlineThickness = 1.0
 
 	mesh.MaterialIlluminationModel = mesh.MeshModel.ModelMaterial.IlluminationMode
 	mesh.SettingParallaxMapping = false
@@ -172,7 +191,7 @@ func (mesh *ModelFace) InitProperties() {
 	mesh.EffectGBlurRadius = types.ObjectCoordinate{Animate: false, Point: 0.0}
 	mesh.EffectGBlurWidth = types.ObjectCoordinate{Animate: false, Point: 0.0}
 
-	mesh.EffectBloomdoBloom = false
+	mesh.EffectBloomDoBloom = false
 	mesh.EffectBloomWeightA = 0.0
 	mesh.EffectBloomWeightB = 0.0
 	mesh.EffectBloomWeightC = 0.0
@@ -195,9 +214,9 @@ func (mesh *ModelFace) InitProperties() {
 func (mesh *ModelFace) InitBuffers() {
 	gl := mesh.window.OpenGL()
 
-	mesh.glVAO = gl.GenVertexArrays(1)[0]
+	mesh.GLVAO = gl.GenVertexArrays(1)[0]
 
-	gl.BindVertexArray(mesh.glVAO)
+	gl.BindVertexArray(mesh.GLVAO)
 
 	vboVertices := gl.GenBuffers(1)[0]
 	gl.BindBuffer(oglconsts.ARRAY_BUFFER, vboVertices)
@@ -270,7 +289,7 @@ func (mesh *ModelFace) InitBuffers() {
 		gl.VertexAttribPointer(4, 3, oglconsts.FLOAT, false, 3*4, gl.PtrOffset(0))
 	}
 
-	mesh.occQuery = gl.GenQueries(1)[0]
+	mesh.OccQuery = gl.GenQueries(1)[0]
 
 	gl.BindVertexArray(0)
 
@@ -289,10 +308,10 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 	}
 
 	if rsett.General.OcclusionCulling {
-		gl.BeginConditionalRender(mesh.occQuery, oglconsts.QUERY_BY_REGION_WAIT)
+		gl.BeginConditionalRender(mesh.OccQuery, oglconsts.QUERY_BY_REGION_WAIT)
 	}
 
-	gl.BindVertexArray(mesh.glVAO)
+	gl.BindVertexArray(mesh.GLVAO)
 
 	if useTessellation {
 		gl.DrawElements(oglconsts.PATCHES, mesh.MeshModel.CountIndices, oglconsts.UNSIGNED_INT, 0)
@@ -312,8 +331,9 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 
 	// matrixBB := rsett.MatrixProjection.Mul(rsett.MatrixCamera).Mul(mgl32.Ident4())
 
-	// if (Settings::Instance()->ShowBoundingBox && this->so_selectedYn)
-	//   this->boundingBox->render(matrixBB, this->so_outlineColor);
+	if rsett.General.ShowBoundingBox && mesh.IsModelSelected {
+		// mesh.boundingBox.Render(matrixBB, mesh.SettingOutlineColor)
+	}
 
 	// if (this->vertexSphereVisible) {
 	//   this->vertexSphere->isSphere = this->vertexSphereIsSphere;
@@ -364,5 +384,5 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 // Dispose ...
 func (mesh *ModelFace) Dispose() {
 	gl := mesh.window.OpenGL()
-	gl.DeleteProgram(mesh.glVAO)
+	gl.DeleteProgram(mesh.GLVAO)
 }

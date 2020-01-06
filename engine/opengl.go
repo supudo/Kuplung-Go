@@ -12,6 +12,7 @@ import (
 
 // OpenGL wraps the native GL API into a common interface.
 type OpenGL struct {
+	reportedErrors []string
 }
 
 // NewOpenGL initializes the GL bindings and returns an OpenGL instance.
@@ -23,6 +24,24 @@ func NewOpenGL() *OpenGL {
 	}
 
 	return opengl
+}
+
+// CheckForOpenGLErrors implements the interfaces.OpenGL interface.
+func (native *OpenGL) CheckForOpenGLErrors(message string) {
+	error := gl.GetError()
+	if error != oglconsts.NO_ERROR {
+		errMessage := "[GLError] [" + message + "] glError = " + string(error)
+		alreadyReported := false
+		for _, n := range native.reportedErrors {
+			if errMessage == n {
+				alreadyReported = true
+			}
+		}
+		if !alreadyReported {
+			settings.LogWarn(errMessage)
+			native.reportedErrors = append(native.reportedErrors, errMessage)
+		}
+	}
 }
 
 // ActiveTexture implements the interfaces.OpenGL interface.
@@ -198,6 +217,26 @@ func (native *OpenGL) GenQueries(n int32) []uint32 {
 	return ids
 }
 
+// BeginQuery delimit the boundaries of a query object.
+func (native *OpenGL) BeginQuery(target uint32, id uint32) {
+	gl.BeginQuery(target, id)
+}
+
+// EndQuery implements the interfaces.OpenGL interface.
+func (native *OpenGL) EndQuery(target uint32) {
+	gl.EndQuery(target)
+}
+
+// IsQuery implements the interfaces.OpenGL interface.
+func (native *OpenGL) IsQuery(id uint32) bool {
+	return gl.IsQuery(id)
+}
+
+// ColorMask implements the interfaces.OpenGL interface.
+func (native *OpenGL) ColorMask(red bool, green bool, blue bool, alpha bool) {
+	gl.ColorMask(red, green, blue, alpha)
+}
+
 // GetAttribLocation implements the interfaces.OpenGL interface.
 func (native *OpenGL) GetAttribLocation(program uint32, name string) int32 {
 	return gl.GetAttribLocation(program, gl.Str(name+"\x00"))
@@ -326,6 +365,11 @@ func (native *OpenGL) Uniform4fv(location int32, value *[4]float32) {
 func (native *OpenGL) UniformMatrix4fv(location int32, transpose bool, value *[16]float32) {
 	count := int32(1)
 	gl.UniformMatrix4fv(location, count, transpose, &value[0])
+}
+
+// UniformMatrix3fv implements the interfaces.OpenGL interface.
+func (native *OpenGL) UniformMatrix3fv(location int32, count int32, transpose bool, value *float32) {
+	gl.UniformMatrix3fv(location, count, transpose, value)
 }
 
 // GLUniformMatrix4fv implements the interfaces.OpenGL interface.
@@ -486,4 +530,14 @@ func (native *OpenGL) BeginConditionalRender(id uint32, mode uint32) {
 // EndConditionalRender will set the depth mask
 func (native *OpenGL) EndConditionalRender() {
 	gl.EndConditionalRender()
+}
+
+// PatchParameteri specifies the parameters for patch primitives
+func (native *OpenGL) PatchParameteri(pname uint32, value int32) {
+	gl.PatchParameteri(pname, value)
+}
+
+// GetQueryObjectui64v specifies the parameters for patch primitives
+func (native *OpenGL) GetQueryObjectui64v(id uint32, pname uint32, params *uint64) {
+	gl.GetQueryObjectui64v(id, pname, params)
 }

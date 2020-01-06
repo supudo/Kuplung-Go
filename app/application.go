@@ -1,8 +1,6 @@
 package app
 
 import (
-	"math"
-
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/input"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
@@ -122,7 +120,7 @@ func (kapp *KuplungApp) initRenderingManager() {
 
 // DoProgress ...
 func (kapp *KuplungApp) DoProgress(progress float32) {
-	settings.LogWarn("[Progress] %v", math.Round(float64(progress)*100)/100)
+	//settings.LogWarn("[Progress] %v", math.Round(float64(progress)*100)/100)
 	kapp.guiContext.GuiVars.ParsingPercentage = progress
 }
 

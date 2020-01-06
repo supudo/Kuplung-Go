@@ -213,6 +213,31 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 			}
 			imgui.TreePop()
 		}
+		if imgui.TreeNodeV("Bounding Box", imgui.TreeNodeFlagsCollapsingHeader) {
+			if imgui.Checkbox("Bounding Box", &rsett.General.ShowBoundingBox) {
+				settings.SaveRenderingSettings()
+			}
+
+			if rsett.General.ShowBoundingBox {
+				if helpers.AddControlsSlider("Padding", 3, 0.001, 0.000, 0.1, false, nil, &rsett.General.BoundingBoxPadding, true, isFrame) {
+					rsett.General.BoundingBoxRefresh = true
+					settings.SaveRenderingSettings()
+				}
+				helpers.AddControlColor4("Color", &rsett.General.OutlineColor, &rsett.General.OutlineColorPickerOpen)
+				helpers.AddControlsSlider("Thickness", 2, 1.01, 0.0, 2.0, false, nil, &rsett.General.OutlineThickness, true, isFrame)
+			}
+			imgui.TreePop()
+		}
+		if imgui.TreeNodeV("Edit Mode", imgui.TreeNodeFlagsCollapsingHeader) {
+			imgui.Checkbox("Vertex Sphere", &rsett.General.VertexSphereVisible)
+			if rsett.General.VertexSphereVisible {
+				imgui.Checkbox("Sphere", &rsett.General.VertexSphereIsSphere)
+				imgui.Checkbox("Wireframes", &rsett.General.VertexSphereShowWireframes)
+				helpers.AddControlsIntegerSlider("Segments", 67, 3, 32, &rsett.General.VertexSphereSegments)
+				helpers.AddControlsSlider("Radius", 1.0, 0.5, 0.0, 2.0, false, nil, &rsett.General.VertexSphereRadius, true, isFrame)
+				helpers.AddControlColor4("Color", &rsett.General.VertexSphereColor, &rsett.General.VertexSphereColorPickerOpen)
+			}
+		}
 	case 1:
 		if imgui.BeginTabBarV("cameraTabs", imgui.TabBarFlagsNoCloseWithMiddleMouseButton|imgui.TabBarFlagsNoTooltip) {
 			if imgui.BeginTabItem("Look At") {

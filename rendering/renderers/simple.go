@@ -65,6 +65,8 @@ func NewRendererSimple(window interfaces.Window) *RendererSimple {
 	rend.solidLight.StrengthDiffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("solidSkin_Light.strengthDiffuse\x00"))
 	rend.solidLight.StrengthSpecular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("solidSkin_Light.strengthSpecular\x00"))
 
+	gl.CheckForOpenGLErrors("ForwardRenderer")
+
 	return rend
 }
 

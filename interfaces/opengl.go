@@ -4,6 +4,8 @@ import "unsafe"
 
 // OpenGL ...
 type OpenGL interface {
+	CheckForOpenGLErrors(message string)
+
 	ActiveTexture(texture uint32)
 	AttachShader(program uint32, shader uint32)
 
@@ -44,6 +46,10 @@ type OpenGL interface {
 	GenTextures(n int32) []uint32
 	GenVertexArrays(n int32) []uint32
 	GenQueries(n int32) []uint32
+	BeginQuery(target uint32, id uint32)
+	EndQuery(target uint32)
+	IsQuery(id uint32) bool
+	ColorMask(red bool, green bool, blue bool, alpha bool)
 
 	GetAttribLocation(program uint32, name string) int32
 	GetError() uint32
@@ -74,6 +80,7 @@ type OpenGL interface {
 	Uniform3f(location int32, value1 float32, value2 float32, value3 float32)
 	Uniform4fv(location int32, value *[4]float32)
 	UniformMatrix4fv(location int32, transpose bool, value *[16]float32)
+	UniformMatrix3fv(location int32, count int32, transpose bool, value *float32)
 	GLUniformMatrix4fv(location int32, count int32, transpose bool, value *float32)
 	UseProgram(program uint32)
 
@@ -111,4 +118,7 @@ type OpenGL interface {
 
 	BeginConditionalRender(id uint32, mode uint32)
 	EndConditionalRender()
+
+	PatchParameteri(pname uint32, value int32)
+	GetQueryObjectui64v(id uint32, pname uint32, params *uint64)
 }

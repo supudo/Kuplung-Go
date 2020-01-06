@@ -96,6 +96,16 @@ func GetShaderSource(filename string) string {
 	return string(source) + "\x00"
 }
 
+// GetShaderSourcePartial ...
+func GetShaderSourcePartial(filename string) string {
+	source, err := ioutil.ReadFile(filename)
+	if err != nil {
+		settings.LogWarn("[OpenGL Utils] Can't load shader source for %v", filename)
+		return ""
+	}
+	return string(source) + " "
+}
+
 // LoadTexture ...
 func LoadTexture(gl interfaces.OpenGL, file string) uint32 {
 	imgFile, err := os.Open(file)

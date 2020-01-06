@@ -75,6 +75,9 @@ type WindowVariables struct {
 
 	showParsing bool
 
+	showImageSave  bool
+	showRendererUI bool
+
 	ParsingPercentage float32
 }
 

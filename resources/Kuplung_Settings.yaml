@@ -4,7 +4,7 @@
 App:
   appVersion: 1.0 d
   currentFolder: 
-  RendererType: 1
+  RendererType: 2
 
 # SDL & Window Settings
 AppWindow:

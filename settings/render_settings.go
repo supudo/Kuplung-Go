@@ -43,7 +43,23 @@ type RenderingSettings struct {
 		RayDirectionYS     string
 		RayDirectionZS     string
 
-		OcclusionCulling bool
+		OcclusionCulling       bool `yaml:"OcclusionCulling"`
+		RenderingDepth         bool
+		SelectedViewModelSkin  types.ViewModelSkin
+		ShowBoundingBox        bool
+		BoundingBoxRefresh     bool
+		BoundingBoxPadding     float32
+		OutlineColor           mgl32.Vec4
+		OutlineColorPickerOpen bool
+		OutlineThickness       float32
+
+		VertexSphereVisible         bool
+		VertexSphereColorPickerOpen bool
+		VertexSphereIsSphere        bool
+		VertexSphereShowWireframes  bool
+		VertexSphereRadius          float32
+		VertexSphereSegments        int32
+		VertexSphereColor           mgl32.Vec4
 	} `yaml:"General"`
 
 	Axis struct {
@@ -108,7 +124,7 @@ func InitRenderingSettings() RenderingSettings {
 	rSettings.General.RayDirectionXS = fmt.Sprintf("%f", rSettings.General.RayDirectionX)
 	rSettings.General.RayDirectionYS = fmt.Sprintf("%f", rSettings.General.RayDirectionY)
 	rSettings.General.RayDirectionZS = fmt.Sprintf("%f", rSettings.General.RayDirectionZ)
-	rSettings.General.OcclusionCulling = false
+	rSettings.General.RenderingDepth = false
 
 	rSettings.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rSettings.General.Fov), rSettings.General.RatioWidth/rSettings.General.RatioHeight, rSettings.General.PlaneClose, rSettings.General.PlaneFar)
 	rSettings.MatrixCamera = mgl32.Ident4()
@@ -156,10 +172,19 @@ func ResetRenderSettings() {
 	rSettings.General.RayDirectionYS = "0.0"
 	rSettings.General.RayDirectionZS = "0.0"
 
+	rSettings.General.RenderingDepth = false
+
 	rSettings.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rSettings.General.Fov), rSettings.General.RatioWidth/rSettings.General.RatioHeight, rSettings.General.PlaneClose, rSettings.General.PlaneFar)
 	rSettings.MatrixCamera = mgl32.Ident4()
 
 	rSettings.General.OcclusionCulling = false
+
+	rSettings.General.OutlineColor = mgl32.Vec4{0.0, 0.0, 0.0, 0.0}
+	rSettings.General.OutlineColorPickerOpen = false
+	rSettings.General.OutlineThickness = 1.01
+	rSettings.General.ShowBoundingBox = false
+	rSettings.General.BoundingBoxRefresh = false
+	rSettings.General.BoundingBoxPadding = 0.01
 }
 
 // SaveRenderingSettings will save the settings back to yaml file
