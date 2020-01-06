@@ -54,6 +54,7 @@ type Context struct {
 
 	viewControls *dialogs.ViewControls
 	viewModels   *dialogs.ViewModels
+	viewOptions  *dialogs.ViewOptions
 
 	componentLog *components.ComponentLog
 
@@ -65,6 +66,7 @@ type Context struct {
 type WindowVariables struct {
 	showModels   bool
 	showControls bool
+	showOptions  bool
 
 	showLog bool
 
@@ -92,12 +94,14 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 
 		viewControls: dialogs.NewViewControls(),
 		viewModels:   dialogs.NewViewModels(),
+		viewOptions:  dialogs.NewViewOptions(),
 
 		componentLog: components.NewComponentLog(),
 	}
 
 	context.GuiVars.showModels = true
 	context.GuiVars.showControls = true
+	context.GuiVars.showOptions = false
 
 	context.GuiVars.showLog = false
 
@@ -200,6 +204,10 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 
 	if context.GuiVars.showModels {
 		context.viewModels.Render(&context.GuiVars.showModels, &isFrame)
+	}
+
+	if context.GuiVars.showOptions {
+		context.viewOptions.Render(&context.GuiVars.showOptions, &isFrame)
 	}
 
 	if context.GuiVars.showLog {

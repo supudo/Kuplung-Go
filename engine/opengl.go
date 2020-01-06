@@ -28,18 +28,21 @@ func NewOpenGL() *OpenGL {
 
 // CheckForOpenGLErrors implements the interfaces.OpenGL interface.
 func (native *OpenGL) CheckForOpenGLErrors(message string) {
-	error := gl.GetError()
-	if error != oglconsts.NO_ERROR {
-		errMessage := "[GLError] [" + message + "] glError = " + string(error)
-		alreadyReported := false
-		for _, n := range native.reportedErrors {
-			if errMessage == n {
-				alreadyReported = true
+	sett := settings.GetSettings()
+	if sett.Rendering.ShowGLErrors {
+		error := gl.GetError()
+		if error != oglconsts.NO_ERROR {
+			errMessage := "[GLError] [" + message + "] glError = " + string(error)
+			alreadyReported := false
+			for _, n := range native.reportedErrors {
+				if errMessage == n {
+					alreadyReported = true
+				}
 			}
-		}
-		if !alreadyReported {
-			settings.LogWarn(errMessage)
-			native.reportedErrors = append(native.reportedErrors, errMessage)
+			if !alreadyReported {
+				settings.LogWarn(errMessage)
+				native.reportedErrors = append(native.reportedErrors, errMessage)
+			}
 		}
 	}
 }

@@ -87,6 +87,10 @@ func (context *Context) DrawMainMenu() {
 			context.GuiVars.showLog = !context.GuiVars.showLog
 		}
 		imgui.Separator()
+		if imgui.MenuItem("Options") {
+			context.GuiVars.showOptions = !context.GuiVars.showOptions
+		}
+		imgui.Separator()
 		if imgui.MenuItem("Cube") {
 			rsett.General.ShowCube = !rsett.General.ShowCube
 		}

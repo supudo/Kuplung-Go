@@ -4,7 +4,7 @@
 App:
   appVersion: 1.0 d
   currentFolder: 
-  RendererType: 2
+  RendererType: 0
 
 # SDL & Window Settings
 AppWindow:
@@ -15,6 +15,7 @@ AppWindow:
 
 Rendering:
   FramesPerSecond: 30.0
+  ShowGLErrors: false
 
 # GUI - clear color
 AppGui:

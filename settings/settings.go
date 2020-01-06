@@ -25,6 +25,7 @@ type ApplicationSettings struct {
 	} `yaml:"AppWindow"`
 	Rendering struct {
 		FramesPerSecond float64 `yaml:"FramesPerSecond"`
+		ShowGLErrors    bool    `yaml:"ShowGLErrors"`
 	} `yaml:"Rendering"`
 	AppGui struct {
 		GUIClearColor []float32 `yaml:"guiClearColor"`
