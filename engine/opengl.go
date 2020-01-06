@@ -30,9 +30,9 @@ func NewOpenGL() *OpenGL {
 func (native *OpenGL) CheckForOpenGLErrors(message string) {
 	sett := settings.GetSettings()
 	if sett.Rendering.ShowGLErrors {
-		error := gl.GetError()
-		if error != oglconsts.NO_ERROR {
-			errMessage := "[GLError] [" + message + "] glError = " + string(error)
+		err := gl.GetError()
+		if err != oglconsts.NO_ERROR {
+			errMessage := "[GLError] [" + message + "] glError = " + string(err)
 			alreadyReported := false
 			for _, n := range native.reportedErrors {
 				if errMessage == n {
