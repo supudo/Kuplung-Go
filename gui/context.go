@@ -203,7 +203,7 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 	}
 
 	if context.GuiVars.showModels {
-		context.viewModels.Render(&context.GuiVars.showModels, &isFrame)
+		context.viewModels.Render(&context.GuiVars.showModels, &isFrame, rm)
 	}
 
 	if context.GuiVars.showOptions {

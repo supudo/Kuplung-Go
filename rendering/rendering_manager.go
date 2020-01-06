@@ -253,24 +253,26 @@ func (rm *RenderManager) initSkyBox() {
 }
 
 func (rm *RenderManager) addShape(shape types.ShapeType) {
-	parsingChan := make(chan types.MeshModel)
+	parsingChan := make(chan []types.MeshModel)
 	go rm.addShapeAsync(parsingChan, shape)
-	mmodel := <-parsingChan
+	mmodels := <-parsingChan
 
-	mesh := meshes.NewModelFace(rm.window, mmodel)
-	mesh.InitProperties()
-	mesh.InitBuffers()
-	rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
+	for i := 0; i < len(mmodels); i++ {
+		mesh := meshes.NewModelFace(rm.window, mmodels[i])
+		mesh.InitProperties()
+		mesh.InitBuffers()
+		rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
 
-	sett := settings.GetSettings()
-	sett.MemSettings.TotalVertices += mesh.MeshModel.CountVertices
-	sett.MemSettings.TotalIndices += mesh.MeshModel.CountIndices
-	sett.MemSettings.TotalTriangles += mesh.MeshModel.CountVertices / 3
-	sett.MemSettings.TotalFaces += mesh.MeshModel.CountVertices / 6
-	sett.MemSettings.TotalObjects++
+		sett := settings.GetSettings()
+		sett.MemSettings.TotalVertices += mesh.MeshModel.CountVertices
+		sett.MemSettings.TotalIndices += mesh.MeshModel.CountIndices
+		sett.MemSettings.TotalTriangles += mesh.MeshModel.CountVertices / 3
+		sett.MemSettings.TotalFaces += mesh.MeshModel.CountVertices / 6
+		sett.MemSettings.TotalObjects++
+	}
 }
 
-func (rm *RenderManager) addShapeAsync(parsingChannel chan types.MeshModel, shape types.ShapeType) {
+func (rm *RenderManager) addShapeAsync(parsingChannel chan []types.MeshModel, shape types.ShapeType) {
 	_, _ = trigger.Fire(types.ActionParsingShow)
 	shapeName := ""
 	switch shape {
@@ -310,9 +312,9 @@ func (rm *RenderManager) addShapeAsync(parsingChannel chan types.MeshModel, shap
 		shapeName = "epcot"
 	}
 	sett := settings.GetSettings()
-	mmodel := rm.fileParser.Parse(sett.App.CurrentPath+"shapes/"+shapeName+".obj", nil)[0]
+	mmodels := rm.fileParser.Parse(sett.App.CurrentPath+"shapes/"+shapeName+".obj", nil)
 	_, _ = trigger.Fire(types.ActionParsingHide)
-	parsingChannel <- mmodel
+	parsingChannel <- mmodels
 }
 
 func (rm *RenderManager) addLight(shape types.LightSourceType) {

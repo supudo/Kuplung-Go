@@ -437,88 +437,82 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 			light := lightSources[j]
 			switch light.LightType {
 			case types.LightSourceTypeDirectional:
-				{
-					if lightsCountDirectional < rend.GLSL_LightSourceNumber_Directional {
-						f := rend.mfLights_Directional[lightsCountDirectional]
+				if lightsCountDirectional < rend.GLSL_LightSourceNumber_Directional {
+					f := rend.mfLights_Directional[lightsCountDirectional]
 
-						gl.Uniform1i(f.InUse, 1)
+					gl.Uniform1i(f.InUse, 1)
 
-						// light
-						gl.Uniform3f(f.Direction, light.PositionX.Point, light.PositionY.Point, light.PositionZ.Point)
+					// light
+					gl.Uniform3f(f.Direction, light.PositionX.Point, light.PositionY.Point, light.PositionZ.Point)
 
-						// color
-						gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
-						gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
-						gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
+					// color
+					gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
+					gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
+					gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
 
-						// light factors
-						gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
-						gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
-						gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
+					// light factors
+					gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
+					gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
+					gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
 
-						lightsCountDirectional++
-					}
+					lightsCountDirectional++
 				}
 			case types.LightSourceTypePoint:
-				{
-					if lightsCountPoint < rend.GLSL_LightSourceNumber_Point {
-						f := rend.mfLights_Point[lightsCountPoint]
+				if lightsCountPoint < rend.GLSL_LightSourceNumber_Point {
+					f := rend.mfLights_Point[lightsCountPoint]
 
-						gl.Uniform1i(f.InUse, 1)
+					gl.Uniform1i(f.InUse, 1)
 
-						// light
-						gl.Uniform3f(f.Position, light.MatrixModel[4*3+0], light.MatrixModel[4*3+1], light.MatrixModel[4*3+2])
+					// light
+					gl.Uniform3f(f.Position, light.MatrixModel[4*3+0], light.MatrixModel[4*3+1], light.MatrixModel[4*3+2])
 
-						// factors
-						gl.Uniform1f(f.Constant, light.LConstant.Point)
-						gl.Uniform1f(f.Linear, light.LLinear.Point)
-						gl.Uniform1f(f.Quadratic, light.LQuadratic.Point)
+					// factors
+					gl.Uniform1f(f.Constant, light.LConstant.Point)
+					gl.Uniform1f(f.Linear, light.LLinear.Point)
+					gl.Uniform1f(f.Quadratic, light.LQuadratic.Point)
 
-						// color
-						gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
-						gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
-						gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
+					// color
+					gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
+					gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
+					gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
 
-						// light factors
-						gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
-						gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
-						gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
+					// light factors
+					gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
+					gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
+					gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
 
-						lightsCountPoint++
-					}
+					lightsCountPoint++
 				}
 			case types.LightSourceTypeSpot:
-				{
-					if lightsCountSpot < rend.GLSL_LightSourceNumber_Spot {
-						f := rend.mfLights_Spot[lightsCountSpot]
+				if lightsCountSpot < rend.GLSL_LightSourceNumber_Spot {
+					f := rend.mfLights_Spot[lightsCountSpot]
 
-						gl.Uniform1i(f.InUse, 1)
+					gl.Uniform1i(f.InUse, 1)
 
-						// light
-						gl.Uniform3f(f.Direction, light.PositionX.Point, light.PositionY.Point, light.PositionZ.Point)
-						gl.Uniform3f(f.Position, light.MatrixModel[4*3+0], light.MatrixModel[4*3+1], light.MatrixModel[4*3+2])
+					// light
+					gl.Uniform3f(f.Direction, light.PositionX.Point, light.PositionY.Point, light.PositionZ.Point)
+					gl.Uniform3f(f.Position, light.MatrixModel[4*3+0], light.MatrixModel[4*3+1], light.MatrixModel[4*3+2])
 
-						// cutoff
-						gl.Uniform1f(f.CutOff, float32(math.Cos(float64(mgl32.DegToRad(light.LCutOff.Point)))))
-						gl.Uniform1f(f.OuterCutOff, float32(math.Cos(float64(mgl32.DegToRad(light.LOuterCutOff.Point)))))
+					// cutoff
+					gl.Uniform1f(f.CutOff, float32(math.Cos(float64(mgl32.DegToRad(light.LCutOff.Point)))))
+					gl.Uniform1f(f.OuterCutOff, float32(math.Cos(float64(mgl32.DegToRad(light.LOuterCutOff.Point)))))
 
-						// factors
-						gl.Uniform1f(f.Constant, light.LConstant.Point)
-						gl.Uniform1f(f.Linear, light.LLinear.Point)
-						gl.Uniform1f(f.Quadratic, light.LQuadratic.Point)
+					// factors
+					gl.Uniform1f(f.Constant, light.LConstant.Point)
+					gl.Uniform1f(f.Linear, light.LLinear.Point)
+					gl.Uniform1f(f.Quadratic, light.LQuadratic.Point)
 
-						// color
-						gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
-						gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
-						gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
+					// color
+					gl.Uniform3f(f.Ambient, light.Ambient.Color.X(), light.Ambient.Color.Y(), light.Ambient.Color.Z())
+					gl.Uniform3f(f.Diffuse, light.Diffuse.Color.X(), light.Diffuse.Color.Y(), light.Diffuse.Color.Z())
+					gl.Uniform3f(f.Specular, light.Specular.Color.X(), light.Specular.Color.Y(), light.Specular.Color.Z())
 
-						// light factors
-						gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
-						gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
-						gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
+					// light factors
+					gl.Uniform1f(f.StrengthAmbient, light.Ambient.Strength)
+					gl.Uniform1f(f.StrengthDiffuse, light.Diffuse.Strength)
+					gl.Uniform1f(f.StrengthSpecular, light.Specular.Strength)
 
-						lightsCountSpot++
-					}
+					lightsCountSpot++
 				}
 			}
 		}
