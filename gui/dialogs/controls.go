@@ -144,7 +144,7 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 		imgui.SetMouseCursor(imgui.MouseCursorNone)
 	}
 
-	imgui.BeginChildV("Properties Page", imgui.Vec2{X: 0, Y: 0}, false, 0)
+	imgui.BeginChildV("Properties Pane", imgui.Vec2{X: 0, Y: 0}, false, 0)
 	imgui.PushItemWidth(imgui.WindowWidth() * .75)
 	switch view.selectedObject {
 	case 0:
@@ -383,7 +383,7 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 			var i int32
 			for i = 0; i < int32(len(rm.SkyBox.SkyboxItems)); i++ {
 				sksel := (i == rsett.SkyBox.SkyboxSelectedItem)
-				if imgui.SelectableV(rm.SkyBox.SkyboxItems[i].Title, sksel, 0, imgui.Vec2{0, 0}) {
+				if imgui.SelectableV(rm.SkyBox.SkyboxItems[i].Title, sksel, 0, imgui.Vec2{X: 0, Y: 0}) {
 					rsett.SkyBox.SkyboxSelectedItem = i
 				}
 				if sksel {

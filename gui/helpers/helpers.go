@@ -102,6 +102,15 @@ func AddControlsIntegerSlider(title string, idx, min, limit int32, animatedValue
 	imgui.SliderInt(sid, *(&animatedValue), min, limit)
 }
 
+// AddControlsFloatSlider ...
+func AddControlsFloatSlider(title string, idx int32, min, limit float32, animatedValue *float32) {
+	if len(title) > 0 {
+		imgui.Text(title)
+	}
+	sid := "##10" + string(idx)
+	imgui.SliderFloat(sid, *(&animatedValue), min, limit)
+}
+
 func animateValue(isFrame, animatedFlag *bool, animatedValue *float32, step, limit float32, doMinus bool) {
 	go animateValueAsync(isFrame, animatedFlag, animatedValue, step, limit, doMinus)
 }

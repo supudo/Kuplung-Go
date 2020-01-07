@@ -155,7 +155,8 @@ func (objp *ObjParser) Parse(filename string, psettings []string) []types.MeshMo
 		} else if strings.HasPrefix(singleLine, objp.idObjTitle) {
 			currentModelID = modelCounter
 			entityModel := types.MeshModel{
-				File:                    objp.filename,
+				File:                    filepath.Base(objp.filename),
+				FilePath:                objp.filename,
 				ID:                      currentModelID,
 				ModelTitle:              singleLine,
 				CountVertices:           0,

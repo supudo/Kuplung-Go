@@ -51,7 +51,8 @@ type ModelFace struct {
 	IsModelSelected        bool
 
 	SettingAlpha                    float32
-	SettingTessellationSubdivision  uint32
+	SettingTessellationSubdivision  int32
+	Scale0                          bool
 	PositionX, PositionY, PositionZ types.ObjectCoordinate
 	ScaleX, ScaleY, ScaleZ          types.ObjectCoordinate
 	RotateX, RotateY, RotateZ       types.ObjectCoordinate
@@ -98,6 +99,7 @@ type ModelFace struct {
 	EffectToneMappingACESFilmRec2020 bool
 	EffectHDRTonemapping             bool
 
+	SettingEditMode    bool
 	SettingShowShadows bool
 
 	SettingRenderingPBR          bool
@@ -202,6 +204,7 @@ func (mesh *ModelFace) InitProperties() {
 	mesh.EffectToneMappingACESFilmRec2020 = false
 	mesh.EffectHDRTonemapping = false
 
+	mesh.SettingEditMode = false
 	mesh.SettingShowShadows = true
 
 	mesh.SettingRenderingPBR = true

@@ -4,8 +4,9 @@ import "github.com/go-gl/mathgl/mgl32"
 
 // MeshModel ...
 type MeshModel struct {
-	ID   uint32
-	File string
+	ID       uint32
+	File     string
+	FilePath string
 
 	ModelTitle    string
 	MaterialTitle string

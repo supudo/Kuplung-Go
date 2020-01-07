@@ -16,7 +16,7 @@ import (
 
 // RenderManager is the main structure for rendering
 type RenderManager struct {
-	window interfaces.Window
+	Window interfaces.Window
 
 	Camera      *objects.Camera
 	cube        *objects.Cube
@@ -53,7 +53,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	ahPosition := float32(rsett.Grid.WorldGridSizeSquares)
 
 	rm := &RenderManager{}
-	rm.window = window
+	rm.Window = window
 	rm.doProgress = doProgress
 	rm.SceneSelectedModelObject = -1
 
@@ -93,8 +93,8 @@ func (rm *RenderManager) Render() {
 	sett := settings.GetSettings()
 	rsett := settings.GetRenderingSettings()
 
-	w, h := rm.window.Size()
-	rm.window.OpenGL().Viewport(0, 0, int32(w), int32(h))
+	w, h := rm.Window.Size()
+	rm.Window.OpenGL().Viewport(0, 0, int32(w), int32(h))
 
 	rsett.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rsett.General.Fov), rsett.General.RatioWidth/rsett.General.RatioHeight, rsett.General.PlaneClose, rsett.General.PlaneFar)
 	rm.Camera.Render()
@@ -212,19 +212,19 @@ func (rm *RenderManager) initSystemModels() {
 }
 
 func (rm *RenderManager) initCamera() {
-	rm.Camera = objects.InitCamera(rm.window)
+	rm.Camera = objects.InitCamera(rm.Window)
 }
 
 func (rm *RenderManager) initCube() {
-	rm.cube = objects.CubeInit(rm.window)
+	rm.cube = objects.CubeInit(rm.Window)
 }
 
 func (rm *RenderManager) initWorldGrid() {
-	rm.wgrid = objects.InitWorldGrid(rm.window)
+	rm.wgrid = objects.InitWorldGrid(rm.Window)
 }
 
 func (rm *RenderManager) initAxisLabels(ahPosition float32) {
-	rm.axisLabels = objects.InitAxisLabels(rm.window)
+	rm.axisLabels = objects.InitAxisLabels(rm.Window)
 	models := []types.MeshModel{
 		rm.systemModels["axis_x_plus"],
 		rm.systemModels["axis_x_minus"],
@@ -236,19 +236,19 @@ func (rm *RenderManager) initAxisLabels(ahPosition float32) {
 }
 
 func (rm *RenderManager) initCameraModel() {
-	rm.CameraModel = objects.InitCameraModel(rm.window, rm.systemModels["camera"])
+	rm.CameraModel = objects.InitCameraModel(rm.Window, rm.systemModels["camera"])
 	rm.CameraModel.InitProperties()
 	rm.CameraModel.InitBuffers()
 }
 
 func (rm *RenderManager) initMiniAxis() {
-	rm.miniAxis = objects.InitMiniAxis(rm.window)
+	rm.miniAxis = objects.InitMiniAxis(rm.Window)
 	rm.miniAxis.InitProperties()
 	rm.miniAxis.InitBuffers()
 }
 
 func (rm *RenderManager) initSkyBox() {
-	rm.SkyBox = objects.InitSkyBox(rm.window)
+	rm.SkyBox = objects.InitSkyBox(rm.Window)
 	rm.SkyBox.InitBuffers()
 }
 
@@ -258,7 +258,7 @@ func (rm *RenderManager) addShape(shape types.ShapeType) {
 	mmodels := <-parsingChan
 
 	for i := 0; i < len(mmodels); i++ {
-		mesh := meshes.NewModelFace(rm.window, mmodels[i])
+		mesh := meshes.NewModelFace(rm.Window, mmodels[i])
 		mesh.InitProperties()
 		mesh.InitBuffers()
 		rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
@@ -318,7 +318,7 @@ func (rm *RenderManager) addShapeAsync(parsingChannel chan []types.MeshModel, sh
 }
 
 func (rm *RenderManager) addLight(shape types.LightSourceType) {
-	lightObject := objects.InitLight(rm.window)
+	lightObject := objects.InitLight(rm.Window)
 	lightObject.InitProperties(shape)
 	switch shape {
 	case types.LightSourceTypeDirectional:
@@ -358,9 +358,9 @@ func (rm *RenderManager) clearScene() {
 }
 
 func (rm *RenderManager) initRenderers() {
-	rm.rendererDefered = renderers.NewRendererDefered(rm.window)
-	rm.rendererForward = renderers.NewRendererForward(rm.window)
-	rm.rendererForwardShadowMapping = renderers.NewRendererForwardShadowMapping(rm.window)
-	rm.rendererShadowMapping = renderers.NewRendererShadowMapping(rm.window)
-	rm.rendererSimple = renderers.NewRendererSimple(rm.window)
+	rm.rendererDefered = renderers.NewRendererDefered(rm.Window)
+	rm.rendererForward = renderers.NewRendererForward(rm.Window)
+	rm.rendererForwardShadowMapping = renderers.NewRendererForwardShadowMapping(rm.Window)
+	rm.rendererShadowMapping = renderers.NewRendererShadowMapping(rm.Window)
+	rm.rendererSimple = renderers.NewRendererSimple(rm.Window)
 }
