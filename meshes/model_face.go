@@ -42,41 +42,41 @@ type ModelFace struct {
 	MeshModel   types.MeshModel
 	MatrixModel mgl32.Mat4
 
-	SettingsDeferredRender bool
-	SettingCelShading      bool
-	SettingWireframe       bool
-	SettingUseTessellation bool
-	SettingUseCullFace     bool
-	ShowMaterialEditor     bool
-	IsModelSelected        bool
+	DeferredRender     bool
+	CelShading         bool
+	Wireframe          bool
+	UseTessellation    bool
+	UseCullFace        bool
+	ShowMaterialEditor bool
+	IsModelSelected    bool
 
-	SettingAlpha                    float32
-	SettingTessellationSubdivision  int32
+	Alpha                           float32
+	TessellationSubdivision         int32
 	Scale0                          bool
 	PositionX, PositionY, PositionZ types.ObjectCoordinate
 	ScaleX, ScaleY, ScaleZ          types.ObjectCoordinate
 	RotateX, RotateY, RotateZ       types.ObjectCoordinate
 	DisplaceX, DisplaceY, DisplaceZ types.ObjectCoordinate
 
-	SettingMaterialRefraction  types.ObjectCoordinate
-	SettingMaterialSpecularExp types.ObjectCoordinate
+	MaterialRefraction  types.ObjectCoordinate
+	MaterialSpecularExp types.ObjectCoordinate
 
-	SettingLightPosition  mgl32.Vec3
-	SettingLightDirection mgl32.Vec3
-	SettingLightAmbient   mgl32.Vec3
-	SettingLightDiffuse   mgl32.Vec3
-	SettingLightSpecular  mgl32.Vec3
+	LightPosition  mgl32.Vec3
+	LightDirection mgl32.Vec3
+	LightAmbient   mgl32.Vec3
+	LightDiffuse   mgl32.Vec3
+	LightSpecular  mgl32.Vec3
 
 	OutlineColor     mgl32.Vec4
 	OutlineThickness float32
 
-	SettingLightStrengthAmbient  float32
-	SettingLightStrengthDiffuse  float32
-	SettingLightStrengthSpecular float32
-	SettingLightingPassDrawMode  uint32
+	LightStrengthAmbient  float32
+	LightStrengthDiffuse  float32
+	LightStrengthSpecular float32
+	LightingPassDrawMode  uint32
 
 	MaterialIlluminationModel uint32
-	SettingParallaxMapping    bool
+	ParallaxMapping           bool
 
 	MaterialAmbient         types.MaterialColor
 	MaterialDiffuse         types.MaterialColor
@@ -99,16 +99,15 @@ type ModelFace struct {
 	EffectToneMappingACESFilmRec2020 bool
 	EffectHDRTonemapping             bool
 
-	SettingEditMode    bool
-	SettingShowShadows bool
+	EditMode    bool
+	ShowShadows bool
 
-	SettingRenderingPBR          bool
-	SettingRenderingPBRMetallic  float32
-	SettingRenderingPBRRoughness float32
-	SettingRenderingPBRAO        float32
+	RenderingPBR          bool
+	RenderingPBRMetallic  float32
+	RenderingPBRRoughness float32
+	RenderingPBRAO        float32
 
 	// view skin
-	SettingModelViewSkin        types.ViewModelSkin
 	SolidLightSkinMaterialColor mgl32.Vec3
 	SolidLightSkinAmbient       mgl32.Vec3
 	SolidLightSkinDiffuse       mgl32.Vec3
@@ -132,12 +131,12 @@ func NewModelFace(window interfaces.Window, model types.MeshModel) *ModelFace {
 func (mesh *ModelFace) InitProperties() {
 	mesh.AssetsFolder = ""
 
-	mesh.SettingCelShading = false
-	mesh.SettingWireframe = false
-	mesh.SettingAlpha = 1.0
+	mesh.CelShading = false
+	mesh.Wireframe = false
+	mesh.Alpha = 1.0
 	mesh.ShowMaterialEditor = false
-	mesh.SettingsDeferredRender = false
-	mesh.SettingUseCullFace = false
+	mesh.DeferredRender = false
+	mesh.UseCullFace = false
 
 	mesh.HasTextureAmbient = false
 	mesh.HasTextureSpecular = false
@@ -164,24 +163,24 @@ func (mesh *ModelFace) InitProperties() {
 
 	mesh.MatrixModel = mgl32.Ident4()
 
-	mesh.SettingMaterialRefraction = types.ObjectCoordinate{Animate: false, Point: mesh.MeshModel.ModelMaterial.OpticalDensity}
-	mesh.SettingMaterialSpecularExp = types.ObjectCoordinate{Animate: false, Point: mesh.MeshModel.ModelMaterial.SpecularExp}
+	mesh.MaterialRefraction = types.ObjectCoordinate{Animate: false, Point: mesh.MeshModel.ModelMaterial.OpticalDensity}
+	mesh.MaterialSpecularExp = types.ObjectCoordinate{Animate: false, Point: mesh.MeshModel.ModelMaterial.SpecularExp}
 
-	mesh.SettingLightPosition = mgl32.Vec3{0.0, 0.0, 0.0}
-	mesh.SettingLightDirection = mgl32.Vec3{0.0, 0.0, 0.0}
-	mesh.SettingLightAmbient = mgl32.Vec3{0.0, 0.0, 0.0}
-	mesh.SettingLightDiffuse = mgl32.Vec3{0.0, 0.0, 0.0}
-	mesh.SettingLightSpecular = mgl32.Vec3{0.0, 0.0, 0.0}
-	mesh.SettingLightStrengthAmbient = 1.0
-	mesh.SettingLightStrengthDiffuse = 1.0
-	mesh.SettingLightStrengthSpecular = 1.0
-	mesh.SettingTessellationSubdivision = 1
-	mesh.SettingLightingPassDrawMode = 1
+	mesh.LightPosition = mgl32.Vec3{0.0, 0.0, 0.0}
+	mesh.LightDirection = mgl32.Vec3{0.0, 0.0, 0.0}
+	mesh.LightAmbient = mgl32.Vec3{0.0, 0.0, 0.0}
+	mesh.LightDiffuse = mgl32.Vec3{0.0, 0.0, 0.0}
+	mesh.LightSpecular = mgl32.Vec3{0.0, 0.0, 0.0}
+	mesh.LightStrengthAmbient = 1.0
+	mesh.LightStrengthDiffuse = 1.0
+	mesh.LightStrengthSpecular = 1.0
+	mesh.TessellationSubdivision = 1
+	mesh.LightingPassDrawMode = 1
 	mesh.OutlineColor = mgl32.Vec4{0.0, 0.0, 0.0, 0.0}
 	mesh.OutlineThickness = 1.0
 
 	mesh.MaterialIlluminationModel = mesh.MeshModel.ModelMaterial.IlluminationMode
-	mesh.SettingParallaxMapping = false
+	mesh.ParallaxMapping = false
 
 	mesh.MaterialAmbient = types.MaterialColor{ColorPickerOpen: false, Animate: false, Strength: 1.0, Color: mesh.MeshModel.ModelMaterial.AmbientColor}
 	mesh.MaterialDiffuse = types.MaterialColor{ColorPickerOpen: false, Animate: false, Strength: 1.0, Color: mesh.MeshModel.ModelMaterial.DiffuseColor}
@@ -204,13 +203,13 @@ func (mesh *ModelFace) InitProperties() {
 	mesh.EffectToneMappingACESFilmRec2020 = false
 	mesh.EffectHDRTonemapping = false
 
-	mesh.SettingEditMode = false
-	mesh.SettingShowShadows = true
+	mesh.EditMode = false
+	mesh.ShowShadows = true
 
-	mesh.SettingRenderingPBR = true
-	mesh.SettingRenderingPBRMetallic = 0.1
-	mesh.SettingRenderingPBRRoughness = 0.1
-	mesh.SettingRenderingPBRAO = 0.1
+	mesh.RenderingPBR = false
+	mesh.RenderingPBRMetallic = 0.1
+	mesh.RenderingPBRRoughness = 0.1
+	mesh.RenderingPBRAO = 0.1
 }
 
 // InitBuffers ...
@@ -304,9 +303,9 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 	gl := mesh.window.OpenGL()
 	rsett := settings.GetRenderingSettings()
 
-	mesh.SettingUseTessellation = useTessellation
+	mesh.UseTessellation = useTessellation
 
-	if mesh.SettingWireframe {
+	if mesh.Wireframe {
 		gl.PolygonMode(oglconsts.FRONT_AND_BACK, oglconsts.LINE)
 	}
 
@@ -328,7 +327,7 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 
 	gl.BindVertexArray(0)
 
-	if mesh.SettingWireframe {
+	if mesh.Wireframe {
 		gl.PolygonMode(oglconsts.FRONT_AND_BACK, oglconsts.FILL)
 	}
 

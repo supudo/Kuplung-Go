@@ -103,7 +103,7 @@ func AddControlsIntegerSlider(title string, idx, min, limit int32, animatedValue
 	if len(title) == 0 {
 		imgui.Text(fmt.Sprintf("%s", title))
 	}
-	sid := "##10" + string(idx)
+	sid := "##10" + fmt.Sprint(idx)
 	imgui.SliderInt(sid, *(&animatedValue), min, limit)
 }
 
@@ -112,7 +112,7 @@ func AddControlsFloatSlider(title string, idx int32, min, limit float32, animate
 	if len(title) > 0 {
 		imgui.Text(title)
 	}
-	sid := "##10" + string(idx)
+	sid := "##10" + fmt.Sprint(idx)
 	imgui.SliderFloat(sid, *(&animatedValue), min, limit)
 }
 

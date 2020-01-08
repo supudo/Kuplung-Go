@@ -8,8 +8,8 @@ App:
 
 # SDL & Window Settings
 AppWindow:
-  SDL_Window_Width: 1200
-  SDL_Window_Height: 800
+  SDL_Window_Width: 1600
+  SDL_Window_Height: 900
   LogWidth: 400
   LogHeight: 300
 

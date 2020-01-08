@@ -77,7 +77,9 @@ func NewViewModels() *ViewModels {
 
 // Render ...
 func (view *ViewModels) Render(open, isFrame *bool, rm *rendering.RenderManager) {
-	imgui.SetNextWindowSizeV(imgui.Vec2{X: 300, Y: 660}, imgui.ConditionFirstUseEver)
+	sett := settings.GetSettings()
+
+	imgui.SetNextWindowSizeV(imgui.Vec2{X: 300, Y: float32(sett.AppWindow.SDLWindowHeight - 40)}, imgui.ConditionFirstUseEver)
 	imgui.SetNextWindowPosV(imgui.Vec2{X: 10, Y: 28}, imgui.ConditionFirstUseEver, imgui.Vec2{X: 0, Y: 0})
 
 	if imgui.BeginV("Models", open, imgui.WindowFlagsResizeFromAnySide) {
@@ -233,15 +235,15 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 				imgui.PopStyleColor()
 
 				// cel shading
-				imgui.Checkbox("Cel Shading", &rm.MeshModelFaces[view.selectedObject].SettingCelShading)
-				imgui.Checkbox("Wireframe", &rm.MeshModelFaces[view.selectedObject].SettingWireframe)
-				imgui.Checkbox("Edit Mode", &rm.MeshModelFaces[view.selectedObject].SettingEditMode)
-				imgui.Checkbox("Shadows", &rm.MeshModelFaces[view.selectedObject].SettingShowShadows)
+				imgui.Checkbox("Cel Shading", &rm.MeshModelFaces[view.selectedObject].CelShading)
+				imgui.Checkbox("Wireframe", &rm.MeshModelFaces[view.selectedObject].Wireframe)
+				imgui.Checkbox("Edit Mode", &rm.MeshModelFaces[view.selectedObject].EditMode)
+				imgui.Checkbox("Shadows", &rm.MeshModelFaces[view.selectedObject].ShowShadows)
 				// alpha
-				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: rm.MeshModelFaces[view.selectedObject].SettingAlpha})
+				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: 1, Y: 0, Z: 0, W: rm.MeshModelFaces[view.selectedObject].Alpha})
 				imgui.Text("Alpha Blending")
 				imgui.PopStyleColor()
-				helpers.AddControlsFloatSlider("", 1, 0.0, 1.0, &rm.MeshModelFaces[view.selectedObject].SettingAlpha)
+				helpers.AddControlsFloatSlider("", 1, 0.0, 1.0, &rm.MeshModelFaces[view.selectedObject].Alpha)
 
 				imgui.EndTabItem()
 			}
@@ -310,12 +312,12 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 				if imgui.Button("Material Editor") {
 					rm.MeshModelFaces[view.selectedObject].ShowMaterialEditor = true
 				}
-				imgui.Checkbox("Parallax Mapping", &rm.MeshModelFaces[view.selectedObject].SettingParallaxMapping)
+				imgui.Checkbox("Parallax Mapping", &rm.MeshModelFaces[view.selectedObject].ParallaxMapping)
 				imgui.Separator()
-				imgui.Checkbox("Use Tessellation", &rm.MeshModelFaces[view.selectedObject].SettingUseTessellation)
-				if rm.MeshModelFaces[view.selectedObject].SettingUseTessellation {
-					imgui.Checkbox("Culling", &rm.MeshModelFaces[view.selectedObject].SettingUseCullFace)
-					helpers.AddControlsIntegerSlider("Subdivision", 24, 0, 100, &rm.MeshModelFaces[view.selectedObject].SettingTessellationSubdivision)
+				imgui.Checkbox("Use Tessellation", &rm.MeshModelFaces[view.selectedObject].UseTessellation)
+				if rm.MeshModelFaces[view.selectedObject].UseTessellation {
+					imgui.Checkbox("Culling", &rm.MeshModelFaces[view.selectedObject].UseCullFace)
+					helpers.AddControlsIntegerSlider("Subdivision", 24, 0, 100, &rm.MeshModelFaces[view.selectedObject].TessellationSubdivision)
 					imgui.Separator()
 					if mmf.MeshModel.ModelMaterial.TextureDisplacement.UseTexture {
 						helpers.AddControlsSlider("Displacement", 15, 0.05, -2.0, 2.0, true, &rm.MeshModelFaces[view.selectedObject].DisplacementHeightScale.Animate, &rm.MeshModelFaces[view.selectedObject].DisplacementHeightScale.Point, false, isFrame)
@@ -324,8 +326,8 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 				} else {
 					imgui.Separator()
 				}
-				helpers.AddControlsSlider("Refraction", 13, 0.05, -10.0, 10.0, true, &rm.MeshModelFaces[view.selectedObject].SettingMaterialRefraction.Animate, &rm.MeshModelFaces[view.selectedObject].SettingMaterialRefraction.Point, true, isFrame)
-				helpers.AddControlsSlider("Specular Exponent", 14, 10.0, 0.0, 1000.0, true, &rm.MeshModelFaces[view.selectedObject].SettingMaterialSpecularExp.Animate, &rm.MeshModelFaces[view.selectedObject].SettingMaterialSpecularExp.Point, true, isFrame)
+				helpers.AddControlsSlider("Refraction", 13, 0.05, -10.0, 10.0, true, &rm.MeshModelFaces[view.selectedObject].MaterialRefraction.Animate, &rm.MeshModelFaces[view.selectedObject].MaterialRefraction.Point, true, isFrame)
+				helpers.AddControlsSlider("Specular Exponent", 14, 10.0, 0.0, 1000.0, true, &rm.MeshModelFaces[view.selectedObject].MaterialSpecularExp.Animate, &rm.MeshModelFaces[view.selectedObject].MaterialSpecularExp.Point, true, isFrame)
 				imgui.Separator()
 				helpers.AddControlColor3("Ambient Color", &rm.MeshModelFaces[view.selectedObject].MaterialAmbient.Color, &rm.MeshModelFaces[view.selectedObject].MaterialAmbient.ColorPickerOpen)
 				helpers.AddControlColor3("Diffuse Color", &rm.MeshModelFaces[view.selectedObject].MaterialDiffuse.Color, &rm.MeshModelFaces[view.selectedObject].MaterialDiffuse.ColorPickerOpen)
@@ -336,10 +338,10 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 			if imgui.BeginTabItem("Effects") {
 				if imgui.TreeNodeV("PBR", imgui.TreeNodeFlagsCollapsingHeader) {
 					imgui.BeginGroup()
-					imgui.Checkbox("Use PBR", &rm.MeshModelFaces[view.selectedObject].SettingRenderingPBR)
-					helpers.AddControlsSlider("Metallic", 13, 0.0000001, 0.0, 1.0, false, nil, &rm.MeshModelFaces[view.selectedObject].SettingRenderingPBRMetallic, true, isFrame)
-					helpers.AddControlsSlider("Rougness", 14, 0.0000001, 0.0, 1.0, false, nil, &rm.MeshModelFaces[view.selectedObject].SettingRenderingPBRRoughness, true, isFrame)
-					helpers.AddControlsSlider("AO", 15, 0.0000001, 0.0, 1.0, false, nil, &rm.MeshModelFaces[view.selectedObject].SettingRenderingPBRAO, true, isFrame)
+					imgui.Checkbox("Use PBR", &rm.MeshModelFaces[view.selectedObject].RenderingPBR)
+					helpers.AddControlsSlider("Metallic", 13, 0.0000001, 0.0, 1.0, false, nil, &rm.MeshModelFaces[view.selectedObject].RenderingPBRMetallic, true, isFrame)
+					helpers.AddControlsSlider("Rougness", 14, 0.0000001, 0.0, 1.0, false, nil, &rm.MeshModelFaces[view.selectedObject].RenderingPBRRoughness, true, isFrame)
+					helpers.AddControlsSlider("AO", 15, 0.0000001, 0.0, 1.0, false, nil, &rm.MeshModelFaces[view.selectedObject].RenderingPBRAO, true, isFrame)
 					imgui.EndGroup()
 					imgui.TreePop()
 				}

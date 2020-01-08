@@ -18,7 +18,7 @@ void main(void) {
     else {
       // PBR
       if (fs_renderPBR)
-          fragColor.rgb = calculatePBR();
+        fragColor.rgb = calculatePBR();
       else {
         vec3 viewDirection = normalize(fs_cameraPosition - fs_vertexPosition);
         vec3 normalDirection = fs_vertexNormal;

@@ -129,6 +129,8 @@ func InitRenderingSettings() RenderingSettings {
 	rSettings.MatrixProjection = mgl32.Perspective(mgl32.DegToRad(rSettings.General.Fov), rSettings.General.RatioWidth/rSettings.General.RatioHeight, rSettings.General.PlaneClose, rSettings.General.PlaneFar)
 	rSettings.MatrixCamera = mgl32.Ident4()
 
+	rSettings.General.SelectedViewModelSkin = types.ViewModelSkinRendered
+
 	return rSettings
 }
 

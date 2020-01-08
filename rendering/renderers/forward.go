@@ -1,6 +1,9 @@
 package renderers
 
 import (
+	"fmt"
+	"math"
+
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
@@ -9,7 +12,6 @@ import (
 	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
-	"math"
 )
 
 // RendererForward ...
@@ -149,17 +151,17 @@ func NewRendererForward(window interfaces.Window) *RendererForward {
 	for i = 0; i < rend.GLSL_LightSourceNumber_Directional; i++ {
 		f := &types.ModelFaceLightSourceDirectional{}
 
-		f.InUse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+string(i)+"].inUse\x00"))
+		f.InUse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+fmt.Sprint(i)+"].inUse\x00"))
 
-		f.Direction = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+string(i)+"].direction\x00"))
+		f.Direction = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+fmt.Sprint(i)+"].direction\x00"))
 
-		f.Ambient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+string(i)+"].ambient\x00"))
-		f.Diffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+string(i)+"].diffuse\x00"))
-		f.Specular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+string(i)+"].specular\x00"))
+		f.Ambient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+fmt.Sprint(i)+"].ambient\x00"))
+		f.Diffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+fmt.Sprint(i)+"].diffuse\x00"))
+		f.Specular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+fmt.Sprint(i)+"].specular\x00"))
 
-		f.StrengthAmbient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+string(i)+"].strengthAmbient\x00"))
-		f.StrengthDiffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+string(i)+"].strengthDiffuse\x00"))
-		f.StrengthSpecular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+string(i)+"].strengthSpecular\x00"))
+		f.StrengthAmbient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+fmt.Sprint(i)+"].strengthAmbient\x00"))
+		f.StrengthDiffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+fmt.Sprint(i)+"].strengthDiffuse\x00"))
+		f.StrengthSpecular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("directionalLights["+fmt.Sprint(i)+"].strengthSpecular\x00"))
 		rend.mfLights_Directional = append(rend.mfLights_Directional, f)
 	}
 
@@ -167,20 +169,20 @@ func NewRendererForward(window interfaces.Window) *RendererForward {
 	for i = 0; i < rend.GLSL_LightSourceNumber_Point; i++ {
 		f := &types.ModelFaceLightSourcePoint{}
 
-		f.InUse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].inUse\x00"))
-		f.Position = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].position\x00"))
+		f.InUse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].inUse\x00"))
+		f.Position = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].position\x00"))
 
-		f.Constant = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].constant\x00"))
-		f.Linear = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].linear\x00"))
-		f.Quadratic = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].quadratic\x00"))
+		f.Constant = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].constant\x00"))
+		f.Linear = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].linear\x00"))
+		f.Quadratic = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].quadratic\x00"))
 
-		f.Ambient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].ambient\x00"))
-		f.Diffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].diffuse\x00"))
-		f.Specular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].specular\x00"))
+		f.Ambient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].ambient\x00"))
+		f.Diffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].diffuse\x00"))
+		f.Specular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].specular\x00"))
 
-		f.StrengthAmbient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].strengthAmbient\x00"))
-		f.StrengthDiffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].strengthDiffuse\x00"))
-		f.StrengthSpecular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+string(i)+"].strengthSpecular\x00"))
+		f.StrengthAmbient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].strengthAmbient\x00"))
+		f.StrengthDiffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].strengthDiffuse\x00"))
+		f.StrengthSpecular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("pointLights["+fmt.Sprint(i)+"].strengthSpecular\x00"))
 		rend.mfLights_Point = append(rend.mfLights_Point, f)
 	}
 
@@ -188,25 +190,25 @@ func NewRendererForward(window interfaces.Window) *RendererForward {
 	for i = 0; i < rend.GLSL_LightSourceNumber_Spot; i++ {
 		f := &types.ModelFaceLightSourceSpot{}
 
-		f.InUse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].inUse\x00"))
+		f.InUse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].inUse\x00"))
 
-		f.Position = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].position\x00"))
-		f.Direction = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].direction\x00"))
+		f.Position = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].position\x00"))
+		f.Direction = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].direction\x00"))
 
-		f.CutOff = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].cutOff\x00"))
-		f.OuterCutOff = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].outerCutOff\x00"))
+		f.CutOff = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].cutOff\x00"))
+		f.OuterCutOff = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].outerCutOff\x00"))
 
-		f.Constant = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].constant\x00"))
-		f.Linear = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].linear\x00"))
-		f.Quadratic = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].quadratic\x00"))
+		f.Constant = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].constant\x00"))
+		f.Linear = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].linear\x00"))
+		f.Quadratic = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].quadratic\x00"))
 
-		f.Ambient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].ambient\x00"))
-		f.Diffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].diffuse\x00"))
-		f.Specular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].specular\x00"))
+		f.Ambient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].ambient\x00"))
+		f.Diffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].diffuse\x00"))
+		f.Specular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].specular\x00"))
 
-		f.StrengthAmbient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].strengthAmbient\x00"))
-		f.StrengthDiffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].strengthDiffuse\x00"))
-		f.StrengthSpecular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+string(i)+"].strengthSpecular\x00"))
+		f.StrengthAmbient = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].strengthAmbient\x00"))
+		f.StrengthDiffuse = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].strengthDiffuse\x00"))
+		f.StrengthSpecular = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("spotLights["+fmt.Sprint(i)+"].strengthSpecular\x00"))
 		rend.mfLights_Spot = append(rend.mfLights_Spot, f)
 	}
 
@@ -280,8 +282,7 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 
 	gl.BeginQuery(oglconsts.TIME_ELAPSED, queries[currentQuery])
 
-	//selectedModelID := int32(-1)
-	i := int32(-1)
+	i := int32(0)
 	for i = 0; i < int32(len(meshModelFaces)); i++ {
 		mfd := meshModelFaces[i]
 
@@ -299,8 +300,6 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 			j = i
 		}
 		gl.Enable(oglconsts.CULL_FACE)
-
-		//selectedModelID = i
 
 		matrixModel := mgl32.Ident4()
 		matrixModel = matrixModel.Mul4(matrixGrid)
@@ -335,14 +334,14 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		gl.GLUniformMatrix4fv(rend.glVS_WorldMatrix, 1, false, &matrixModel[0])
 
 		// blending
-		if mfd.MeshModel.ModelMaterial.Transparency < 1.0 || mfd.SettingAlpha < 1.0 {
+		if mfd.MeshModel.ModelMaterial.Transparency < 1.0 || mfd.Alpha < 1.0 {
 			gl.Disable(oglconsts.DEPTH_TEST)
 			gl.BlendFunc(oglconsts.SRC_ALPHA, oglconsts.ONE_MINUS_SRC_ALPHA)
 			gl.Enable(oglconsts.BLEND)
 			if mfd.MeshModel.ModelMaterial.Transparency < 1.0 {
 				gl.Uniform1f(rend.glFS_AlphaBlending, mfd.MeshModel.ModelMaterial.Transparency)
 			} else {
-				gl.Uniform1f(rend.glFS_AlphaBlending, mfd.SettingAlpha)
+				gl.Uniform1f(rend.glFS_AlphaBlending, mfd.Alpha)
 			}
 		} else {
 			gl.Enable(oglconsts.DEPTH_TEST)
@@ -367,20 +366,20 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		gl.Uniform1i(rend.glFS_ShadowPass, 0)
 
 		// tessellation
-		if mfd.SettingUseCullFace {
+		if mfd.UseCullFace {
 			gl.Uniform1i(rend.glTCS_UseCullFace, 1)
 		} else {
 			gl.Uniform1i(rend.glTCS_UseCullFace, 0)
 		}
-		if mfd.SettingUseTessellation {
+		if mfd.UseTessellation {
 			gl.Uniform1i(rend.glTCS_UseTessellation, 1)
 		} else {
 			gl.Uniform1i(rend.glTCS_UseTessellation, 0)
 		}
-		gl.Uniform1i(rend.glTCS_TessellationSubdivision, int32(mfd.SettingTessellationSubdivision))
+		gl.Uniform1i(rend.glTCS_TessellationSubdivision, int32(mfd.TessellationSubdivision))
 
 		// cel-shading
-		if mfd.SettingCelShading {
+		if mfd.CelShading {
 			gl.Uniform1i(rend.glFS_CelShading, 1)
 		} else {
 			gl.Uniform1i(rend.glFS_CelShading, 0)
@@ -404,7 +403,7 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		gl.Uniform3f(rend.glGS_GeomDisplacementLocation, mfd.DisplaceX.Point, mfd.DisplaceY.Point, mfd.DisplaceZ.Point)
 
 		// mapping
-		if mfd.SettingParallaxMapping {
+		if mfd.ParallaxMapping {
 			gl.Uniform1i(rend.glMaterial_ParallaxMapping, 1)
 		} else {
 			gl.Uniform1i(rend.glMaterial_ParallaxMapping, 0)
@@ -414,7 +413,7 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		gl.Uniform1f(rend.glFS_GammaCoeficient, rsett.General.GammaCoeficient)
 
 		// render skin
-		gl.Uniform1i(rend.gl_ModelViewSkin, int32(mfd.SettingModelViewSkin))
+		gl.Uniform1i(rend.gl_ModelViewSkin, int32(mfd.ModelViewSkin))
 		gl.Uniform3f(rend.glFS_solidSkin_materialColor, mfd.SolidLightSkinMaterialColor.X(), mfd.SolidLightSkinMaterialColor.Y(), mfd.SolidLightSkinMaterialColor.Z())
 
 		// shadows
@@ -530,8 +529,8 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		}
 
 		// material
-		gl.Uniform1f(rend.glMaterial_Refraction, mfd.SettingMaterialRefraction.Point)
-		gl.Uniform1f(rend.glMaterial_SpecularExp, mfd.SettingMaterialSpecularExp.Point)
+		gl.Uniform1f(rend.glMaterial_Refraction, mfd.MaterialRefraction.Point)
+		gl.Uniform1f(rend.glMaterial_SpecularExp, mfd.MaterialSpecularExp.Point)
 		gl.Uniform1i(rend.glMaterial_IlluminationModel, int32(mfd.MaterialIlluminationModel))
 		gl.Uniform1f(rend.glMaterial_HeightScale, mfd.DisplacementHeightScale.Point)
 		gl.Uniform3f(rend.glMaterial_Ambient, mfd.MaterialAmbient.Color.X(), mfd.MaterialAmbient.Color.Y(), mfd.MaterialAmbient.Color.Z())
@@ -634,14 +633,14 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		}
 
 		// PBR
-		if mfd.SettingRenderingPBR {
+		if mfd.RenderingPBR {
 			gl.Uniform1i(rend.glPBR_UsePBR, 1)
 		} else {
 			gl.Uniform1i(rend.glPBR_UsePBR, 0)
 		}
-		gl.Uniform1f(rend.glPBR_Metallic, mfd.SettingRenderingPBRMetallic)
-		gl.Uniform1f(rend.glPBR_Rougness, mfd.SettingRenderingPBRRoughness)
-		gl.Uniform1f(rend.glPBR_AO, mfd.SettingRenderingPBRAO)
+		gl.Uniform1f(rend.glPBR_Metallic, mfd.RenderingPBRMetallic)
+		gl.Uniform1f(rend.glPBR_Rougness, mfd.RenderingPBRRoughness)
+		gl.Uniform1f(rend.glPBR_AO, mfd.RenderingPBRAO)
 
 		gl.Uniform1f(rend.glVS_IsBorder, 0.0)
 
