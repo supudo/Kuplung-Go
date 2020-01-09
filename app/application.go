@@ -87,11 +87,7 @@ func (kapp *KuplungApp) initOpenGL() {
 
 func (kapp *KuplungApp) initGui() {
 	kapp.initGuiSizes()
-	param := gui.ContextParameters{
-		FontFile: kapp.FontFile,
-		FontSize: kapp.FontSize,
-	}
-	kapp.guiContext = gui.NewContext(kapp.window, param)
+	kapp.guiContext = gui.NewContext(kapp.window)
 	kapp.initGuiStyle()
 	settings.LogInfo("[Application] GUI initialized.")
 }

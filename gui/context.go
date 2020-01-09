@@ -1,7 +1,6 @@
 package gui
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/inkyblackness/imgui-go"
@@ -84,7 +83,7 @@ type WindowVariables struct {
 }
 
 // NewContext initializes a new UI context based on the provided OpenGL window.
-func NewContext(window interfaces.Window, param ContextParameters) *Context {
+func NewContext(window interfaces.Window) *Context {
 	imgui.SetAssertHandler(nil)
 	context := &Context{
 		imguiContext: imgui.CreateContext(nil),
@@ -114,7 +113,7 @@ func NewContext(window interfaces.Window, param ContextParameters) *Context {
 
 	context.GuiVars.ParsingPercentage = 0.0
 
-	err := context.createDeviceObjects(param)
+	err := context.createDeviceObjects()
 	if err != nil {
 		context.Destroy()
 		context = nil
@@ -252,7 +251,7 @@ func (context *Context) MouseScroll(dx, dy float32) {
 	imgui.CurrentIO().AddMouseWheelDelta(dx, dy)
 }
 
-func (context *Context) createDeviceObjects(param ContextParameters) (err error) {
+func (context *Context) createDeviceObjects() (err error) {
 	gl := context.window.OpenGL()
 	glslVersion := "#version 150"
 
@@ -308,29 +307,19 @@ void main()
 	context.vboHandle = buffers[0]
 	context.elementsHandle = buffers[1]
 
-	return context.createFontsTexture(gl, param)
+	return context.createFontsTexture(gl)
 }
 
-func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextParameters) error {
+func (context *Context) createFontsTexture(gl interfaces.OpenGL) error {
 	io := imgui.CurrentIO()
 	fontAtlas := io.Fonts()
 	_ = fontAtlas.AddFontDefault()
-	if len(param.FontFile) > 0 {
-		fontSize := float32(16.0)
-		if param.FontSize > 0.0 {
-			fontSize = param.FontSize
-		}
-		font := fontAtlas.AddFontFromFileTTF(param.FontFile, fontSize)
-		if font == imgui.DefaultFont {
-			return fmt.Errorf("could not load font <%s>", param.FontFile)
-		}
-	}
 
 	sett := settings.GetSettings()
 	fileFA := sett.App.CurrentPath + "fonts/fontawesome-webfont.ttf"
 	fontConfigFA := imgui.NewFontConfig()
-	fontConfigFA.SetGlyphMaxAdvanceX(float32(fonts.FA_ICON_MIN))
-	fontConfigFA.SetGlyphMinAdvanceX(float32(fonts.FA_ICON_MAX))
+	fontConfigFA.SetGlyphMinAdvanceX(float32(fonts.FA_ICON_MIN))
+	fontConfigFA.SetGlyphMaxAdvanceX(float32(fonts.FA_ICON_MAX))
 	fontConfigFA.SetMergeMode(true)
 	fontConfigFA.SetPixelSnapH(true)
 	var builderFA imgui.GlyphRangesBuilder
@@ -341,8 +330,8 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL, param ContextPa
 
 	fileMD := sett.App.CurrentPath + "fonts/material-icons-regular.ttf"
 	fontConfigMD := imgui.NewFontConfig()
-	fontConfigMD.SetGlyphMaxAdvanceX(float32(fonts.MD_ICON_MIN))
-	fontConfigMD.SetGlyphMinAdvanceX(float32(fonts.MD_ICON_MAX))
+	fontConfigMD.SetGlyphMinAdvanceX(float32(fonts.MD_ICON_MIN))
+	fontConfigMD.SetGlyphMaxAdvanceX(float32(fonts.MD_ICON_MAX))
 	fontConfigMD.SetMergeMode(true)
 	fontConfigMD.SetPixelSnapH(true)
 	var builderMD imgui.GlyphRangesBuilder
