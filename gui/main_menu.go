@@ -22,7 +22,9 @@ func (context *Context) DrawMainMenu() {
 	if imgui.BeginMenu("File") {
 		// TODO: add FA icons
 		// lbl := ""
-		// lbl += fmt.Sprintf("%#U", unicode.ToLower(fonts.FA_ICON_FILE_O)) + " "
+		// lbl += fmt.Sprintf("%#U", fonts.FA_ICON_FILE_O) + " "
+		// lbl += fmt.Sprintf("%q", '\uf001') + " "
+		// lbl += fmt.Sprintf("%v", fonts.FA_ICON_FILE_O) + " "
 		// lbl += "New"
 		if imgui.MenuItem("New") {
 			_, _ = trigger.Fire(types.ActionGuiActionFileNew)

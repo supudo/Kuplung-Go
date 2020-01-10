@@ -1,8 +1,8 @@
 package fonts
 
 const (
-	MD_ICON_MIN = 57344 // e000
-	MD_ICON_MAX = 60236 // eb4c
+	MD_ICON_MIN = 0xe000
+	MD_ICON_MAX = 0xeb4c
 
 	MD_ICON_3D_ROTATION = 59469 // e84d
 	MD_ICON_AC_UNIT = 60219 // eb3b
