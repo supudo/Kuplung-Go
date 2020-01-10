@@ -60,6 +60,8 @@ type RenderingSettings struct {
 		VertexSphereRadius          float32
 		VertexSphereSegments        int32
 		VertexSphereColor           mgl32.Vec4
+
+		ShowAllVisualArtefacts bool
 	} `yaml:"General"`
 
 	Axis struct {
@@ -187,6 +189,7 @@ func ResetRenderSettings() {
 	rSettings.General.ShowBoundingBox = false
 	rSettings.General.BoundingBoxRefresh = false
 	rSettings.General.BoundingBoxPadding = 0.01
+	rSettings.General.ShowAllVisualArtefacts = true
 }
 
 // SaveRenderingSettings will save the settings back to yaml file

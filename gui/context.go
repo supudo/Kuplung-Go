@@ -79,6 +79,21 @@ type WindowVariables struct {
 	showImageSave  bool
 	showRendererUI bool
 
+	showOpenDialog bool
+	showSaveDialog bool
+
+	showImporterFile bool
+	showExporterFile bool
+	dialogImportType types.ImportExportFormat
+	dialogExportType types.ImportExportFormat
+
+	showShaderEditor     bool
+	showKuplungIDE       bool
+	showScreenshotWindow bool
+	showSceneStats       bool
+	showSVS              bool
+	showShadertoy        bool
+
 	ParsingPercentage float32
 }
 
@@ -104,6 +119,9 @@ func NewContext(window interfaces.Window) *Context {
 
 	context.GuiVars.showLog = false
 
+	context.GuiVars.showOpenDialog = false
+	context.GuiVars.showSaveDialog = false
+
 	context.GuiVars.showDemoWindow = false
 	context.GuiVars.showAboutImGui = false
 	context.GuiVars.showAboutKuplung = false
@@ -112,6 +130,22 @@ func NewContext(window interfaces.Window) *Context {
 	context.GuiVars.showParsing = false
 
 	context.GuiVars.ParsingPercentage = 0.0
+
+	context.GuiVars.showImageSave = false
+	context.GuiVars.showRendererUI = false
+
+	context.GuiVars.showImporterFile = false
+	context.GuiVars.showExporterFile = false
+	context.GuiVars.dialogImportType = types.ImportExportFormatUNDEFINED
+	context.GuiVars.dialogExportType = types.ImportExportFormatUNDEFINED
+
+	context.GuiVars.showShaderEditor = false
+
+	context.GuiVars.showKuplungIDE = false
+	context.GuiVars.showScreenshotWindow = false
+	context.GuiVars.showSceneStats = false
+	context.GuiVars.showSVS = false
+	context.GuiVars.showShadertoy = false
 
 	err := context.createDeviceObjects()
 	if err != nil {

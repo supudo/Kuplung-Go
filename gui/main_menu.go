@@ -3,6 +3,7 @@ package gui
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/inkyblackness/imgui-go"
 	"github.com/sadlil/go-trigger"
@@ -26,11 +27,117 @@ func (context *Context) DrawMainMenu() {
 		// lbl += fmt.Sprintf("%q", '\uf001') + " "
 		// lbl += fmt.Sprintf("%v", fonts.FA_ICON_FILE_O) + " "
 		// lbl += "New"
-		if imgui.MenuItem("New") {
+		if imgui.MenuItem("New") { // fonts.FA_ICON_FILE_O
 			_, _ = trigger.Fire(types.ActionGuiActionFileNew)
 		}
+		if imgui.MenuItem("Open ...") { // fonts.FA_ICON_FOLDER_OPEN_O
+			context.GuiVars.showOpenDialog = true
+		}
+		if imgui.BeginMenu("Open Recent") { // fonts.FA_ICON_FILES_O
+			// if (this->recentFiles.size() == 0)
+			// 	imgui.MenuItem("No recent files", nil, false, false);
+			// else {
+			// 	for (size_t i = 0; i < this->recentFiles.size(); i++) {
+			// 		FBEntity file = this->recentFiles[i];
+			// 		if (imgui.MenuItem(file.title.c_str(), nil, false, true)) {
+			// 			if (boost::filesystem::exists(file.path))
+			// 				this->funcOpenScene(file);
+			// 			else
+			// 				this->showRecentFileDoesntExists = true;
+			// 		}
+			// 	}
+			// 	imgui.Separator();
+			// 	if (imgui.MenuItem("Clear recent files", nil, false))
+			// 		this->recentFilesClear();
+			// }
+			imgui.EndMenu()
+		}
+
+		if imgui.MenuItem("Save ...") { // fonts.FA_ICON_FLOPPY_O
+			context.GuiVars.showSaveDialog = true
+		}
+
 		imgui.Separator()
-		if imgui.MenuItemV("Quit", "Cmd+Q", false, true) {
+
+		if imgui.BeginMenu("Import") {
+			if imgui.MenuItemV("Wavefront (.OBJ)", "", context.GuiVars.showImporterFile, true) {
+				context.GuiVars.dialogImportType = types.ImportExportFormatOBJ
+			}
+			if imgui.MenuItemV("glTF (.gltf)", "", context.GuiVars.showImporterFile, true) {
+				context.GuiVars.dialogImportType = types.ImportExportFormatGLTF
+			}
+			if imgui.MenuItemV("STereoLithography (.STL)", "", context.GuiVars.showImporterFile, true) {
+				context.GuiVars.dialogImportType = types.ImportExportFormatSTL
+			}
+			if imgui.MenuItemV("Stanford (.PLY)", "", context.GuiVars.showImporterFile, true) {
+				context.GuiVars.dialogImportType = types.ImportExportFormatPLY
+			}
+			if imgui.BeginMenu("Assimp...") {
+				// for (size_t a = 0; a < Settings::Instance()->AssimpSupportedFormats_Import.size(); a++) {
+				// 	SupportedAssimpFormat format = Settings::Instance()->AssimpSupportedFormats_Import[a];
+				// 	std::string f = std::string(format.description) + " (" + std::string(format.fileExtension) + ")";
+				// 	if (imgui.MenuItem(f.c_str(), nil, &this->showImporterFile))
+				// 		this->dialogImportType_Assimp = static_cast<int>(a);
+				// }
+				imgui.EndMenu()
+			}
+			imgui.EndMenu()
+		}
+
+		if imgui.BeginMenu("Import Recent") { // fonts.FA_ICON_FILES_O
+			// if (this->recentFilesImported.size() == 0)
+			// 	imgui.MenuItem("No recent files", nil, false, false);
+			// else {
+			// 	for (size_t i = 0; i < this->recentFilesImported.size(); i++) {
+			// 		FBEntity file = this->recentFilesImported[i];
+			// 		if (imgui.MenuItem(file.title.c_str(), nil, false, true)) {
+			// 			if (boost::filesystem::exists(file.path))
+			// 				this->funcProcessImportedFile(file, std::vector<std::string>(), static_cast<ImportExportFormats>(this->dialogImportType), dialogImportType_Assimp);
+			// 			else
+			// 				this->showRecentFileImportedDoesntExists = true;
+			// 		}
+			// 	}
+			// 	imgui.Separator()
+			// 	if (imgui.MenuItem("Clear recent files", nil, false))
+			// 		this->recentFilesClearImported();
+			// }
+			imgui.EndMenu()
+		}
+
+		if imgui.BeginMenu("Export") {
+			if imgui.MenuItemV("Wavefront (.OBJ)", "", context.GuiVars.showExporterFile, true) {
+				context.GuiVars.dialogExportType = types.ImportExportFormatOBJ
+			}
+			if imgui.MenuItemV("glTF (.gltf)", "", context.GuiVars.showExporterFile, true) {
+				context.GuiVars.dialogExportType = types.ImportExportFormatGLTF
+			}
+			if imgui.MenuItemV("STereoLithography (.stl)", "", context.GuiVars.showExporterFile, true) {
+				context.GuiVars.dialogExportType = types.ImportExportFormatSTL
+			}
+			if imgui.MenuItemV("Stanford PLY (.ply)", "", context.GuiVars.showExporterFile, true) {
+				context.GuiVars.dialogExportType = types.ImportExportFormatPLY
+			}
+			if imgui.BeginMenu("Assimp...") {
+				// for (size_t a = 0; a < Settings::Instance()->AssimpSupportedFormats_Export.size(); a++) {
+				// 	SupportedAssimpFormat format = Settings::Instance()->AssimpSupportedFormats_Export[a];
+				// 	std::string f = std::string(format.description) + " (" + std::string(format.fileExtension) + ")";
+				// 	if (imgui.MenuItem(f.c_str(), nil, &this->showExporterFile))
+				// 		this->dialogExportType_Assimp = static_cast<int>(a);
+				// }
+				imgui.EndMenu()
+			}
+			imgui.EndMenu()
+		}
+
+		imgui.Separator()
+
+		quitShortcut := ""
+		if runtime.GOOS == "darwin" {
+			quitShortcut = "Cmd+Q"
+		} else if runtime.GOOS == "windows" {
+			quitShortcut = "Alt+F4"
+		}
+		if imgui.MenuItemV("Quit", quitShortcut, false, true) {
 			os.Exit(3)
 		}
 		imgui.EndMenu()
@@ -84,9 +191,42 @@ func (context *Context) DrawMainMenu() {
 		if imgui.MenuItem("Controls") {
 			context.GuiVars.showControls = !context.GuiVars.showControls
 		}
+		lblVisualArtefacts := ""
+		if rsett.General.ShowAllVisualArtefacts {
+			lblVisualArtefacts = "Hide Visual Artefacts"
+		} else {
+			lblVisualArtefacts = "Show Visual Artefacts"
+		}
+		if imgui.MenuItem(lblVisualArtefacts) {
+			rsett.General.ShowAllVisualArtefacts = !rsett.General.ShowAllVisualArtefacts
+		}
 		imgui.Separator()
-		if imgui.MenuItem("Log") {
+		if imgui.MenuItem("Show Log Window") { // fonts.FA_ICON_BUG
 			context.GuiVars.showLog = !context.GuiVars.showLog
+		}
+		if imgui.MenuItem("Show Shader Editor") { // fonts.FA_ICON_PENCIL
+			context.GuiVars.showShaderEditor = !context.GuiVars.showShaderEditor
+		}
+		if imgui.MenuItem("IDE") { // fonts.FA_ICON_PENCIL
+			context.GuiVars.showShaderEditor = !context.GuiVars.showShaderEditor
+		}
+
+		if sett.App.RendererType == types.InAppRendererTypeForward {
+			if imgui.MenuItem("IDE") { // fonts.FA_ICON_PENCIL
+				context.GuiVars.showKuplungIDE = !context.GuiVars.showKuplungIDE
+			}
+		}
+		if imgui.MenuItem("Screenshot") { // fonts.FA_ICON_DESKTOP
+			context.GuiVars.showScreenshotWindow = !context.GuiVars.showScreenshotWindow
+		}
+		if imgui.MenuItem("Scene Statistics") { // fonts.FA_ICON_TACHOMETER
+			context.GuiVars.showSceneStats = !context.GuiVars.showSceneStats
+		}
+		if imgui.MenuItem("Structured Volumetric Sampling") { // fonts.FA_ICON_PAPER_PLANE_O
+			context.GuiVars.showSVS = !context.GuiVars.showSVS
+		}
+		if imgui.MenuItem("Shadertoy") { // fonts.FА_ICON_BICYCLE
+			context.GuiVars.showShadertoy = !context.GuiVars.showShadertoy
 		}
 		imgui.Separator()
 		if imgui.MenuItem("Options") {

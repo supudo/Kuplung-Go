@@ -113,21 +113,23 @@ func (rm *RenderManager) Render() {
 		rm.cube.Render()
 	}
 
-	if rsett.Grid.ShowGrid {
+	if rsett.General.ShowAllVisualArtefacts && rsett.Grid.ShowGrid {
 		rm.wgrid.ActAsMirror = rsett.Grid.ActAsMirror
 		rm.wgrid.Render()
 	}
 
-	if rsett.Axis.ShowAxisHelpers {
+	if rsett.General.ShowAllVisualArtefacts && rsett.Axis.ShowAxisHelpers {
 		rm.axisLabels.Render(ahPosition)
 	}
 
-	rm.CameraModel.Render(rm.wgrid.MatrixModel)
-	rm.miniAxis.Render()
-	rm.SkyBox.Render()
+	if rsett.General.ShowAllVisualArtefacts {
+		rm.CameraModel.Render(rm.wgrid.MatrixModel)
+		rm.miniAxis.Render()
+		rm.SkyBox.Render()
 
-	for i := 0; i < len(rm.LightSources); i++ {
-		rm.LightSources[i].Render()
+		for i := 0; i < len(rm.LightSources); i++ {
+			rm.LightSources[i].Render()
+		}
 	}
 
 	switch sett.App.RendererType {
