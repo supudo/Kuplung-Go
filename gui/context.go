@@ -88,7 +88,6 @@ type WindowVariables struct {
 	dialogImportType types.ImportExportFormat
 	dialogExportType types.ImportExportFormat
 
-	showShaderEditor     bool
 	showKuplungIDE       bool
 	showScreenshotWindow bool
 	showSceneStats       bool
@@ -140,8 +139,6 @@ func NewContext(window interfaces.Window) *Context {
 	context.GuiVars.showExporterFile = false
 	context.GuiVars.dialogImportType = types.ImportExportFormatUNDEFINED
 	context.GuiVars.dialogExportType = types.ImportExportFormatUNDEFINED
-
-	context.GuiVars.showShaderEditor = false
 
 	context.GuiVars.showKuplungIDE = false
 	context.GuiVars.showScreenshotWindow = false

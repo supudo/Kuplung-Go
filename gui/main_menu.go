@@ -204,13 +204,6 @@ func (context *Context) DrawMainMenu() {
 		if imgui.MenuItem("Show Log Window") { // fonts.FA_ICON_BUG
 			context.GuiVars.showLog = !context.GuiVars.showLog
 		}
-		if imgui.MenuItem("Show Shader Editor") { // fonts.FA_ICON_PENCIL
-			context.GuiVars.showShaderEditor = !context.GuiVars.showShaderEditor
-		}
-		if imgui.MenuItem("Shader Editor") { // fonts.FA_ICON_PENCIL
-			context.GuiVars.showShaderEditor = !context.GuiVars.showShaderEditor
-		}
-
 		if sett.App.RendererType == types.InAppRendererTypeForward {
 			if imgui.MenuItem("IDE") { // fonts.FA_ICON_PENCIL
 				context.GuiVars.showKuplungIDE = !context.GuiVars.showKuplungIDE
