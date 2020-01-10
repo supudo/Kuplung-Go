@@ -207,7 +207,7 @@ func (context *Context) DrawMainMenu() {
 		if imgui.MenuItem("Show Shader Editor") { // fonts.FA_ICON_PENCIL
 			context.GuiVars.showShaderEditor = !context.GuiVars.showShaderEditor
 		}
-		if imgui.MenuItem("IDE") { // fonts.FA_ICON_PENCIL
+		if imgui.MenuItem("Shader Editor") { // fonts.FA_ICON_PENCIL
 			context.GuiVars.showShaderEditor = !context.GuiVars.showShaderEditor
 		}
 

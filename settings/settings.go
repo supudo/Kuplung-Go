@@ -20,8 +20,8 @@ type ApplicationSettings struct {
 	AppWindow struct {
 		SDLWindowWidth  float32 `yaml:"SDL_Window_Width"`
 		SDLWindowHeight float32 `yaml:"SDL_Window_Height"`
-		LogWidth        float32 `yaml:"Log_Width"`
-		LogHeight       float32 `yaml:"Log_Height"`
+		LogWidth        float32 `yaml:"LogWidth"`
+		LogHeight       float32 `yaml:"LogHeight"`
 	} `yaml:"AppWindow"`
 	Rendering struct {
 		FramesPerSecond float64 `yaml:"FramesPerSecond"`
@@ -55,6 +55,14 @@ type ApplicationSettings struct {
 		TotalTriangles int32
 		TotalFaces     int32
 		TotalObjects   int32
+	}
+	Components struct {
+		ShouldRecompileShaders bool
+		ShaderSourceVertex     string
+		ShaderSourceGeometry   string
+		ShaderSourceTCS        string
+		ShaderSourceTES        string
+		ShaderSourceFragment   string
 	}
 }
 
@@ -121,6 +129,20 @@ func InitSettings() ApplicationSettings {
 	appSettings.Consumption.ConsumptionTimerMemory = 0
 	appSettings.Consumption.ConsumptionCounterMemory = 0
 
+	appSettings.Components.ShouldRecompileShaders = false
+	appSettings.Components.ShaderSourceVertex = ReadFile(appSettings.App.CurrentPath+"shaders/model_face.vert", true)
+	appSettings.Components.ShaderSourceTCS = ReadFile(appSettings.App.CurrentPath+"shaders/model_face.tcs", true)
+	appSettings.Components.ShaderSourceTES = ReadFile(appSettings.App.CurrentPath+"shaders/model_face.tes", true)
+	appSettings.Components.ShaderSourceGeometry = ReadFile(appSettings.App.CurrentPath+"shaders/model_face.geom", true)
+	appSettings.Components.ShaderSourceFragment = ReadFile(appSettings.App.CurrentPath+"shaders/model_face_vars.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_effects.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_lights.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_mapping.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_shadow_mapping.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_misc.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_pbr.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face.frag", true)
+
 	for idx, num := range appSettings.AppGui.GUIClearColor {
 		appSettings.AppGui.GUIClearColor[idx] = num / 255.0
 	}
@@ -140,5 +162,19 @@ func SaveSettings() {
 	err = ioutil.WriteFile(sett.App.CurrentPath+"Kuplung_Settings.yaml", data, 0644)
 	if err != nil {
 		log.Fatalf("Settings save error: %v", err)
+	}
+}
+
+// ReadFile ...
+func ReadFile(filename string, terminated bool) string {
+	source, err := ioutil.ReadFile(filename)
+	if err != nil {
+		LogWarn("[OpenGL Utils] Can't load shader source for %v", filename)
+		return ""
+	}
+	if terminated {
+		return string(source) + "\x00"
+	} else {
+		return string(source) + " "
 	}
 }

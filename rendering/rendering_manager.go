@@ -132,6 +132,10 @@ func (rm *RenderManager) Render() {
 		}
 	}
 
+	if sett.Components.ShouldRecompileShaders && sett.App.RendererType == types.InAppRendererTypeForward {
+		rm.rendererForward.CompileShaders()
+	}
+
 	switch sett.App.RendererType {
 	case types.InAppRendererTypeDeferred:
 		rm.rendererDefered.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)

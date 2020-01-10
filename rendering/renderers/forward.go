@@ -72,9 +72,6 @@ type RendererForward struct {
 
 // NewRendererForward ...
 func NewRendererForward(window interfaces.Window) *RendererForward {
-	sett := settings.GetSettings()
-	gl := window.OpenGL()
-
 	rend := &RendererForward{}
 	rend.window = window
 
@@ -82,18 +79,21 @@ func NewRendererForward(window interfaces.Window) *RendererForward {
 	rend.GLSL_LightSourceNumber_Point = 4
 	rend.GLSL_LightSourceNumber_Spot = 4
 
-	sVertex := engine.GetShaderSource(sett.App.CurrentPath + "shaders/model_face.vert")
-	sTcs := engine.GetShaderSource(sett.App.CurrentPath + "shaders/model_face.tcs")
-	sTes := engine.GetShaderSource(sett.App.CurrentPath + "shaders/model_face.tes")
-	sGeom := engine.GetShaderSource(sett.App.CurrentPath + "shaders/model_face.geom")
-	sFragment := engine.GetShaderSourcePartial(sett.App.CurrentPath + "shaders/model_face_vars.frag")
-	sFragment += engine.GetShaderSourcePartial(sett.App.CurrentPath + "shaders/model_face_effects.frag")
-	sFragment += engine.GetShaderSourcePartial(sett.App.CurrentPath + "shaders/model_face_lights.frag")
-	sFragment += engine.GetShaderSourcePartial(sett.App.CurrentPath + "shaders/model_face_mapping.frag")
-	sFragment += engine.GetShaderSourcePartial(sett.App.CurrentPath + "shaders/model_face_shadow_mapping.frag")
-	sFragment += engine.GetShaderSourcePartial(sett.App.CurrentPath + "shaders/model_face_misc.frag")
-	sFragment += engine.GetShaderSourcePartial(sett.App.CurrentPath + "shaders/model_face_pbr.frag")
-	sFragment += engine.GetShaderSource(sett.App.CurrentPath + "shaders/model_face.frag")
+	rend.CompileShaders()
+
+	return rend
+}
+
+// CompileShaders ...
+func (rend *RendererForward) CompileShaders() {
+	sett := settings.GetSettings()
+	gl := rend.window.OpenGL()
+
+	sVertex := sett.Components.ShaderSourceVertex
+	sTcs := sett.Components.ShaderSourceTCS
+	sTes := sett.Components.ShaderSourceTES
+	sGeom := sett.Components.ShaderSourceGeometry
+	sFragment := sett.Components.ShaderSourceFragment
 
 	var err error
 	rend.shaderProgram, err = engine.LinkMultiProgram(gl, sVertex, sTcs, sTes, sGeom, sFragment)
@@ -264,8 +264,6 @@ func NewRendererForward(window interfaces.Window) *RendererForward {
 	rend.glPBR_AO = gl.GLGetUniformLocation(rend.shaderProgram, gl.Str("fs_PBR_AO\x00"))
 
 	gl.CheckForOpenGLErrors("ForwardRenderer")
-
-	return rend
 }
 
 // Render ...

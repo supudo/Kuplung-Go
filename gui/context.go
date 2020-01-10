@@ -56,6 +56,7 @@ type Context struct {
 	viewOptions  *dialogs.ViewOptions
 
 	componentLog *components.ComponentLog
+	componentIDE *components.ComponentIDE
 
 	fontFA imgui.Font
 	fontMD imgui.Font
@@ -111,6 +112,7 @@ func NewContext(window interfaces.Window) *Context {
 		viewOptions:  dialogs.NewViewOptions(),
 
 		componentLog: components.NewComponentLog(),
+		componentIDE: components.NewComponentIDE(),
 	}
 
 	context.GuiVars.showModels = true
@@ -265,6 +267,10 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 
 	if context.GuiVars.showParsing {
 		context.showParsing(&context.GuiVars.showParsing)
+	}
+
+	if context.GuiVars.showKuplungIDE {
+		context.componentIDE.Render(&context.GuiVars.showKuplungIDE)
 	}
 }
 

@@ -132,6 +132,7 @@ func InitRenderingSettings() RenderingSettings {
 	rSettings.MatrixCamera = mgl32.Ident4()
 
 	rSettings.General.SelectedViewModelSkin = types.ViewModelSkinRendered
+	rSettings.General.ShowAllVisualArtefacts = true
 
 	return rSettings
 }
