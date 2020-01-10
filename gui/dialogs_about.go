@@ -5,7 +5,6 @@ import (
 	"github.com/supudo/Kuplung-Go/settings"
 )
 
-// ShowAboutImGui ...
 func (context *Context) showAboutImGui(open *bool) {
 	if imgui.BeginV("About ImGui", open, imgui.WindowFlagsAlwaysAutoResize) {
 		imgui.Text("ImGui " + imgui.Version())
@@ -19,7 +18,6 @@ func (context *Context) showAboutImGui(open *bool) {
 	}
 }
 
-// ShowAboutKuplung ...
 func (context *Context) showAboutKuplung(open *bool) {
 	var sett = settings.GetSettings()
 	if imgui.BeginV("About Kuplung", open, imgui.WindowFlagsAlwaysAutoResize) {
@@ -36,7 +34,6 @@ func (context *Context) showAboutKuplung(open *bool) {
 	}
 }
 
-// ShowMetrics ...
 func (context *Context) showMetrics(open *bool) {
 	if imgui.BeginV("Scene stats", open, imgui.WindowFlagsAlwaysAutoResize|imgui.WindowFlagsNoTitleBar|imgui.WindowFlagsNoResize|imgui.WindowFlagsNoSavedSettings) {
 		gl := context.window.OpenGL()

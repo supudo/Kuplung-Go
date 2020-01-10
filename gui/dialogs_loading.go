@@ -7,7 +7,6 @@ import (
 	"github.com/supudo/Kuplung-Go/settings"
 )
 
-// ShowAboutImGui ...
 func (context *Context) showParsing(open *bool) {
 	if *open {
 		imgui.OpenPopup("Kuplung Parsing")

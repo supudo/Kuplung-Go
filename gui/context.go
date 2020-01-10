@@ -269,6 +269,10 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 	if context.GuiVars.showKuplungIDE {
 		context.componentIDE.Render(&context.GuiVars.showKuplungIDE)
 	}
+
+	if context.GuiVars.showSceneStats {
+		context.dialogSceneStats(&context.GuiVars.showSceneStats)
+	}
 }
 
 // IsUsingKeyboard returns true if the UI is currently capturing keyboard input.
