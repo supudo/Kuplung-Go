@@ -18,10 +18,12 @@ type ApplicationSettings struct {
 		RendererType       uint32 `yaml:"RendererType"`
 	} `yaml:"App"`
 	AppWindow struct {
-		SDLWindowWidth  float32 `yaml:"SDL_Window_Width"`
-		SDLWindowHeight float32 `yaml:"SDL_Window_Height"`
-		LogWidth        float32 `yaml:"LogWidth"`
-		LogHeight       float32 `yaml:"LogHeight"`
+		SDLWindowWidth    float32 `yaml:"SDL_Window_Width"`
+		SDLWindowHeight   float32 `yaml:"SDL_Window_Height"`
+		LogWidth          float32 `yaml:"LogWidth"`
+		LogHeight         float32 `yaml:"LogHeight"`
+		FileBrowserWidth  float32 `yaml:"FileBrowserWidth"`
+		FileBrowserHeight float32 `yaml:"FileBrowserHeight"`
 	} `yaml:"AppWindow"`
 	Rendering struct {
 		FramesPerSecond float64 `yaml:"FramesPerSecond"`
@@ -55,6 +57,8 @@ type ApplicationSettings struct {
 		TotalTriangles int32
 		TotalFaces     int32
 		TotalObjects   int32
+
+		ModelFileParser int32
 	}
 	Components struct {
 		ShouldRecompileShaders bool

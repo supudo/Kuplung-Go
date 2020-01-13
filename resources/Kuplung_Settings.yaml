@@ -12,6 +12,8 @@ AppWindow:
   SDL_Window_Height: 900
   LogWidth: 400
   LogHeight: 300
+  FileBrowserWidth: 500
+  FileBrowserHeight: 300
 
 Rendering:
   FramesPerSecond: 30.0

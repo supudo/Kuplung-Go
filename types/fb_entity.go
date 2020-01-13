@@ -2,11 +2,10 @@ package types
 
 // FBEntity ...
 type FBEntity struct {
-	isFile bool
-
-	path         string
-	title        string
-	extension    string
-	modifiedDate string
-	size         string
+	IsFile       bool
+	Path         string
+	Title        string
+	Extension    string
+	ModifiedDate string
+	Size         string
 }

@@ -55,8 +55,10 @@ type Context struct {
 	viewModels   *dialogs.ViewModels
 	viewOptions  *dialogs.ViewOptions
 
-	componentLog *components.ComponentLog
-	componentIDE *components.ComponentIDE
+	componentLog    *components.ComponentLog
+	componentIDE    *components.ComponentIDE
+	componentImport *components.ComponentImport
+	componentExport *components.ComponentExport
 
 	fontFA imgui.Font
 	fontMD imgui.Font
@@ -110,8 +112,10 @@ func NewContext(window interfaces.Window) *Context {
 		viewModels:   dialogs.NewViewModels(),
 		viewOptions:  dialogs.NewViewOptions(),
 
-		componentLog: components.NewComponentLog(),
-		componentIDE: components.NewComponentIDE(),
+		componentLog:    components.NewComponentLog(),
+		componentIDE:    components.NewComponentIDE(),
+		componentImport: components.NewComponentImport(),
+		componentExport: components.NewComponentExport(),
 	}
 
 	context.GuiVars.showModels = true
@@ -272,6 +276,14 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 
 	if context.GuiVars.showSceneStats {
 		context.dialogSceneStats(&context.GuiVars.showSceneStats)
+	}
+
+	if context.GuiVars.showImporterFile {
+		context.componentImport.Render(&context.GuiVars.showImporterFile, &context.GuiVars.dialogImportType)
+	}
+
+	if context.GuiVars.showExporterFile {
+		context.componentExport.Render(&context.GuiVars.showExporterFile, &context.GuiVars.dialogExportType)
 	}
 }
 

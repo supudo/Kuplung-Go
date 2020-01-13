@@ -61,15 +61,19 @@ func (context *Context) DrawMainMenu() {
 
 		if imgui.BeginMenu("Import") {
 			if imgui.MenuItemV("Wavefront (.OBJ)", "", context.GuiVars.showImporterFile, true) {
+				context.GuiVars.showImporterFile = true
 				context.GuiVars.dialogImportType = types.ImportExportFormatOBJ
 			}
 			if imgui.MenuItemV("glTF (.gltf)", "", context.GuiVars.showImporterFile, true) {
+				context.GuiVars.showImporterFile = true
 				context.GuiVars.dialogImportType = types.ImportExportFormatGLTF
 			}
 			if imgui.MenuItemV("STereoLithography (.STL)", "", context.GuiVars.showImporterFile, true) {
+				context.GuiVars.showImporterFile = true
 				context.GuiVars.dialogImportType = types.ImportExportFormatSTL
 			}
 			if imgui.MenuItemV("Stanford (.PLY)", "", context.GuiVars.showImporterFile, true) {
+				context.GuiVars.showImporterFile = true
 				context.GuiVars.dialogImportType = types.ImportExportFormatPLY
 			}
 			if imgui.BeginMenu("Assimp...") {
@@ -106,16 +110,20 @@ func (context *Context) DrawMainMenu() {
 
 		if imgui.BeginMenu("Export") {
 			if imgui.MenuItemV("Wavefront (.OBJ)", "", context.GuiVars.showExporterFile, true) {
-				context.GuiVars.dialogExportType = types.ImportExportFormatOBJ
+				context.GuiVars.showExporterFile = true
+				context.GuiVars.dialogExportType = types.ImportExportFormatOBJ - 1
 			}
 			if imgui.MenuItemV("glTF (.gltf)", "", context.GuiVars.showExporterFile, true) {
-				context.GuiVars.dialogExportType = types.ImportExportFormatGLTF
+				context.GuiVars.showExporterFile = true
+				context.GuiVars.dialogExportType = types.ImportExportFormatGLTF - 1
 			}
 			if imgui.MenuItemV("STereoLithography (.stl)", "", context.GuiVars.showExporterFile, true) {
-				context.GuiVars.dialogExportType = types.ImportExportFormatSTL
+				context.GuiVars.showExporterFile = true
+				context.GuiVars.dialogExportType = types.ImportExportFormatSTL - 1
 			}
 			if imgui.MenuItemV("Stanford PLY (.ply)", "", context.GuiVars.showExporterFile, true) {
-				context.GuiVars.dialogExportType = types.ImportExportFormatPLY
+				context.GuiVars.showExporterFile = true
+				context.GuiVars.dialogExportType = types.ImportExportFormatPLY - 1
 			}
 			if imgui.BeginMenu("Assimp...") {
 				// for (size_t a = 0; a < Settings::Instance()->AssimpSupportedFormats_Export.size(); a++) {

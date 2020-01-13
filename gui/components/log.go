@@ -15,7 +15,7 @@ func NewComponentLog() *ComponentLog {
 }
 
 // Render ...
-func (view *ComponentLog) Render(open *bool) {
+func (comp *ComponentLog) Render(open *bool) {
 	sett := settings.GetSettings()
 
 	imgui.SetNextWindowSizeV(imgui.Vec2{X: sett.AppWindow.LogWidth, Y: sett.AppWindow.LogHeight}, imgui.ConditionFirstUseEver)
@@ -25,7 +25,7 @@ func (view *ComponentLog) Render(open *bool) {
 
 	if imgui.BeginV("Log", open, imgui.WindowFlagsResizeFromAnySide) {
 		if imgui.Button("Clear") {
-			view.clear()
+			comp.clear()
 		}
 		imgui.SameLine()
 		doCopy := imgui.Button("Copy")
@@ -43,7 +43,7 @@ func (view *ComponentLog) Render(open *bool) {
 	}
 }
 
-func (view *ComponentLog) clear() {
+func (comp *ComponentLog) clear() {
 	sett := settings.GetSettings()
 	sett.MemSettings.LogBuffer = ""
 }

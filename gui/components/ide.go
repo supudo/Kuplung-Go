@@ -28,19 +28,19 @@ func NewComponentIDE() *ComponentIDE {
 }
 
 // Render ...
-func (view *ComponentIDE) Render(open *bool) {
+func (comp *ComponentIDE) Render(open *bool) {
 	sett := settings.GetSettings()
 
 	imgui.SetNextWindowSizeV(imgui.Vec2{X: sett.AppWindow.LogWidth, Y: sett.AppWindow.LogHeight}, imgui.ConditionFirstUseEver)
 	imgui.SetNextWindowPosV(imgui.Vec2{X: 40, Y: 40}, imgui.ConditionFirstUseEver, imgui.Vec2{X: 0, Y: 0})
 
 	if imgui.BeginV("IDE", open, imgui.WindowFlagsResizeFromAnySide) {
-		if imgui.BeginCombo("##shader_ide", view.items[view.selectedItem]) {
+		if imgui.BeginCombo("##shader_ide", comp.items[comp.selectedItem]) {
 			var i int32
-			for i = 0; i < int32(len(view.items)); i++ {
-				sksel := (i == view.selectedItem)
-				if imgui.SelectableV(view.items[i], sksel, 0, imgui.Vec2{X: 0, Y: 0}) {
-					view.selectedItem = i - 1
+			for i = 0; i < int32(len(comp.items)); i++ {
+				sksel := (i == comp.selectedItem)
+				if imgui.SelectableV(comp.items[i], sksel, 0, imgui.Vec2{X: 0, Y: 0}) {
+					comp.selectedItem = i - 1
 				}
 				if sksel {
 					imgui.SetItemDefaultFocus()
@@ -50,22 +50,22 @@ func (view *ComponentIDE) Render(open *bool) {
 		}
 		imgui.SameLine()
 		if imgui.Button("Load Shader") {
-			view.loadSelectedItem()
+			comp.loadSelectedItem()
 		}
 		imgui.Separator()
 
 		if imgui.ButtonV("Compile Shaders", imgui.Vec2{X: -1.0, Y: 40.0}) {
 			if sett.App.RendererType == types.InAppRendererTypeForward {
-				if view.selectedItem == 0 {
-					sett.Components.ShaderSourceVertex = view.selectedContent
-				} else if view.selectedItem == 1 {
-					sett.Components.ShaderSourceGeometry = view.selectedContent
-				} else if view.selectedItem == 2 {
-					sett.Components.ShaderSourceTCS = view.selectedContent
-				} else if view.selectedItem == 3 {
-					sett.Components.ShaderSourceTES = view.selectedContent
-				} else if view.selectedItem == 4 {
-					sett.Components.ShaderSourceFragment = view.selectedContent
+				if comp.selectedItem == 0 {
+					sett.Components.ShaderSourceVertex = comp.selectedContent
+				} else if comp.selectedItem == 1 {
+					sett.Components.ShaderSourceGeometry = comp.selectedContent
+				} else if comp.selectedItem == 2 {
+					sett.Components.ShaderSourceTCS = comp.selectedContent
+				} else if comp.selectedItem == 3 {
+					sett.Components.ShaderSourceTES = comp.selectedContent
+				} else if comp.selectedItem == 4 {
+					sett.Components.ShaderSourceFragment = comp.selectedContent
 				}
 				sett.Components.ShouldRecompileShaders = true
 			}
@@ -73,26 +73,26 @@ func (view *ComponentIDE) Render(open *bool) {
 		imgui.Separator()
 
 		ws := imgui.WindowSize()
-		imgui.InputTextMultilineV("", &view.selectedContent, imgui.Vec2{X: ws.X, Y: ws.Y - 110}, 0, nil)
+		imgui.InputTextMultilineV("", &comp.selectedContent, imgui.Vec2{X: ws.X, Y: ws.Y - 110}, 0, nil)
 
 		imgui.End()
 	}
 }
 
-func (view *ComponentIDE) loadSelectedItem() {
+func (comp *ComponentIDE) loadSelectedItem() {
 	sett := settings.GetSettings()
 
 	if sett.App.RendererType == types.InAppRendererTypeForward {
-		if view.selectedItem == 0 {
-			view.selectedContent = sett.Components.ShaderSourceVertex
-		} else if view.selectedItem == 1 {
-			view.selectedContent = sett.Components.ShaderSourceGeometry
-		} else if view.selectedItem == 2 {
-			view.selectedContent = sett.Components.ShaderSourceTCS
-		} else if view.selectedItem == 3 {
-			view.selectedContent = sett.Components.ShaderSourceTES
-		} else if view.selectedItem == 4 {
-			view.selectedContent = sett.Components.ShaderSourceFragment
+		if comp.selectedItem == 0 {
+			comp.selectedContent = sett.Components.ShaderSourceVertex
+		} else if comp.selectedItem == 1 {
+			comp.selectedContent = sett.Components.ShaderSourceGeometry
+		} else if comp.selectedItem == 2 {
+			comp.selectedContent = sett.Components.ShaderSourceTCS
+		} else if comp.selectedItem == 3 {
+			comp.selectedContent = sett.Components.ShaderSourceTES
+		} else if comp.selectedItem == 4 {
+			comp.selectedContent = sett.Components.ShaderSourceFragment
 		}
 	}
 }

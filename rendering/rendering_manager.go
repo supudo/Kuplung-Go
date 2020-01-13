@@ -72,6 +72,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	trigger.On(types.ActionGuiAddShape, rm.addShape)
 	trigger.On(types.ActionGuiAddLight, rm.addLight)
 	trigger.On(types.ActionGuiActionFileNew, rm.clearScene)
+	trigger.On(types.ActionImportFile, rm.fileImport)
 
 	return rm
 }
@@ -369,4 +370,31 @@ func (rm *RenderManager) initRenderers() {
 	rm.rendererForwardShadowMapping = renderers.NewRendererForwardShadowMapping(rm.Window)
 	rm.rendererShadowMapping = renderers.NewRendererShadowMapping(rm.Window)
 	rm.rendererSimple = renderers.NewRendererSimple(rm.Window)
+}
+
+func (rm *RenderManager) fileImport(entity *types.FBEntity, setts []string, itype types.ImportExportFormat) {
+	parsingChan := make(chan []types.MeshModel)
+	go rm.fileImportAsync(parsingChan, entity, setts, itype)
+	mmodels := <-parsingChan
+
+	for i := 0; i < len(mmodels); i++ {
+		mesh := meshes.NewModelFace(rm.Window, mmodels[i])
+		mesh.InitProperties()
+		mesh.InitBuffers()
+		rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
+
+		sett := settings.GetSettings()
+		sett.MemSettings.TotalVertices += mesh.MeshModel.CountVertices
+		sett.MemSettings.TotalIndices += mesh.MeshModel.CountIndices
+		sett.MemSettings.TotalTriangles += mesh.MeshModel.CountVertices / 3
+		sett.MemSettings.TotalFaces += mesh.MeshModel.CountVertices / 6
+		sett.MemSettings.TotalObjects++
+	}
+}
+
+func (rm *RenderManager) fileImportAsync(parsingChannel chan []types.MeshModel, entity *types.FBEntity, setts []string, itype types.ImportExportFormat) {
+	_, _ = trigger.Fire(types.ActionParsingShow)
+	mmodels := rm.fileParser.Parse(entity.Path, nil)
+	_, _ = trigger.Fire(types.ActionParsingHide)
+	parsingChannel <- mmodels
 }
