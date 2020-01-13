@@ -111,19 +111,19 @@ func (context *Context) DrawMainMenu() {
 		if imgui.BeginMenu("Export") {
 			if imgui.MenuItemV("Wavefront (.OBJ)", "", context.GuiVars.showExporterFile, true) {
 				context.GuiVars.showExporterFile = true
-				context.GuiVars.dialogExportType = types.ImportExportFormatOBJ - 1
+				context.GuiVars.dialogExportType = types.ImportExportFormatOBJ
 			}
 			if imgui.MenuItemV("glTF (.gltf)", "", context.GuiVars.showExporterFile, true) {
 				context.GuiVars.showExporterFile = true
-				context.GuiVars.dialogExportType = types.ImportExportFormatGLTF - 1
+				context.GuiVars.dialogExportType = types.ImportExportFormatGLTF
 			}
 			if imgui.MenuItemV("STereoLithography (.stl)", "", context.GuiVars.showExporterFile, true) {
 				context.GuiVars.showExporterFile = true
-				context.GuiVars.dialogExportType = types.ImportExportFormatSTL - 1
+				context.GuiVars.dialogExportType = types.ImportExportFormatSTL
 			}
 			if imgui.MenuItemV("Stanford PLY (.ply)", "", context.GuiVars.showExporterFile, true) {
 				context.GuiVars.showExporterFile = true
-				context.GuiVars.dialogExportType = types.ImportExportFormatPLY - 1
+				context.GuiVars.dialogExportType = types.ImportExportFormatPLY
 			}
 			if imgui.BeginMenu("Assimp...") {
 				// for (size_t a = 0; a < Settings::Instance()->AssimpSupportedFormats_Export.size(); a++) {

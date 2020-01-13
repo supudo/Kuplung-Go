@@ -231,7 +231,7 @@ func (comp *ComponentImport) drawFiles(dialogImportType *types.ImportExportForma
 				var setts []string
 				setts = append(setts, fmt.Sprintf("%v", comp.SettingForward))
 				setts = append(setts, fmt.Sprintf("%v", comp.SettingUp))
-				_, _ = trigger.Fire(types.ActionImportFile, entity, setts, *dialogImportType)
+				_, _ = trigger.Fire(types.ActionFileImport, entity, setts, *dialogImportType)
 
 				sett.App.CurrentPath = comp.currentFolder
 				comp.currentFolder = sett.App.CurrentPath

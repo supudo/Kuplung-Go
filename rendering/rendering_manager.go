@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/sadlil/go-trigger"
+	"github.com/supudo/Kuplung-Go/engine/export"
 	"github.com/supudo/Kuplung-Go/engine/parsers"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/meshes"
@@ -34,8 +35,9 @@ type RenderManager struct {
 
 	gridSize int32
 
-	doProgress func(float32)
-	fileParser *parsers.ParserManager
+	doProgress     func(float32)
+	fileParser     *parsers.ParserManager
+	sceneExporeter *export.ExporterManager
 
 	systemModels map[string]types.MeshModel
 
@@ -59,6 +61,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 
 	rm.initSettings()
 	rm.initParserManager()
+	rm.initExporterManager()
 	rm.initSystemModels()
 	rm.initCamera()
 	rm.initCube()
@@ -72,7 +75,8 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	trigger.On(types.ActionGuiAddShape, rm.addShape)
 	trigger.On(types.ActionGuiAddLight, rm.addLight)
 	trigger.On(types.ActionGuiActionFileNew, rm.clearScene)
-	trigger.On(types.ActionImportFile, rm.fileImport)
+	trigger.On(types.ActionFileImport, rm.fileImport)
+	trigger.On(types.ActionFileExport, rm.fileExport)
 
 	return rm
 }
@@ -201,6 +205,10 @@ func (rm *RenderManager) initSettings() {
 
 func (rm *RenderManager) initParserManager() {
 	rm.fileParser = parsers.NewParserManager(rm.doProgress)
+}
+
+func (rm *RenderManager) initExporterManager() {
+	rm.sceneExporeter = export.NewExportManager(rm.doProgress)
 }
 
 func (rm *RenderManager) initSystemModels() {
@@ -394,7 +402,15 @@ func (rm *RenderManager) fileImport(entity *types.FBEntity, setts []string, ityp
 
 func (rm *RenderManager) fileImportAsync(parsingChannel chan []types.MeshModel, entity *types.FBEntity, setts []string, itype types.ImportExportFormat) {
 	_, _ = trigger.Fire(types.ActionParsingShow)
-	mmodels := rm.fileParser.Parse(entity.Path, nil)
+	mmodels := rm.fileParser.Parse(entity.Path, nil, itype)
 	_, _ = trigger.Fire(types.ActionParsingHide)
 	parsingChannel <- mmodels
+}
+
+func (rm *RenderManager) fileExport(entity types.FBEntity, setts []string, itype types.ImportExportFormat) {
+	go rm.fileExportAsync(entity, setts, itype)
+}
+
+func (rm *RenderManager) fileExportAsync(entity types.FBEntity, setts []string, itype types.ImportExportFormat) {
+	rm.sceneExporeter.Export(entity, setts)
 }

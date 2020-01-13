@@ -18,8 +18,12 @@ func NewParserManager(doProgress func(float32)) *ParserManager {
 }
 
 // Parse ...
-func (pm *ParserManager) Parse(filename string, psettings []string) []types.MeshModel {
-	return pm.objParser.Parse(filename, psettings)
+func (pm *ParserManager) Parse(filename string, psettings []string, itype types.ImportExportFormat) []types.MeshModel {
+	switch itype {
+	case types.ImportExportFormatOBJ:
+		return pm.objParser.Parse(filename, psettings)
+	}
+	return nil
 }
 
 func (pm *ParserManager) initObjParser() {
