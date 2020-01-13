@@ -32,11 +32,11 @@ func NewRendererSimple(window interfaces.Window) *RendererSimple {
 	rend := &RendererSimple{}
 	rend.window = window
 
-	sVertex := engine.GetShaderSource(sett.App.CurrentPath + "shaders/rendering_simple.vert")
-	sTcs := engine.GetShaderSource(sett.App.CurrentPath + "shaders/rendering_simple.tcs")
-	sTes := engine.GetShaderSource(sett.App.CurrentPath + "shaders/rendering_simple.tes")
-	sGeom := engine.GetShaderSource(sett.App.CurrentPath + "shaders/rendering_simple.geom")
-	sFragment := engine.GetShaderSource(sett.App.CurrentPath + "shaders/rendering_simple.frag")
+	sVertex := engine.GetShaderSource(sett.App.AppFolder + "shaders/rendering_simple.vert")
+	sTcs := engine.GetShaderSource(sett.App.AppFolder + "shaders/rendering_simple.tcs")
+	sTes := engine.GetShaderSource(sett.App.AppFolder + "shaders/rendering_simple.tes")
+	sGeom := engine.GetShaderSource(sett.App.AppFolder + "shaders/rendering_simple.geom")
+	sFragment := engine.GetShaderSource(sett.App.AppFolder + "shaders/rendering_simple.frag")
 
 	var err error
 	rend.shaderProgram, err = engine.LinkMultiProgram(gl, sVertex, sTcs, sTes, sGeom, sFragment)

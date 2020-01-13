@@ -214,16 +214,16 @@ func (rm *RenderManager) initExporterManager() {
 func (rm *RenderManager) initSystemModels() {
 	sett := settings.GetSettings()
 	rm.systemModels = make(map[string]types.MeshModel)
-	rm.systemModels["axis_x_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/x_plus.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["axis_x_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/x_minus.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["axis_y_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/y_plus.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["axis_y_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/y_minus.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["axis_z_plus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/z_plus.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["axis_z_minus"] = rm.fileParser.Parse(sett.App.CurrentPath+"axis_helpers/z_minus.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["camera"] = rm.fileParser.Parse(sett.App.CurrentPath+"gui/camera.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["light_directional"] = rm.fileParser.Parse(sett.App.CurrentPath+"gui/light_directional.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["light_point"] = rm.fileParser.Parse(sett.App.CurrentPath+"gui/light_point.obj", nil, types.ImportExportFormatOBJ)[0]
-	rm.systemModels["light_spot"] = rm.fileParser.Parse(sett.App.CurrentPath+"gui/light_spot.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["axis_x_plus"] = rm.fileParser.Parse(sett.App.AppFolder+"axis_helpers/x_plus.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["axis_x_minus"] = rm.fileParser.Parse(sett.App.AppFolder+"axis_helpers/x_minus.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["axis_y_plus"] = rm.fileParser.Parse(sett.App.AppFolder+"axis_helpers/y_plus.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["axis_y_minus"] = rm.fileParser.Parse(sett.App.AppFolder+"axis_helpers/y_minus.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["axis_z_plus"] = rm.fileParser.Parse(sett.App.AppFolder+"axis_helpers/z_plus.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["axis_z_minus"] = rm.fileParser.Parse(sett.App.AppFolder+"axis_helpers/z_minus.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["camera"] = rm.fileParser.Parse(sett.App.AppFolder+"gui/camera.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["light_directional"] = rm.fileParser.Parse(sett.App.AppFolder+"gui/light_directional.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["light_point"] = rm.fileParser.Parse(sett.App.AppFolder+"gui/light_point.obj", nil, types.ImportExportFormatOBJ)[0]
+	rm.systemModels["light_spot"] = rm.fileParser.Parse(sett.App.AppFolder+"gui/light_spot.obj", nil, types.ImportExportFormatOBJ)[0]
 }
 
 func (rm *RenderManager) initCamera() {
@@ -327,7 +327,7 @@ func (rm *RenderManager) addShapeAsync(parsingChannel chan []types.MeshModel, sh
 		shapeName = "epcot"
 	}
 	sett := settings.GetSettings()
-	mmodels := rm.fileParser.Parse(sett.App.CurrentPath+"shapes/"+shapeName+".obj", nil, types.ImportExportFormatOBJ)
+	mmodels := rm.fileParser.Parse(sett.App.AppFolder+"shapes/"+shapeName+".obj", nil, types.ImportExportFormatOBJ)
 	_, _ = trigger.Fire(types.ActionParsingHide)
 	parsingChannel <- mmodels
 }
@@ -412,5 +412,5 @@ func (rm *RenderManager) fileExport(entity types.FBEntity, setts []string, itype
 }
 
 func (rm *RenderManager) fileExportAsync(entity types.FBEntity, setts []string, itype types.ImportExportFormat) {
-	rm.sceneExporeter.Export(entity, setts, itype)
+	rm.sceneExporeter.Export(rm.MeshModelFaces, entity, setts, itype)
 }

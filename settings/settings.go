@@ -14,7 +14,8 @@ import (
 type ApplicationSettings struct {
 	App struct {
 		ApplicationVersion string `yaml:"appVersion"`
-		CurrentPath        string
+		AppFolder          string `yaml:"appFolder"`
+		CurrentFolder      string `yaml:"currentFolder"`
 		RendererType       uint32 `yaml:"RendererType"`
 	} `yaml:"App"`
 	AppWindow struct {
@@ -92,15 +93,17 @@ func InitSettings() ApplicationSettings {
 	}
 
 	if runtime.GOOS == "darwin" {
-		appSettings.App.CurrentPath = dir + "/../Resources/resources/"
+		appSettings.App.AppFolder = dir + "/../Resources/resources/"
 	} else if runtime.GOOS == "windows" {
-		appSettings.App.CurrentPath = dir + "./"
+		appSettings.App.AppFolder = dir + "./"
 	} else {
 		// TODO: other platforms
-		appSettings.App.CurrentPath = dir
+		appSettings.App.AppFolder = dir
 	}
 
-	appConfig, err := ioutil.ReadFile(appSettings.App.CurrentPath + "Kuplung_Settings.yaml")
+	appSettings.App.CurrentFolder = appSettings.App.AppFolder
+
+	appConfig, err := ioutil.ReadFile(appSettings.App.AppFolder + "Kuplung_Settings.yaml")
 	if err != nil {
 		log.Fatalf("Settings error: %v", err)
 	}
@@ -108,6 +111,21 @@ func InitSettings() ApplicationSettings {
 	err = yaml.Unmarshal(appConfig, &appSettings)
 	if err != nil {
 		log.Fatalf("Settings error: %v", err)
+	}
+
+	if len(appSettings.App.AppFolder) == 0 {
+		if runtime.GOOS == "darwin" {
+			appSettings.App.AppFolder = dir + "/../Resources/resources/"
+		} else if runtime.GOOS == "windows" {
+			appSettings.App.AppFolder = dir + "./"
+		} else {
+			// TODO: other platforms
+			appSettings.App.AppFolder = dir
+		}
+	}
+
+	if len(appSettings.App.CurrentFolder) == 0 {
+		appSettings.App.CurrentFolder = appSettings.App.AppFolder
 	}
 
 	appSettings.MemSettings.QuitApplication = false
@@ -134,18 +152,18 @@ func InitSettings() ApplicationSettings {
 	appSettings.Consumption.ConsumptionCounterMemory = 0
 
 	appSettings.Components.ShouldRecompileShaders = false
-	appSettings.Components.ShaderSourceVertex = ReadFile(appSettings.App.CurrentPath+"shaders/model_face.vert", true)
-	appSettings.Components.ShaderSourceTCS = ReadFile(appSettings.App.CurrentPath+"shaders/model_face.tcs", true)
-	appSettings.Components.ShaderSourceTES = ReadFile(appSettings.App.CurrentPath+"shaders/model_face.tes", true)
-	appSettings.Components.ShaderSourceGeometry = ReadFile(appSettings.App.CurrentPath+"shaders/model_face.geom", true)
-	appSettings.Components.ShaderSourceFragment = ReadFile(appSettings.App.CurrentPath+"shaders/model_face_vars.frag", false)
-	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_effects.frag", false)
-	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_lights.frag", false)
-	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_mapping.frag", false)
-	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_shadow_mapping.frag", false)
-	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_misc.frag", false)
-	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face_pbr.frag", false)
-	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.CurrentPath+"shaders/model_face.frag", true)
+	appSettings.Components.ShaderSourceVertex = ReadFile(appSettings.App.AppFolder+"shaders/model_face.vert", true)
+	appSettings.Components.ShaderSourceTCS = ReadFile(appSettings.App.AppFolder+"shaders/model_face.tcs", true)
+	appSettings.Components.ShaderSourceTES = ReadFile(appSettings.App.AppFolder+"shaders/model_face.tes", true)
+	appSettings.Components.ShaderSourceGeometry = ReadFile(appSettings.App.AppFolder+"shaders/model_face.geom", true)
+	appSettings.Components.ShaderSourceFragment = ReadFile(appSettings.App.AppFolder+"shaders/model_face_vars.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.AppFolder+"shaders/model_face_effects.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.AppFolder+"shaders/model_face_lights.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.AppFolder+"shaders/model_face_mapping.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.AppFolder+"shaders/model_face_shadow_mapping.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.AppFolder+"shaders/model_face_misc.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.AppFolder+"shaders/model_face_pbr.frag", false)
+	appSettings.Components.ShaderSourceFragment += ReadFile(appSettings.App.AppFolder+"shaders/model_face.frag", true)
 
 	for idx, num := range appSettings.AppGui.GUIClearColor {
 		appSettings.AppGui.GUIClearColor[idx] = num / 255.0
@@ -163,7 +181,7 @@ func SaveSettings() {
 		log.Fatalf("Settings save error: %v", err)
 	}
 
-	err = ioutil.WriteFile(sett.App.CurrentPath+"Kuplung_Settings.yaml", data, 0644)
+	err = ioutil.WriteFile(sett.App.AppFolder+"Kuplung_Settings.yaml", data, 0644)
 	if err != nil {
 		log.Fatalf("Settings save error: %v", err)
 	}

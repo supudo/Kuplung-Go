@@ -42,7 +42,7 @@ func NewComponentImport() *ComponentImport {
 	comp.panelWidthOptionsMin = 200.0
 	comp.SettingForward = 2
 	comp.SettingUp = 4
-	comp.currentFolder = sett.App.CurrentPath
+	comp.currentFolder = sett.App.CurrentFolder
 	comp.formats = []string{
 		"Wavefront OBJ",
 		"glTF",
@@ -211,7 +211,7 @@ func (comp *ComponentImport) Render(open *bool, dialogImportType *types.ImportEx
 
 func (comp *ComponentImport) drawFiles(dialogImportType *types.ImportExportFormat, open *bool) {
 	sett := settings.GetSettings()
-	folderKeys, folderContents := comp.getFolderContents(dialogImportType, sett.App.CurrentPath)
+	folderKeys, folderContents := comp.getFolderContents(dialogImportType, sett.App.CurrentFolder)
 	if runtime.GOOS == "windows" {
 		// TODO: windows
 		// if sett.CurrentDriveIndex != Settings::Instance()->Setting_SelectedDriveIndex) {
@@ -233,13 +233,13 @@ func (comp *ComponentImport) drawFiles(dialogImportType *types.ImportExportForma
 				setts = append(setts, fmt.Sprintf("%v", comp.SettingUp))
 				_, _ = trigger.Fire(types.ActionFileImport, entity, setts, *dialogImportType)
 
-				sett.App.CurrentPath = comp.currentFolder
-				comp.currentFolder = sett.App.CurrentPath
+				sett.App.CurrentFolder = comp.currentFolder
+				comp.currentFolder = sett.App.CurrentFolder
 				settings.SaveSettings()
 				*open = false
 			} else {
-				sett.App.CurrentPath = entity.Path
-				comp.currentFolder = sett.App.CurrentPath
+				sett.App.CurrentFolder = entity.Path
+				comp.currentFolder = sett.App.CurrentFolder
 				comp.drawFiles(dialogImportType, open)
 			}
 		}

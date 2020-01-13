@@ -43,8 +43,8 @@ func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	grid := &WorldGrid{}
 	grid.window = window
 
-	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/grid2d.vert")
-	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/grid2d.frag")
+	vertexShader := engine.GetShaderSource(sett.App.AppFolder + "shaders/grid2d.vert")
+	fragmentShader := engine.GetShaderSource(sett.App.AppFolder + "shaders/grid2d.frag")
 
 	var err error
 	grid.shaderProgram, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)

@@ -30,8 +30,8 @@ func NewLightRay(window interfaces.Window) *RayLine {
 	lrModel := &RayLine{}
 	lrModel.window = window
 
-	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/light_ray.vert")
-	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/light_ray.frag")
+	vertexShader := engine.GetShaderSource(sett.App.AppFolder + "shaders/light_ray.vert")
+	fragmentShader := engine.GetShaderSource(sett.App.AppFolder + "shaders/light_ray.frag")
 
 	var err error
 	lrModel.shaderProgram, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)

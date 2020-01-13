@@ -1,6 +1,9 @@
 package export
 
-import "github.com/supudo/Kuplung-Go/types"
+import (
+	"github.com/supudo/Kuplung-Go/meshes"
+	"github.com/supudo/Kuplung-Go/types"
+)
 
 // ExporterManager ...
 type ExporterManager struct {
@@ -18,10 +21,10 @@ func NewExportManager(doProgress func(float32)) *ExporterManager {
 }
 
 // Export ...
-func (pm *ExporterManager) Export(file types.FBEntity, psettings []string, itype types.ImportExportFormat) {
+func (pm *ExporterManager) Export(mmodels []*meshes.ModelFace, file types.FBEntity, psettings []string, itype types.ImportExportFormat) {
 	switch itype {
 	case types.ImportExportFormatOBJ:
-		pm.exporterObj.Export(file, psettings)
+		pm.exporterObj.Export(mmodels, file, psettings)
 	}
 }
 

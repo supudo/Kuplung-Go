@@ -369,7 +369,7 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL) error {
 	_ = fontAtlas.AddFontDefault()
 
 	sett := settings.GetSettings()
-	fileFA := sett.App.CurrentPath + "fonts/fontawesome-webfont.ttf"
+	fileFA := sett.App.AppFolder + "fonts/fontawesome-webfont.ttf"
 	fontConfigFA := imgui.NewFontConfig()
 	fontConfigFA.SetGlyphMinAdvanceX(float32(fonts.FA_ICON_MIN))
 	fontConfigFA.SetGlyphMaxAdvanceX(float32(fonts.FA_ICON_MAX))
@@ -381,7 +381,7 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL) error {
 	context.fontFA = fontAtlas.AddFontFromFileTTFV(fileFA, 14, fontConfigFA, rangesFA.GlyphRanges)
 	fontConfigFA.Delete()
 
-	fileMD := sett.App.CurrentPath + "fonts/material-icons-regular.ttf"
+	fileMD := sett.App.AppFolder + "fonts/material-icons-regular.ttf"
 	fontConfigMD := imgui.NewFontConfig()
 	fontConfigMD.SetGlyphMinAdvanceX(float32(fonts.MD_ICON_MIN))
 	fontConfigMD.SetGlyphMaxAdvanceX(float32(fonts.MD_ICON_MAX))

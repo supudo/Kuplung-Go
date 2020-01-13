@@ -55,8 +55,8 @@ func (sb *SkyBox) InitBuffers() {
 	sett := settings.GetSettings()
 	gl := sb.window.OpenGL()
 
-	vertexShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/skybox.vert")
-	fragmentShader := engine.GetShaderSource(sett.App.CurrentPath + "shaders/skybox.frag")
+	vertexShader := engine.GetShaderSource(sett.App.AppFolder + "shaders/skybox.vert")
+	fragmentShader := engine.GetShaderSource(sett.App.AppFolder + "shaders/skybox.frag")
 
 	var err error
 	sb.shaderProgram, err = engine.LinkNewStandardProgram(gl, vertexShader, fragmentShader)

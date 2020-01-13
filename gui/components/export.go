@@ -46,7 +46,7 @@ func NewComponentExport() *ComponentExport {
 	comp.panelWidthOptionsMin = 200.0
 	comp.SettingForward = 2
 	comp.SettingUp = 4
-	comp.currentFolder = sett.App.CurrentPath
+	comp.currentFolder = sett.App.CurrentFolder
 	comp.formats = []string{
 		"Wavefront OBJ",
 		"glTF",
@@ -205,12 +205,13 @@ func (comp *ComponentExport) Render(open *bool, dialogExportType *types.ImportEx
 			file.Extension = filepath.Ext(file.Title)
 			file.ModifiedDate = ""
 			file.Size = ""
-			sett.App.CurrentPath = comp.currentFolder
+			sett.App.CurrentFolder = comp.currentFolder
 			settings.SaveSettings()
 			var setts []string
 			setts = append(setts, fmt.Sprintf("%v", comp.SettingForward))
 			setts = append(setts, fmt.Sprintf("%v", comp.SettingUp))
 			_, _ = trigger.Fire(types.ActionFileExport, file, setts, *dialogExportType)
+			*open = false
 		}
 		imgui.SameLineV(0, 10)
 		if imgui.Button("New Folder") {
@@ -288,7 +289,7 @@ func (comp *ComponentExport) modalNewFolder(ww float32) {
 
 func (comp *ComponentExport) drawFiles(dialogExportType *types.ImportExportFormat, open *bool) {
 	sett := settings.GetSettings()
-	folderKeys, folderContents := comp.getFolderContents(dialogExportType, sett.App.CurrentPath)
+	folderKeys, folderContents := comp.getFolderContents(dialogExportType, sett.App.CurrentFolder)
 	if runtime.GOOS == "windows" {
 		// TODO: windows
 		// if sett.CurrentDriveIndex != Settings::Instance()->Setting_SelectedDriveIndex) {
@@ -308,15 +309,14 @@ func (comp *ComponentExport) drawFiles(dialogExportType *types.ImportExportForma
 				var setts []string
 				setts = append(setts, fmt.Sprintf("%v", comp.SettingForward))
 				setts = append(setts, fmt.Sprintf("%v", comp.SettingUp))
-				//_, _ = trigger.Fire(types.ActionExportFile, entity, setts, *dialogExportType)
+				//_, _ = trigger.Fire(types.ActionFileExport, entity, setts, *dialogExportType)
+				comp.fileName = entity.Title
 
-				sett.App.CurrentPath = comp.currentFolder
-				comp.currentFolder = sett.App.CurrentPath
-				settings.SaveSettings()
-				*open = false
+				sett.App.CurrentFolder = comp.currentFolder
+				comp.currentFolder = sett.App.CurrentFolder
 			} else {
-				sett.App.CurrentPath = entity.Path
-				comp.currentFolder = sett.App.CurrentPath
+				sett.App.CurrentFolder = entity.Path
+				comp.currentFolder = sett.App.CurrentFolder
 				comp.drawFiles(dialogExportType, open)
 			}
 		}
