@@ -60,7 +60,7 @@ func (eobj *ExporterObj) exportGeometry(faces []*meshes.ModelFace) {
 	fileContents := "# Kuplung v1.0 OBJ File Export" + eobj.nlDelimiter
 	fileContents += "# http://www.github.com/supudo/kuplung/" + eobj.nlDelimiter
 	fn := eobj.exportFile.Title
-	strings.ReplaceAll(fn, ".obj", "")
+	fn = strings.TrimSuffix(fn, ".obj")
 	fileContents += "mtllib " + fn + ".mtl" + eobj.nlDelimiter
 
 	eobj.uniqueVertices = nil
@@ -170,7 +170,8 @@ func (eobj *ExporterObj) exportMesh(face meshes.ModelFace) string {
 		vertex := model.Vertices[idx]
 
 		vertex = vertex.Add(mgl32.Vec3{face.PositionX.Point, face.PositionY.Point, face.PositionZ.Point})
-		// vertex = vertex.Mul(rotation)
+		// TODO: rotation & scale vector
+		// vertex = vertex.Cross(rotation)
 		// vertex = vertex.Mul(scale)
 
 		textureCoordinate := mgl32.Vec2{0}
@@ -184,7 +185,7 @@ func (eobj *ExporterObj) exportMesh(face meshes.ModelFace) string {
 			v += fmt.Sprintf("v %.6f %.6f %.6f", vertex.X(), vertex.Y(), vertex.Z()) + eobj.nlDelimiter
 		}
 
-		if !eobj.hasVec2(eobj.uniqueTextureCoordinates, textureCoordinate) {
+		if len(face.MeshModel.TextureCoordinates) > 0 && !eobj.hasVec2(eobj.uniqueTextureCoordinates, textureCoordinate) {
 			eobj.uniqueTextureCoordinates = append(eobj.uniqueTextureCoordinates, textureCoordinate)
 			vt += fmt.Sprintf("vt %.6f %.6f", textureCoordinate.X(), textureCoordinate.Y()) + eobj.nlDelimiter
 		}
@@ -210,6 +211,7 @@ func (eobj *ExporterObj) exportMesh(face meshes.ModelFace) string {
 
 		vertex := model.Vertices[j]
 		vertex = vertex.Add(mgl32.Vec3{face.PositionX.Point, face.PositionY.Point, face.PositionZ.Point})
+		// TODO: rotation & scale vector
 		// vertex = vertex.Mul(rotation)
 		// vertex = vertex.Mul(scale)
 
