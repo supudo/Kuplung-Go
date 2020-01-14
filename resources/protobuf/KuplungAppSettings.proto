@@ -1,0 +1,129 @@
+// protoc --go_out=../../saveopen/ KuplungAppSettings.proto 
+
+syntax = "proto2";
+
+package saveopen;
+
+import "KuplungDefinitions.proto";
+
+message GUISettings {
+  required float Setting_FOV = 1;
+  required float Setting_OutlineThickness = 2;
+  required float Setting_RatioWidth = 3;
+  required float Setting_RatioHeight = 4;
+  required float Setting_PlaneClose = 5;
+  required float Setting_PlaneFar = 6;
+  required int32 Setting_GridSize = 7;
+  required int32 Setting_Skybox = 8;
+  required Vec4 Setting_OutlineColor = 9;
+  required Vec3 Setting_UIAmbientLight = 10;
+  required bool Setting_FixedGridWorld = 11;
+  required bool Setting_OutlineColorPickerOpen = 12;
+  required bool Setting_ShowAxisHelpers = 13;
+  required bool Settings_ShowZAxis = 14;
+  required bool Setting_DeferredTestMode = 15;
+  required bool Setting_DeferredTestLights = 16;
+  required int32 Setting_LightingPass_DrawMode = 17;
+  required int32 Setting_DeferredTestLightsNumber = 18;
+  required float Setting_DeferredAmbientStrength = 19;
+
+  required int32 viewModelSkin = 20;
+  required Vec3 SolidLight_Direction = 21;
+  required Vec3 SolidLight_MaterialColor = 22;
+  required Vec3 SolidLight_Ambient = 23;
+  required Vec3 SolidLight_Diffuse = 24;
+  required Vec3 SolidLight_Specular = 25;
+  required float SolidLight_Ambient_Strength = 26;
+  required float SolidLight_Diffuse_Strength = 27;
+  required float SolidLight_Specular_Strength = 28;
+  required bool SolidLight_MaterialColor_ColorPicker = 29;
+  required bool SolidLight_Ambient_ColorPicker = 30;
+  required bool SolidLight_Diffuse_ColorPicker = 31;
+  required bool SolidLight_Specular_ColorPicker = 32;
+
+  required bool Setting_ShowTerrain = 33;
+  required bool Setting_TerrainModel = 34;
+  required bool Setting_TerrainAnimateX = 35;
+  required bool Setting_TerrainAnimateY = 36;
+  required string heightmapImage = 37;
+  required int32 Setting_TerrainWidth = 38;
+  required int32 Setting_TerrainHeight = 39;
+
+  required bool Setting_ShowSpaceship = 40;
+  required bool Setting_GenerateSpaceship = 41;
+
+  required CameraSettings camera = 42;
+  required GridSettings grid = 43;
+  repeated LightObject lights = 44;
+}
+
+message CameraSettings {
+  required Vec3 cameraPosition = 1;
+  required Vec3 View_Eye = 2;
+  required Vec3 View_Center = 3;
+  required Vec3 View_Up = 4;
+  required ObjectCoordinate positionX = 5;
+  required ObjectCoordinate positionY = 6;
+  required ObjectCoordinate positionZ = 7;
+  required ObjectCoordinate rotateX = 8;
+  required ObjectCoordinate rotateY = 9;
+  required ObjectCoordinate rotateZ = 10;
+  required ObjectCoordinate rotateCenterX = 11;
+  required ObjectCoordinate rotateCenterY = 12;
+  required ObjectCoordinate rotateCenterZ = 13;
+}
+
+message GridSettings {
+  required bool actAsMirror = 1;
+  required int32 gridSize = 2;
+  required ObjectCoordinate positionX = 3;
+  required ObjectCoordinate positionY = 4;
+  required ObjectCoordinate positionZ = 5;
+  required ObjectCoordinate rotateX = 6;
+  required ObjectCoordinate rotateY = 7;
+  required ObjectCoordinate rotateZ = 8;
+  required ObjectCoordinate scaleX = 9;
+  required ObjectCoordinate scaleY = 10;
+  required ObjectCoordinate scaleZ = 11;
+  required float transparency = 12;
+  required int32 showGrid = 13;
+}
+
+message LightObject {
+  required string title = 1;
+  required string description = 2;
+  required int32 type = 3;
+  required bool showLampObject = 4;
+  required bool showLampDirection = 5;
+  required bool showInWire = 6;
+
+  required ObjectCoordinate positionX = 7;
+  required ObjectCoordinate positionY = 8;
+  required ObjectCoordinate positionZ = 9;
+  
+  required ObjectCoordinate directionX = 10;
+  required ObjectCoordinate directionY = 11;
+  required ObjectCoordinate directionZ = 12;
+
+  required ObjectCoordinate scaleX = 13;
+  required ObjectCoordinate scaleY = 14;
+  required ObjectCoordinate scaleZ = 15;
+
+  required ObjectCoordinate rotateX = 16;
+  required ObjectCoordinate rotateY = 17;
+  required ObjectCoordinate rotateZ = 18;
+  
+  required ObjectCoordinate rotateCenterX = 19;
+  required ObjectCoordinate rotateCenterY = 20;
+  required ObjectCoordinate rotateCenterZ = 21;
+  
+  required MaterialColor ambient = 22;
+  required MaterialColor diffuse = 23;
+  required MaterialColor specular = 24;
+
+  required ObjectCoordinate lCutOff = 25;
+  required ObjectCoordinate lOuterCutOff = 26;
+  required ObjectCoordinate lConstant = 27;
+  required ObjectCoordinate lLinear = 28;
+  required ObjectCoordinate lQuadratic = 29;
+}

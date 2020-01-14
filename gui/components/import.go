@@ -3,11 +3,9 @@ package components
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
-	"strings"
 
 	"github.com/inkyblackness/imgui-go"
 	"github.com/sadlil/go-trigger"
@@ -259,7 +257,7 @@ func (comp *ComponentImport) getFolderContents(dialogImportType *types.ImportExp
 	folderKeys = []string{}
 	folderContents = make(map[string]*types.FBEntity)
 
-	if comp.isFolder(currentPath) {
+	if settings.IsFolder(currentPath) {
 		entity := &types.FBEntity{}
 		entity.IsFile = false
 		entity.Title = ".."
@@ -300,7 +298,7 @@ func (comp *ComponentImport) getFolderContents(dialogImportType *types.ImportExp
 					if f.IsDir() {
 						entity.Size = ""
 					} else {
-						entity.Size = comp.convertSize(f.Size())
+						entity.Size = settings.ConvertSize(f.Size())
 					}
 					entity.ModifiedDate = f.ModTime().Format("02-Jan-2006")
 					if _, ok := folderContents[entity.Path]; !ok {
@@ -314,40 +312,4 @@ func (comp *ComponentImport) getFolderContents(dialogImportType *types.ImportExp
 
 	sort.Strings(folderKeys)
 	return folderKeys, folderContents
-}
-
-func (comp *ComponentImport) convertSize(size int64) string {
-	sizes := []string{"B", "KB", "MB", "GB"}
-	div := int32(0)
-	rem := float32(0)
-
-	for size >= 1024 && div < int32(len(sizes)) {
-		rem = float32(int32(size) % 1024)
-		div++
-		size /= 1024
-	}
-
-	sized := float32(size) + rem/1024.0
-	result := fmt.Sprintf("%.2f %s", (comp.roundOff(sized)), sizes[div])
-	return result
-}
-
-func (comp *ComponentImport) roundOff(n float32) float32 {
-	d := n * 100.0
-	i := d + 0.5
-	d = i / 100.0
-	return d
-}
-
-func (comp *ComponentImport) isHidden(p string) bool {
-	name := filepath.Base(p)
-	if name == ".." || name == "." || strings.HasPrefix(name, ".") {
-		return true
-	}
-	return false
-}
-
-func (comp *ComponentImport) isFolder(path string) bool {
-	fileInfo, _ := os.Stat(path)
-	return fileInfo.IsDir()
 }

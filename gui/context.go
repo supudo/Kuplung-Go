@@ -55,10 +55,11 @@ type Context struct {
 	viewModels   *dialogs.ViewModels
 	viewOptions  *dialogs.ViewOptions
 
-	componentLog    *components.ComponentLog
-	componentIDE    *components.ComponentIDE
-	componentImport *components.ComponentImport
-	componentExport *components.ComponentExport
+	componentLog       *components.ComponentLog
+	componentIDE       *components.ComponentIDE
+	componentImport    *components.ComponentImport
+	componentExport    *components.ComponentExport
+	componentFileSaver *components.ComponentFileSaver
 
 	fontFA imgui.Font
 	fontMD imgui.Font
@@ -117,10 +118,11 @@ func NewContext(window interfaces.Window) *Context {
 		viewModels:   dialogs.NewViewModels(),
 		viewOptions:  dialogs.NewViewOptions(),
 
-		componentLog:    components.NewComponentLog(),
-		componentIDE:    components.NewComponentIDE(),
-		componentImport: components.NewComponentImport(),
-		componentExport: components.NewComponentExport(),
+		componentLog:       components.NewComponentLog(),
+		componentIDE:       components.NewComponentIDE(),
+		componentImport:    components.NewComponentImport(),
+		componentExport:    components.NewComponentExport(),
+		componentFileSaver: components.NewComponentFileSaver(),
 	}
 
 	context.GuiVars.showModels = true
@@ -299,6 +301,14 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 
 	if context.GuiVars.showRecentFileImportedDoesntExists {
 		context.popupRecentFileImportedDoesntExists(&context.GuiVars.showRecentFileImportedDoesntExists)
+	}
+
+	if context.GuiVars.showSaveDialog {
+		context.componentFileSaver.Render(types.FileSaverOperationSaveScene, &context.GuiVars.showSaveDialog)
+	}
+
+	if context.GuiVars.showOpenDialog {
+		context.componentFileSaver.Render(types.FileSaverOperationOpenScene, &context.GuiVars.showOpenDialog)
 	}
 }
 

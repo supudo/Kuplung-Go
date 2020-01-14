@@ -13,6 +13,10 @@ const (
 	ActionFileExport                 = "Action_File_Export"
 	ActionFileImportAddToRecentFiles = "Action_File_Import_AddToRecentFiles"
 
+	ActionFileSaverSaveScene = "Action_FileSaver_SaveScene"
+	ActionFileSaverOpenScene = "Action_FileSaver_OpenScene"
+	ActionFileSaverRenderer  = "Action_FileSaver_Renderer"
+
 	ActionLog = "Action_Log"
 
 	ActionLoadingShow = "Loading_Show"

@@ -11,6 +11,7 @@ import (
 	"github.com/supudo/Kuplung-Go/meshes"
 	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/rendering/renderers"
+	"github.com/supudo/Kuplung-Go/saveopen"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
 )
@@ -35,9 +36,10 @@ type RenderManager struct {
 
 	gridSize int32
 
-	doProgress     func(float32)
-	fileParser     *parsers.ParserManager
-	sceneExporeter *export.ExporterManager
+	doProgress      func(float32)
+	fileParser      *parsers.ParserManager
+	sceneExporter   *export.ExporterManager
+	saveOpenManager *saveopen.SaveOpenManager
 
 	systemModels map[string]types.MeshModel
 
@@ -71,12 +73,15 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm.initMiniAxis()
 	rm.initSkyBox()
 	rm.initRenderers()
+	rm.initSaveOpen()
 
 	trigger.On(types.ActionGuiAddShape, rm.addShape)
 	trigger.On(types.ActionGuiAddLight, rm.addLight)
 	trigger.On(types.ActionGuiActionFileNew, rm.clearScene)
 	trigger.On(types.ActionFileImport, rm.fileImport)
 	trigger.On(types.ActionFileExport, rm.fileExport)
+	trigger.On(types.ActionFileSaverSaveScene, rm.saveScene)
+	trigger.On(types.ActionFileSaverOpenScene, rm.openScene)
 
 	return rm
 }
@@ -208,7 +213,7 @@ func (rm *RenderManager) initParserManager() {
 }
 
 func (rm *RenderManager) initExporterManager() {
-	rm.sceneExporeter = export.NewExportManager(rm.doProgress)
+	rm.sceneExporter = export.NewExportManager(rm.doProgress)
 }
 
 func (rm *RenderManager) initSystemModels() {
@@ -414,5 +419,17 @@ func (rm *RenderManager) fileExport(entity types.FBEntity, setts []string, itype
 }
 
 func (rm *RenderManager) fileExportAsync(entity types.FBEntity, setts []string, itype types.ImportExportFormat) {
-	rm.sceneExporeter.Export(rm.MeshModelFaces, entity, setts, itype)
+	rm.sceneExporter.Export(rm.MeshModelFaces, entity, setts, itype)
+}
+
+func (rm *RenderManager) initSaveOpen() {
+	rm.saveOpenManager = saveopen.NewSaveOpenManager(rm.doProgress)
+}
+
+func (rm *RenderManager) saveScene(file *types.FBEntity) {
+	rm.saveOpenManager.Save(file, rm.MeshModelFaces)
+}
+
+func (rm *RenderManager) openScene(file *types.FBEntity) {
+	rm.MeshModelFaces = rm.saveOpenManager.Open(file)
 }
