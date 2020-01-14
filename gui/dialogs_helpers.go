@@ -1,8 +1,11 @@
 package gui
 
 import (
+	"os"
+
 	"github.com/inkyblackness/imgui-go"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 )
 
 func (context *Context) dialogSceneStats(open *bool) {
@@ -16,8 +19,33 @@ func (context *Context) dialogSceneStats(open *bool) {
 	imgui.Text("Vendor: " + gl.GetVendorName())
 	imgui.Text("Renderer: " + gl.GetRendererName())
 	// imgui.Separator()
-	// imgui.Text("Mouse Position: (%.1f, %.1f)", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
+	// imgui.Text("Mouse Position: (%.1f, %.1f)", imgui.GetIO().MousePos.x, imgui.GetIO().MousePos.y);
 	// imgui.Separator()
-	// imgui.Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	// imgui.Text("%d vertices, %d indices (%d triangles)", sett. ImGui::GetIO().MetricsRenderVertices, ImGui::GetIO().MetricsRenderIndices, ImGui::GetIO().MetricsRenderIndices / 3);
+	// imgui.Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / imgui.GetIO().Framerate, imgui.GetIO().Framerate);
+	// imgui.Text("%d vertices, %d indices (%d triangles)", sett. imgui.GetIO().MetricsRenderVertices, imgui.GetIO().MetricsRenderIndices, imgui.GetIO().MetricsRenderIndices / 3);
+}
+
+func (context *Context) popupRecentFileImportedDoesntExists(open *bool) {
+	if *open {
+		imgui.OpenPopup("Warning")
+	}
+	sett := settings.GetSettings()
+	imgui.SetNextWindowPosV(imgui.Vec2{X: float32(sett.AppWindow.SDLWindowWidth)/2 - 200, Y: float32(sett.AppWindow.SDLWindowHeight)/2 - 100}, imgui.ConditionAlways, imgui.Vec2{X: 0.5, Y: 0.5})
+	imgui.SetNextWindowFocus()
+	if imgui.BeginPopupModalV("Warning", open, imgui.WindowFlagsAlwaysAutoResize|imgui.WindowFlagsNoResize|imgui.WindowFlagsNoTitleBar) {
+		imgui.Text("This file no longer exists!")
+		if imgui.ButtonV("OK", imgui.Vec2{X: 140, Y: 0}) {
+			var recents []*types.FBEntity
+			for i := 0; i < len(context.GuiVars.recentFilesImported); i++ {
+				if _, err := os.Stat(context.GuiVars.recentFilesImported[i].Path); !os.IsNotExist(err) {
+					recents = append(recents, context.GuiVars.recentFilesImported[i])
+				}
+			}
+			context.GuiVars.recentFilesImported = recents
+			settings.SaveRecentFilesImported(context.GuiVars.recentFilesImported)
+			*open = false
+			imgui.CloseCurrentPopup()
+		}
+		imgui.EndPopup()
+	}
 }

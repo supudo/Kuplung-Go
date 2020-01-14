@@ -2,7 +2,6 @@ package export
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -83,7 +82,7 @@ func (eobj *ExporterObj) exportGeometry(faces []*meshes.ModelFace) {
 		filePath := filepath.Dir(eobj.exportFile.Path)
 		fileName := eobj.exportFile.Title
 		fileName = strings.TrimSuffix(fileName, ".obj")
-		eobj.saveFile(fileContents, filePath+"/"+fileName+fileSuffix+".obj")
+		settings.SaveStringToFile(fileContents, filePath+"/"+fileName+fileSuffix+".obj", "ExporterOBJ")
 	}
 }
 
@@ -147,7 +146,7 @@ func (eobj *ExporterObj) exportMaterials(faces []*meshes.ModelFace) {
 		filePath := filepath.Dir(eobj.exportFile.Path)
 		fileName := eobj.exportFile.Title
 		fileName = strings.TrimSuffix(fileName, ".obj")
-		eobj.saveFile(fileContents, filePath+"/"+fileName+fileSuffix+".mtl")
+		settings.SaveStringToFile(fileContents, filePath+"/"+fileName+fileSuffix+".mtl", "ExporterOBJ")
 	}
 }
 
@@ -243,19 +242,6 @@ func (eobj *ExporterObj) exportMesh(face meshes.ModelFace) string {
 	meshData += f
 
 	return meshData
-}
-
-func (eobj *ExporterObj) saveFile(fileContents, filepath string) {
-	f, err := os.Create(filepath)
-	if err != nil {
-		settings.LogError("[Exporter OBJ] Can't create file : %v!", filepath)
-	}
-	defer f.Close()
-	_, err = f.WriteString(fileContents)
-	if err != nil {
-		settings.LogError("[Exporter OBJ] Can't save file : %v!", filepath)
-	}
-	f.Sync()
 }
 
 func (eobj *ExporterObj) hasVec2(haystack []mgl32.Vec2, needle mgl32.Vec2) bool {

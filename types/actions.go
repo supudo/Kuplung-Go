@@ -9,8 +9,9 @@ const (
 	ActionGuiAddShape = "Gui_Add_Shape"
 	ActionGuiAddLight = "Gui_Add_Light"
 
-	ActionFileImport = "Action_File_Import"
-	ActionFileExport = "Action_File_Export"
+	ActionFileImport                 = "Action_File_Import"
+	ActionFileExport                 = "Action_File_Export"
+	ActionFileImportAddToRecentFiles = "Action_File_Import_AddToRecentFiles"
 
 	ActionLog = "Action_Log"
 

@@ -89,22 +89,27 @@ func (context *Context) DrawMainMenu() {
 		}
 
 		if imgui.BeginMenu("Import Recent") { // fonts.FA_ICON_FILES_O
-			// if (this->recentFilesImported.size() == 0)
-			// 	imgui.MenuItem("No recent files", nil, false, false);
-			// else {
-			// 	for (size_t i = 0; i < this->recentFilesImported.size(); i++) {
-			// 		FBEntity file = this->recentFilesImported[i];
-			// 		if (imgui.MenuItem(file.title.c_str(), nil, false, true)) {
-			// 			if (boost::filesystem::exists(file.path))
-			// 				this->funcProcessImportedFile(file, std::vector<std::string>(), static_cast<ImportExportFormats>(this->dialogImportType), dialogImportType_Assimp);
-			// 			else
-			// 				this->showRecentFileImportedDoesntExists = true;
-			// 		}
-			// 	}
-			// 	imgui.Separator()
-			// 	if (imgui.MenuItem("Clear recent files", nil, false))
-			// 		this->recentFilesClearImported();
-			// }
+			if len(context.GuiVars.recentFilesImported) == 0 {
+				imgui.MenuItem("No recent files")
+			} else {
+				for i := 0; i < len(context.GuiVars.recentFilesImported); i++ {
+					file := context.GuiVars.recentFilesImported[i]
+					if imgui.MenuItem(file.Title) {
+						if _, err := os.Stat(file.Path); !os.IsNotExist(err) {
+							var setts []string
+							setts = append(setts, "2")
+							setts = append(setts, "4")
+							_, _ = trigger.Fire(types.ActionFileImport, file, setts, context.GuiVars.dialogImportType)
+						} else {
+							context.GuiVars.showRecentFileImportedDoesntExists = true
+						}
+					}
+				}
+				imgui.Separator()
+				if imgui.MenuItem("Clear recent files") {
+					context.recentFilesClearImported()
+				}
+			}
 			imgui.EndMenu()
 		}
 

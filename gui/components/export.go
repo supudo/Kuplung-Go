@@ -265,7 +265,7 @@ func (comp *ComponentExport) modalNewFolder(ww float32) {
 		imgui.InputText("", &comp.newFolderName)
 		imgui.PopItemWidth()
 
-		if imgui.ButtonV("OK", imgui.Vec2{X: 140, Y: 0}) {
+		if imgui.ButtonV("OK", imgui.Vec2{X: 200, Y: 0}) {
 			newDir := comp.currentFolder + "/" + comp.newFolderName
 			if _, err := os.Stat(newDir); os.IsNotExist(err) {
 				if err := os.MkdirAll(newDir, 0755); err != nil {

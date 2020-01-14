@@ -398,6 +398,8 @@ func (rm *RenderManager) fileImport(entity *types.FBEntity, setts []string, ityp
 		sett.MemSettings.TotalFaces += mesh.MeshModel.CountVertices / 6
 		sett.MemSettings.TotalObjects++
 	}
+
+	_, _ = trigger.Fire(types.ActionFileImportAddToRecentFiles, entity)
 }
 
 func (rm *RenderManager) fileImportAsync(parsingChannel chan []types.MeshModel, entity *types.FBEntity, setts []string, itype types.ImportExportFormat) {

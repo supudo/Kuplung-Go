@@ -186,17 +186,3 @@ func SaveSettings() {
 		log.Fatalf("Settings save error: %v", err)
 	}
 }
-
-// ReadFile ...
-func ReadFile(filename string, terminated bool) string {
-	source, err := ioutil.ReadFile(filename)
-	if err != nil {
-		LogWarn("[OpenGL Utils] Can't load shader source for %v", filename)
-		return ""
-	}
-	if terminated {
-		return string(source) + "\x00"
-	} else {
-		return string(source) + " "
-	}
-}

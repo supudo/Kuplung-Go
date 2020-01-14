@@ -97,6 +97,11 @@ type WindowVariables struct {
 	showShadertoy        bool
 
 	ParsingPercentage float32
+
+	recentFiles         []*types.FBEntity
+	recentFilesImported []*types.FBEntity
+
+	showRecentFileImportedDoesntExists bool
 }
 
 // NewContext initializes a new UI context based on the provided OpenGL window.
@@ -150,6 +155,10 @@ func NewContext(window interfaces.Window) *Context {
 	context.GuiVars.showSVS = false
 	context.GuiVars.showShadertoy = false
 
+	context.GuiVars.recentFiles = nil
+	context.GuiVars.recentFilesImported = nil
+	context.GuiVars.showRecentFileImportedDoesntExists = false
+
 	err := context.createDeviceObjects()
 	if err != nil {
 		context.Destroy()
@@ -165,6 +174,8 @@ func NewContext(window interfaces.Window) *Context {
 	trigger.On(types.ActionParsingHide, func() {
 		context.GuiVars.showParsing = false
 	})
+
+	trigger.On(types.ActionFileImportAddToRecentFiles, context.recentFilesAddImported)
 
 	return context
 }
@@ -285,7 +296,30 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 	if context.GuiVars.showExporterFile {
 		context.componentExport.Render(&context.GuiVars.showExporterFile, &context.GuiVars.dialogExportType)
 	}
+
+	if context.GuiVars.showRecentFileImportedDoesntExists {
+		context.popupRecentFileImportedDoesntExists(&context.GuiVars.showRecentFileImportedDoesntExists)
+	}
 }
+
+func (context *Context) recentFilesClearImported() {
+	context.GuiVars.recentFilesImported = nil
+}
+
+func (context *Context) recentFilesAddImported(file *types.FBEntity) {
+	exists := false
+	for i := 0; i < len(context.GuiVars.recentFilesImported); i++ {
+		if context.GuiVars.recentFilesImported[i].Path == file.Path {
+			exists = true
+		}
+	}
+	if !exists {
+		context.GuiVars.recentFilesImported = append(context.GuiVars.recentFilesImported, file)
+		settings.SaveRecentFilesImported(context.GuiVars.recentFilesImported)
+	}
+}
+
+// IMGUI IMPLEMENTATION FOLLOWS BELLOW ...
 
 // IsUsingKeyboard returns true if the UI is currently capturing keyboard input.
 // The application should not process keyboard input events in this case.
