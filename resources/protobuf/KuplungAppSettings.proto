@@ -7,54 +7,85 @@ package saveopen;
 import "KuplungDefinitions.proto";
 
 message GUISettings {
-  required float Setting_FOV = 1;
-  required float Setting_OutlineThickness = 2;
-  required float Setting_RatioWidth = 3;
-  required float Setting_RatioHeight = 4;
-  required float Setting_PlaneClose = 5;
-  required float Setting_PlaneFar = 6;
-  required int32 Setting_GridSize = 7;
-  required int32 Setting_Skybox = 8;
-  required Vec4 Setting_OutlineColor = 9;
-  required Vec3 Setting_UIAmbientLight = 10;
-  required bool Setting_FixedGridWorld = 11;
-  required bool Setting_OutlineColorPickerOpen = 12;
-  required bool Setting_ShowAxisHelpers = 13;
-  required bool Settings_ShowZAxis = 14;
-  required bool Setting_DeferredTestMode = 15;
-  required bool Setting_DeferredTestLights = 16;
-  required int32 Setting_LightingPass_DrawMode = 17;
-  required int32 Setting_DeferredTestLightsNumber = 18;
-  required float Setting_DeferredAmbientStrength = 19;
+  required bool ShowCube = 1;
+  required float Fov = 2;
+  required float RatioWidth = 3;
+  required float RatioHeight = 4;
+  required float PlaneClose = 5;
+  required float PlaneFar = 6;
+  required float GammaCoeficient = 7;
 
-  required int32 viewModelSkin = 20;
-  required Vec3 SolidLight_Direction = 21;
-  required Vec3 SolidLight_MaterialColor = 22;
-  required Vec3 SolidLight_Ambient = 23;
-  required Vec3 SolidLight_Diffuse = 24;
-  required Vec3 SolidLight_Specular = 25;
-  required float SolidLight_Ambient_Strength = 26;
-  required float SolidLight_Diffuse_Strength = 27;
-  required float SolidLight_Specular_Strength = 28;
-  required bool SolidLight_MaterialColor_ColorPicker = 29;
-  required bool SolidLight_Ambient_ColorPicker = 30;
-  required bool SolidLight_Diffuse_ColorPicker = 31;
-  required bool SolidLight_Specular_ColorPicker = 32;
+  required bool ShowPickRays = 8;
+  required bool ShowPickRaysSingle = 9;
+  required bool RayAnimate = 10;
+  required float RayOriginX = 11;
+  required float RayOriginY = 12;
+  required float RayOriginZ = 13;
+  required string RayOriginXS = 14;
+  required string RayOriginYS = 15;
+  required string RayOriginZS = 16;
+  required bool RayDraw = 17;
+  required float RayDirectionX = 18;
+  required float RayDirectionY = 19;
+  required float RayDirectionZ = 20;
+  required string RayDirectionXS = 21;
+  required string RayDirectionYS = 22;
+  required string RayDirectionZS = 23;
 
-  required bool Setting_ShowTerrain = 33;
-  required bool Setting_TerrainModel = 34;
-  required bool Setting_TerrainAnimateX = 35;
-  required bool Setting_TerrainAnimateY = 36;
-  required string heightmapImage = 37;
-  required int32 Setting_TerrainWidth = 38;
-  required int32 Setting_TerrainHeight = 39;
+  required bool OcclusionCulling = 24;
+  required bool RenderingDepth = 25;
+  required uint32 SelectedViewModelSkin = 26;
+  required bool ShowBoundingBox = 27;
+  required bool BoundingBoxRefresh = 28;
+  required float BoundingBoxPadding = 29;
+  required Vec4 OutlineColor = 30;
+  required bool OutlineColorPickerOpen = 31;
+  required float OutlineThickness = 32;
 
-  required bool Setting_ShowSpaceship = 40;
-  required bool Setting_GenerateSpaceship = 41;
+  required bool VertexSphereVisible = 33;
+  required bool VertexSphereColorPickerOpen = 34;
+  required bool VertexSphereIsSphere = 35;
+  required bool VertexSphereShowWireframes = 36;
+  required float VertexSphereRadius = 37;
+  required int32 VertexSphereSegments = 38;
+  required Vec4 VertexSphereColor = 39;
 
-  required CameraSettings camera = 42;
-  required GridSettings grid = 43;
-  repeated LightObject lights = 44;
+  required bool ShowAllVisualArtefacts = 40;
+
+  required bool ShowZAxis = 41;
+
+  required int32 WorldGridSizeSquares = 42;
+  required bool WorldGridFixedWithWorld = 43;
+  required bool ShowGrid = 44;
+  required bool ActAsMirror = 45;
+
+  required int32 SkyboxSelectedItem = 46;
+
+  required CameraSettings camera = 47;
+  optional GridSettings grid = 48;
+  repeated LightObject lights = 49;
+
+	required float UIAmbientLightX = 50;
+  required float UIAmbientLightY = 51;
+  required float UIAmbientLightZ = 52;
+
+	required float SolidLightDirectionX = 53;
+  required float SolidLightDirectionY = 54;
+  required float SolidLightDirectionZ = 55;
+
+	required Vec3 SolidLightMaterialColor = 56;
+	required Vec3 SolidLightAmbient = 57;
+	required Vec3 SolidLightDiffuse = 58;
+	required Vec3 SolidLightSpecular = 59;
+
+	required float SolidLightAmbientStrength = 60;
+  required float SolidLightDiffuseStrength = 61;
+  required float SolidLightSpecularStrength = 62;
+
+  required bool SolidLightMaterialColorColorPicker = 63;
+  required bool SolidLightAmbientColorPicker = 64;
+  required bool SolidLightDiffuseColorPicker = 65;
+  required bool SolidLightSpecularColorPicker = 66;
 }
 
 message CameraSettings {
@@ -86,7 +117,6 @@ message GridSettings {
   required ObjectCoordinate scaleY = 10;
   required ObjectCoordinate scaleZ = 11;
   required float transparency = 12;
-  required int32 showGrid = 13;
 }
 
 message LightObject {

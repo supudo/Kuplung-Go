@@ -8,6 +8,7 @@ import (
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 )
 
 // WorldGrid ...
@@ -31,8 +32,13 @@ type WorldGrid struct {
 	ActAsMirror            bool
 	actAsMirrorNeedsChange bool
 	zIndex                 int
+	Transparency           float32
 
 	GridSize int32
+
+	PositionX, PositionY, PositionZ types.ObjectCoordinate
+	ScaleX, ScaleY, ScaleZ          types.ObjectCoordinate
+	RotateX, RotateY, RotateZ       types.ObjectCoordinate
 }
 
 // InitWorldGrid ...
@@ -70,6 +76,7 @@ func (grid *WorldGrid) InitProperties() {
 	grid.zIndex = 0
 	grid.MatrixModel = mgl32.Ident4()
 	grid.GridSize = rsett.Grid.WorldGridSizeSquares
+	grid.Transparency = 1.0
 }
 
 // InitBuffers ...

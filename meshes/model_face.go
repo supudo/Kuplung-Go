@@ -35,6 +35,8 @@ type ModelFace struct {
 
 	OccQuery uint32
 
+	ModelID int32
+
 	AssetsFolder string
 
 	ModelViewSkin types.ViewModelSkin
@@ -129,6 +131,8 @@ func NewModelFace(window interfaces.Window, model types.MeshModel) *ModelFace {
 
 // InitProperties ...
 func (mesh *ModelFace) InitProperties() {
+	mesh.ModelID = 0
+
 	mesh.AssetsFolder = ""
 
 	mesh.CelShading = false

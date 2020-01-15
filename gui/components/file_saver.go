@@ -79,8 +79,7 @@ func (comp *ComponentFileSaver) Render(operation types.FileSaverOperation, open 
 		imgui.InputText("", &comp.fileName)
 		imgui.SameLineV(0, 10)
 		if imgui.Button(btnLabel) {
-			var file types.FBEntity
-
+			file := &types.FBEntity{}
 			file.IsFile = true
 			file.Title = comp.fileName
 			file.Path = comp.currentFolder + "/" + file.Title

@@ -39,7 +39,7 @@ type RenderManager struct {
 	doProgress      func(float32)
 	fileParser      *parsers.ParserManager
 	sceneExporter   *export.ExporterManager
-	saveOpenManager *saveopen.SaveOpenManager
+	saveOpenManager *saveopen.SOManager
 
 	systemModels map[string]types.MeshModel
 
@@ -281,6 +281,7 @@ func (rm *RenderManager) addShape(shape types.ShapeType) {
 		mesh := meshes.NewModelFace(rm.Window, mmodels[i])
 		mesh.InitProperties()
 		mesh.InitBuffers()
+		mesh.ModelID = int32(len(rm.MeshModelFaces) + 1)
 		rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
 
 		sett := settings.GetSettings()
@@ -394,6 +395,7 @@ func (rm *RenderManager) fileImport(entity *types.FBEntity, setts []string, ityp
 		mesh := meshes.NewModelFace(rm.Window, mmodels[i])
 		mesh.InitProperties()
 		mesh.InitBuffers()
+		mesh.ModelID = int32(len(rm.MeshModelFaces) + 1)
 		rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
 
 		sett := settings.GetSettings()
@@ -427,7 +429,7 @@ func (rm *RenderManager) initSaveOpen() {
 }
 
 func (rm *RenderManager) saveScene(file *types.FBEntity) {
-	rm.saveOpenManager.Save(file, rm.MeshModelFaces)
+	rm.saveOpenManager.Save(file, rm.MeshModelFaces, rm.LightSources, rm.RenderProps, rm.Camera, rm.wgrid)
 }
 
 func (rm *RenderManager) openScene(file *types.FBEntity) {

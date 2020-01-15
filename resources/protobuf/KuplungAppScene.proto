@@ -67,7 +67,7 @@ message MeshModel {
   required ObjectCoordinate Effect_GBlur_Radius = 48;
   required ObjectCoordinate Effect_GBlur_Width = 49;
 
-  required bool Effect_Bloom_doBloom = 50;
+  required bool Effect_Bloom_DoBloom = 50;
   required float Effect_Bloom_WeightA = 51;
   required float Effect_Bloom_WeightB = 52;
   required float Effect_Bloom_WeightC = 53;

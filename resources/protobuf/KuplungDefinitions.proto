@@ -27,15 +27,6 @@ message ObjectCoordinate {
   required float point = 2;
 }
 
-message FBEntity {
-  required bool isFile = 1;
-  required string path = 2;
-  required string title = 3;
-  required string extension = 4;
-  required string modifiedDate = 5;
-  required string size = 6;
-}
-
 message MaterialColor {
   required bool colorPickerOpen = 1;
   required bool animate = 2;
@@ -76,17 +67,18 @@ message MeshModelMaterial {
 
 message Mesh {
   required int32 ID = 1;
-  required FBEntity File = 2;
-  required string ModelTitle = 3;
-  required string MaterialTitle = 4;
-  required int32 countVertices = 5;
-  required int32 countTextureCoordinates = 6;
-  required int32 countNormals = 7;
-  required int32 countIndices = 8;
+  required string File = 2;
+  required string FilePath = 3;
+  required string ModelTitle = 4;
+  required string MaterialTitle = 5;
+  required int32 countVertices = 6;
+  required int32 countTextureCoordinates = 7;
+  required int32 countNormals = 8;
+  required int32 countIndices = 9;
 
-  required MeshModelMaterial ModelMaterial = 9;
-  repeated Vec3 vertices = 10;
-  repeated Vec2 texture_coordinates = 11;
-  repeated Vec3 normals = 12;
-  repeated fixed32 indices = 13;
+  required MeshModelMaterial ModelMaterial = 10;
+  repeated Vec3 vertices = 11;
+  repeated Vec2 texture_coordinates = 12;
+  repeated Vec3 normals = 13;
+  repeated fixed32 indices = 14;
 }

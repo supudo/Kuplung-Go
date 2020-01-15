@@ -2,6 +2,7 @@ package saveopen
 
 import (
 	"github.com/supudo/Kuplung-Go/meshes"
+	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/types"
 )
 
@@ -21,8 +22,8 @@ func NewSaveOpenManager(doProgress func(float32)) *SOManager {
 }
 
 // Save ...
-func (som *SOManager) Save(file *types.FBEntity, meshes []*meshes.ModelFace) {
-	som.soProtobufs.Save(file, meshes)
+func (som *SOManager) Save(file *types.FBEntity, meshes []*meshes.ModelFace, lights []*objects.Light, rprops types.RenderProperties, cam *objects.Camera, grid *objects.WorldGrid) {
+	som.soProtobufs.Save(file, meshes, lights, rprops, cam, grid)
 }
 
 // Open ...
