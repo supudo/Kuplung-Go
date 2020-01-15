@@ -9,16 +9,15 @@ import (
 	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
+	"github.com/supudo/Kuplung-Go/utilities"
 )
 
 // ProtoBufsSaveOpen ...
 type ProtoBufsSaveOpen struct {
 	doProgress func(float32)
 
-	fileNameSettings    string
-	fileNameScene       string
-	fileNameZipSettings string
-	fileNameZipScene    string
+	fileNameSettings string
+	fileNameScene    string
 }
 
 // NewProtoBufsSaveOpen ...
@@ -36,21 +35,12 @@ func (pm *ProtoBufsSaveOpen) Save(file *types.FBEntity, meshModelFaces []*meshes
 	}
 	pm.fileNameSettings = fileName + ".settings"
 	pm.fileNameScene = fileName + ".scene"
-	pm.fileNameZipSettings = file.Title + ".settings"
-	pm.fileNameZipScene = file.Title + ".scene"
-	if !strings.HasSuffix(file.Title, ".kuplung") {
-		pm.fileNameZipSettings = file.Title + ".kuplung.settings"
-		pm.fileNameZipScene = file.Title + ".kuplung.scene"
-	}
 
 	pm.storeRenderingSettings(lights, rprops, cam, grid)
 	pm.storeObjects(meshModelFaces)
 
-	// TODO: zip the file
-	// this->managerZip->createZipFile(fileName.c_str());
-	// this->managerZip->addFileToArchive(fileNameSettings.c_str(), fileNameZipSettings.c_str());
-	// this->managerZip->addFileToArchive(fileNameScene.c_str(), fileNameZipScene.c_str());
-	// this->managerZip->closeZipFile();
+	zfiles := []string{pm.fileNameSettings, pm.fileNameScene}
+	utilities.ZipFiles(fileName, zfiles, true)
 }
 
 // Open ...
