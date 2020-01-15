@@ -277,6 +277,7 @@ func (rm *RenderManager) addShape(shape types.ShapeType) {
 	go rm.addShapeAsync(parsingChan, shape)
 	mmodels := <-parsingChan
 
+	sett := settings.GetSettings()
 	for i := 0; i < len(mmodels); i++ {
 		mesh := meshes.NewModelFace(rm.Window, mmodels[i])
 		mesh.InitProperties()
@@ -284,7 +285,6 @@ func (rm *RenderManager) addShape(shape types.ShapeType) {
 		mesh.ModelID = int32(len(rm.MeshModelFaces) + 1)
 		rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
 
-		sett := settings.GetSettings()
 		sett.MemSettings.TotalVertices += mesh.MeshModel.CountVertices
 		sett.MemSettings.TotalIndices += mesh.MeshModel.CountIndices
 		sett.MemSettings.TotalTriangles += mesh.MeshModel.CountVertices / 3
@@ -391,6 +391,7 @@ func (rm *RenderManager) fileImport(entity *types.FBEntity, setts []string, ityp
 	go rm.fileImportAsync(parsingChan, entity, setts, itype)
 	mmodels := <-parsingChan
 
+	sett := settings.GetSettings()
 	for i := 0; i < len(mmodels); i++ {
 		mesh := meshes.NewModelFace(rm.Window, mmodels[i])
 		mesh.InitProperties()
@@ -398,7 +399,6 @@ func (rm *RenderManager) fileImport(entity *types.FBEntity, setts []string, ityp
 		mesh.ModelID = int32(len(rm.MeshModelFaces) + 1)
 		rm.MeshModelFaces = append(rm.MeshModelFaces, mesh)
 
-		sett := settings.GetSettings()
 		sett.MemSettings.TotalVertices += mesh.MeshModel.CountVertices
 		sett.MemSettings.TotalIndices += mesh.MeshModel.CountIndices
 		sett.MemSettings.TotalTriangles += mesh.MeshModel.CountVertices / 3
@@ -433,5 +433,5 @@ func (rm *RenderManager) saveScene(file *types.FBEntity) {
 }
 
 func (rm *RenderManager) openScene(file *types.FBEntity) {
-	rm.MeshModelFaces = rm.saveOpenManager.Open(file)
+	rm.saveOpenManager.Open(file, rm.Window, rm.systemModels, &rm.MeshModelFaces, &rm.LightSources, &rm.RenderProps, rm.Camera, rm.wgrid)
 }

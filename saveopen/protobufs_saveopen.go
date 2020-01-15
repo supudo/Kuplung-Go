@@ -1,10 +1,15 @@
 package saveopen
 
 import (
+	fmt "fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/go-gl/mathgl/mgl32"
 	proto "github.com/golang/protobuf/proto"
+	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/meshes"
 	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/settings"
@@ -40,13 +45,422 @@ func (pm *ProtoBufsSaveOpen) Save(file *types.FBEntity, meshModelFaces []*meshes
 	pm.storeObjects(meshModelFaces)
 
 	zfiles := []string{pm.fileNameSettings, pm.fileNameScene}
-	utilities.ZipFiles(fileName, zfiles, true)
+	utilities.ZipFiles(fileName, zfiles)
+
+	if err := os.Remove(pm.fileNameSettings); err != nil {
+		settings.LogWarn("[SaveOpen-ProtoBufs] [Save] Can't delete temp file : %v!", pm.fileNameSettings)
+	}
+	if err := os.Remove(pm.fileNameScene); err != nil {
+		settings.LogWarn("[SaveOpen-ProtoBufs] [Save] Can't delete temp file : %v!", pm.fileNameScene)
+	}
 }
 
 // Open ...
-func (pm *ProtoBufsSaveOpen) Open(file *types.FBEntity) []*meshes.ModelFace {
-	meshes := []*meshes.ModelFace{}
-	return meshes
+func (pm *ProtoBufsSaveOpen) Open(file *types.FBEntity, window interfaces.Window, systemModels map[string]types.MeshModel, faces *[]*meshes.ModelFace, lights *[]*objects.Light, rprops *types.RenderProperties, cam *objects.Camera, grid *objects.WorldGrid) {
+	pfiles := utilities.UnzipFiles(file.Path, filepath.Dir(file.Path))
+	if len(pfiles) == 2 {
+		pm.openRenderingSettings(pfiles[0], window, systemModels, lights, rprops, cam, grid)
+		pm.readObjects(pfiles[1], window, faces)
+		if err := os.Remove(pfiles[0]); err != nil {
+			settings.LogWarn("[SaveOpen-ProtoBufs] [Open] Can't delete temp file : %v!", pfiles[0])
+		}
+		if err := os.Remove(pfiles[1]); err != nil {
+			settings.LogWarn("[SaveOpen-ProtoBufs] [Open] Can't delete temp file : %v!", pfiles[1])
+		}
+	}
+}
+
+func (pm *ProtoBufsSaveOpen) openRenderingSettings(filename string, window interfaces.Window, systemModels map[string]types.MeshModel, lights *[]*objects.Light, rprops *types.RenderProperties, cam *objects.Camera, grid *objects.WorldGrid) {
+	fSettingsHandle, err := ioutil.ReadFile(filename)
+	if err != nil {
+		settings.LogWarn("[SaveOpen-ProtoBufs] [Open] Error reading file %v : %v", filename, err)
+		return
+	}
+	gs := &GUISettings{}
+	if err := proto.Unmarshal(fSettingsHandle, gs); err != nil {
+		settings.LogWarn("[SaveOpen-ProtoBufs] [Open] Can't decode general settings: %v", err)
+		return
+	}
+
+	rsett := settings.GetRenderingSettings()
+
+	// Render Settings
+	rsett.General.ShowCube = *gs.ShowCube
+	rsett.General.Fov = *gs.Fov
+	rsett.General.RatioWidth = *gs.RatioWidth
+	rsett.General.RatioHeight = *gs.RatioHeight
+	rsett.General.PlaneClose = *gs.PlaneClose
+	rsett.General.PlaneFar = *gs.PlaneFar
+	rsett.General.GammaCoeficient = *gs.GammaCoeficient
+
+	rsett.General.ShowPickRays = *gs.ShowPickRays
+	rsett.General.ShowPickRaysSingle = *gs.ShowPickRaysSingle
+	rsett.General.RayAnimate = *gs.RayAnimate
+	rsett.General.RayOriginX = *gs.RayOriginX
+	rsett.General.RayOriginX = *gs.RayOriginY
+	rsett.General.RayOriginZ = *gs.RayOriginZ
+	rsett.General.RayOriginXS = *gs.RayOriginXS
+	rsett.General.RayOriginYS = *gs.RayOriginYS
+	rsett.General.RayOriginZS = *gs.RayOriginZS
+	rsett.General.RayDraw = *gs.RayDraw
+	rsett.General.RayDirectionX = *gs.RayDirectionX
+	rsett.General.RayDirectionY = *gs.RayDirectionY
+	rsett.General.RayDirectionZ = *gs.RayDirectionZ
+	rsett.General.RayDirectionXS = *gs.RayDirectionXS
+	rsett.General.RayDirectionYS = *gs.RayDirectionYS
+	rsett.General.RayDirectionZS = *gs.RayDirectionZS
+
+	rsett.General.OcclusionCulling = *gs.OcclusionCulling
+	rsett.General.RenderingDepth = *gs.RenderingDepth
+	rsett.General.SelectedViewModelSkin = types.ViewModelSkin(*gs.SelectedViewModelSkin)
+	rsett.General.ShowBoundingBox = *gs.ShowBoundingBox
+	rsett.General.BoundingBoxRefresh = *gs.BoundingBoxRefresh
+	rsett.General.BoundingBoxPadding = *gs.BoundingBoxPadding
+	rsett.General.OutlineColor = mgl32.Vec4{*gs.OutlineColor.X, *gs.OutlineColor.Y, *gs.OutlineColor.Z, 1}
+	rsett.General.OutlineColorPickerOpen = *gs.OutlineColorPickerOpen
+	rsett.General.OutlineThickness = *gs.OutlineThickness
+
+	rsett.General.VertexSphereVisible = *gs.VertexSphereVisible
+	rsett.General.VertexSphereColorPickerOpen = *gs.VertexSphereColorPickerOpen
+	rsett.General.VertexSphereIsSphere = *gs.VertexSphereIsSphere
+	rsett.General.VertexSphereShowWireframes = *gs.VertexSphereShowWireframes
+	rsett.General.VertexSphereRadius = *gs.VertexSphereRadius
+	rsett.General.VertexSphereSegments = *gs.VertexSphereSegments
+	rsett.General.VertexSphereColor = mgl32.Vec4{*gs.VertexSphereColor.X, *gs.VertexSphereColor.Y, *gs.VertexSphereColor.Z, 1}
+
+	rsett.General.ShowAllVisualArtefacts = *gs.ShowAllVisualArtefacts
+
+	rsett.Axis.ShowZAxis = *gs.ShowZAxis
+
+	rsett.Grid.WorldGridSizeSquares = *gs.WorldGridSizeSquares
+	rsett.Grid.WorldGridFixedWithWorld = *gs.WorldGridFixedWithWorld
+	rsett.Grid.ShowGrid = *gs.ShowGrid
+	rsett.Grid.ActAsMirror = *gs.ActAsMirror
+
+	rsett.SkyBox.SkyboxSelectedItem = *gs.SkyboxSelectedItem
+
+	// Render Properties
+	rprops.UIAmbientLightX = *gs.UIAmbientLightX
+	rprops.UIAmbientLightY = *gs.UIAmbientLightY
+	rprops.UIAmbientLightZ = *gs.UIAmbientLightZ
+
+	rprops.SolidLightDirectionX = *gs.SolidLightDirectionX
+	rprops.SolidLightDirectionY = *gs.SolidLightDirectionY
+	rprops.SolidLightDirectionZ = *gs.SolidLightDirectionZ
+
+	rprops.SolidLightMaterialColor = mgl32.Vec3{*gs.SolidLightMaterialColor.X, *gs.SolidLightMaterialColor.Y, *gs.SolidLightMaterialColor.Z}
+	rprops.SolidLightAmbient = mgl32.Vec3{*gs.SolidLightAmbient.X, *gs.SolidLightAmbient.Y, *gs.SolidLightAmbient.Z}
+	rprops.SolidLightDiffuse = mgl32.Vec3{*gs.SolidLightDiffuse.X, *gs.SolidLightDiffuse.Y, *gs.SolidLightDiffuse.Z}
+	rprops.SolidLightSpecular = mgl32.Vec3{*gs.SolidLightSpecular.X, *gs.SolidLightSpecular.Y, *gs.SolidLightSpecular.Z}
+
+	rprops.SolidLightAmbientStrength = *gs.SolidLightAmbientStrength
+	rprops.SolidLightDiffuseStrength = *gs.SolidLightDiffuseStrength
+	rprops.SolidLightSpecularStrength = *gs.SolidLightSpecularStrength
+
+	rprops.SolidLightMaterialColorColorPicker = *gs.SolidLightMaterialColorColorPicker
+	rprops.SolidLightAmbientColorPicker = *gs.SolidLightAmbientColorPicker
+	rprops.SolidLightDiffuseColorPicker = *gs.SolidLightDiffuseColorPicker
+	rprops.SolidLightSpecularColorPicker = *gs.SolidLightSpecularColorPicker
+
+	// Camera
+	c := &CameraSettings{}
+	if err := proto.Unmarshal(fSettingsHandle, c); err != nil {
+		settings.LogError("[SaveOpen-ProtoBufs] [Open] Can't decode camera settings: %v", err)
+	}
+	cam.CameraPosition = mgl32.Vec3{*c.CameraPosition.X, *c.CameraPosition.Y, *c.CameraPosition.Z}
+	cam.EyeSettings.ViewEye = mgl32.Vec3{*c.View_Eye.X, *c.View_Eye.Y, *c.View_Eye.Z}
+	cam.EyeSettings.ViewCenter = mgl32.Vec3{*c.View_Center.X, *c.View_Center.Y, *c.View_Center.Z}
+	cam.EyeSettings.ViewUp = mgl32.Vec3{*c.View_Up.X, *c.View_Up.Y, *c.View_Up.Z}
+	cam.PositionX = types.ObjectCoordinate{Animate: *c.PositionX.Animate, Point: *c.PositionX.Point}
+	cam.PositionY = types.ObjectCoordinate{Animate: *c.PositionY.Animate, Point: *c.PositionY.Point}
+	cam.PositionZ = types.ObjectCoordinate{Animate: *c.PositionZ.Animate, Point: *c.PositionZ.Point}
+	cam.RotateX = types.ObjectCoordinate{Animate: *c.RotateX.Animate, Point: *c.RotateX.Point}
+	cam.RotateY = types.ObjectCoordinate{Animate: *c.RotateY.Animate, Point: *c.RotateY.Point}
+	cam.RotateZ = types.ObjectCoordinate{Animate: *c.RotateZ.Animate, Point: *c.RotateZ.Point}
+	cam.RotateCenterX = types.ObjectCoordinate{Animate: *c.RotateCenterX.Animate, Point: *c.RotateCenterX.Point}
+	cam.RotateCenterY = types.ObjectCoordinate{Animate: *c.RotateCenterY.Animate, Point: *c.RotateCenterY.Point}
+	cam.RotateCenterZ = types.ObjectCoordinate{Animate: *c.RotateCenterZ.Animate, Point: *c.RotateCenterZ.Point}
+
+	// Grid
+	g := &GridSettings{}
+	if err := proto.Unmarshal(fSettingsHandle, g); err != nil {
+		settings.LogError("[SaveOpen-ProtoBufs] [Open] Can't decode grid settings: %v", err)
+	}
+	grid.ActAsMirror = *g.ActAsMirror
+	grid.GridSize = *g.GridSize
+	grid.Transparency = *g.Transparency
+	grid.PositionX = types.ObjectCoordinate{Animate: *g.PositionX.Animate, Point: *g.PositionX.Point}
+	grid.PositionY = types.ObjectCoordinate{Animate: *g.PositionY.Animate, Point: *g.PositionY.Point}
+	grid.PositionZ = types.ObjectCoordinate{Animate: *g.PositionZ.Animate, Point: *g.PositionZ.Point}
+	grid.RotateX = types.ObjectCoordinate{Animate: *g.RotateX.Animate, Point: *g.RotateX.Point}
+	grid.RotateY = types.ObjectCoordinate{Animate: *g.RotateY.Animate, Point: *g.RotateY.Point}
+	grid.RotateZ = types.ObjectCoordinate{Animate: *g.RotateZ.Animate, Point: *g.RotateZ.Point}
+	grid.ScaleX = types.ObjectCoordinate{Animate: *g.ScaleX.Animate, Point: *g.ScaleX.Point}
+	grid.ScaleY = types.ObjectCoordinate{Animate: *g.ScaleY.Animate, Point: *g.ScaleY.Point}
+	grid.ScaleZ = types.ObjectCoordinate{Animate: *g.ScaleZ.Animate, Point: *g.ScaleZ.Point}
+
+	// Lights
+	lights = nil
+	for i := 0; i < len(gs.Lights); i++ {
+		l := gs.Lights[i]
+
+		var lShape types.LightSourceType
+		var lTitle, lDescription, lModel string
+		switch *l.Type {
+		case 0:
+			lShape = types.LightSourceTypeDirectional
+			lTitle = fmt.Sprintf("Directional %v", i)
+			lDescription = "Directional area light source"
+			lModel = "light_directional"
+		case 1:
+			lShape = types.LightSourceTypePoint
+			lTitle = fmt.Sprintf("Point %v", i)
+			lDescription = "Omnidirectional point light source"
+			lModel = "light_point"
+		case 2:
+			lShape = types.LightSourceTypeSpot
+			lTitle = fmt.Sprintf("Spot %v", i)
+			lDescription = "Directional cone light source"
+			lModel = "light_spot"
+		}
+		ll := objects.InitLight(window)
+		ll.InitProperties(lShape)
+		ll.Title = lTitle
+		ll.Description = lDescription
+		ll.SetModel(systemModels[lModel])
+		ll.InitBuffers()
+
+		*lights = append(*lights, ll)
+	}
+}
+
+func (pm *ProtoBufsSaveOpen) readObjects(filename string, window interfaces.Window, faces *[]*meshes.ModelFace) {
+	fModelsHandle, err := ioutil.ReadFile(filename)
+	if err != nil {
+		settings.LogError("[SaveOpen-ProtoBufs] [readObjects] Error reading file %v : %v", filename, err)
+		return
+	}
+	gs := &Scene{}
+	if err := proto.Unmarshal(fModelsHandle, gs); err != nil {
+		settings.LogError("[SaveOpen-ProtoBufs] [readObjects] Can't decode general settings: %v", err)
+		return
+	}
+
+	sett := settings.GetSettings()
+	faces = nil
+	var i int32
+	for i = 0; i < int32(len(gs.Models)); i++ {
+		gm := gs.Models[i]
+		gmo := gm.MeshObject
+		gmom := gm.MeshObject.ModelMaterial
+
+		// MeshModel
+		mm := types.MeshModel{}
+		mm.ID = uint32(*gmo.ID)
+		mm.File = *gmo.File
+		mm.FilePath = *gmo.FilePath
+
+		mm.ModelTitle = *gmo.ModelTitle
+		mm.MaterialTitle = *gmo.MaterialTitle
+
+		mm.CountVertices = *gmo.CountVertices
+		mm.CountTextureCoordinates = *gmo.CountTextureCoordinates
+		mm.CountNormals = *gmo.CountNormals
+		mm.CountIndices = *gmo.CountIndices
+
+		for j := 0; j < len(gmo.Vertices); j++ {
+			mm.Vertices = append(mm.Vertices, mgl32.Vec3{*gmo.Vertices[i].X, *gmo.Vertices[i].Y, *gmo.Vertices[i].Z})
+		}
+		for j := 0; j < len(gmo.TextureCoordinates); j++ {
+			mm.TextureCoordinates = append(mm.TextureCoordinates, mgl32.Vec2{*gmo.TextureCoordinates[i].X, *gmo.TextureCoordinates[i].Y})
+		}
+		for j := 0; j < len(gmo.Normals); j++ {
+			mm.Normals = append(mm.Normals, mgl32.Vec3{*gmo.Normals[i].X, *gmo.Normals[i].Y, *gmo.Normals[i].Z})
+		}
+		mm.Indices = gmo.Indices
+
+		// MeshModelMaterial
+		mmm := types.MeshModelMaterial{}
+		mmm.MaterialID = uint32(*gmom.MaterialID)
+		mmm.MaterialTitle = *gmom.MaterialTitle
+
+		mmm.SpecularExp = *gmom.SpecularExp
+
+		mmm.AmbientColor = mgl32.Vec3{*gmom.AmbientColor.X, *gmom.AmbientColor.Y, *gmom.AmbientColor.Z}
+		mmm.DiffuseColor = mgl32.Vec3{*gmom.DiffuseColor.X, *gmom.DiffuseColor.Y, *gmom.DiffuseColor.Z}
+		mmm.SpecularColor = mgl32.Vec3{*gmom.SpecularColor.X, *gmom.SpecularColor.Y, *gmom.SpecularColor.Z}
+		mmm.EmissionColor = mgl32.Vec3{*gmom.EmissionColor.X, *gmom.EmissionColor.Y, *gmom.EmissionColor.Z}
+
+		mmm.Transparency = *gmom.Transparency
+		mmm.IlluminationMode = *gmom.IlluminationMode
+		mmm.OpticalDensity = *gmom.OpticalDensity
+
+		mmmtia := types.MeshMaterialTextureImage{
+			Filename:   *gmom.TextureAmbient.Filename,
+			Image:      *gmom.TextureAmbient.Image,
+			Width:      *gmom.TextureAmbient.Width,
+			Height:     *gmom.TextureAmbient.Height,
+			UseTexture: *gmom.TextureAmbient.UseTexture,
+			Commands:   gmom.TextureAmbient.Commands}
+		mmm.TextureAmbient = mmmtia
+		mmmtid := types.MeshMaterialTextureImage{
+			Filename:   *gmom.TextureDiffuse.Filename,
+			Image:      *gmom.TextureDiffuse.Image,
+			Width:      *gmom.TextureDiffuse.Width,
+			Height:     *gmom.TextureDiffuse.Height,
+			UseTexture: *gmom.TextureDiffuse.UseTexture,
+			Commands:   gmom.TextureDiffuse.Commands}
+		mmm.TextureDiffuse = mmmtid
+		mmmtis := types.MeshMaterialTextureImage{
+			Filename:   *gmom.TextureSpecular.Filename,
+			Image:      *gmom.TextureSpecular.Image,
+			Width:      *gmom.TextureSpecular.Width,
+			Height:     *gmom.TextureSpecular.Height,
+			UseTexture: *gmom.TextureSpecular.UseTexture,
+			Commands:   gmom.TextureSpecular.Commands}
+		mmm.TextureSpecular = mmmtis
+		mmmtise := types.MeshMaterialTextureImage{
+			Filename:   *gmom.TextureSpecularExp.Filename,
+			Image:      *gmom.TextureSpecularExp.Image,
+			Width:      *gmom.TextureSpecularExp.Width,
+			Height:     *gmom.TextureSpecularExp.Height,
+			UseTexture: *gmom.TextureSpecularExp.UseTexture,
+			Commands:   gmom.TextureSpecularExp.Commands}
+		mmm.TextureSpecularExp = mmmtise
+		mmmtidi := types.MeshMaterialTextureImage{
+			Filename:   *gmom.TextureDissolve.Filename,
+			Image:      *gmom.TextureDissolve.Image,
+			Width:      *gmom.TextureDissolve.Width,
+			Height:     *gmom.TextureDissolve.Height,
+			UseTexture: *gmom.TextureDissolve.UseTexture,
+			Commands:   gmom.TextureDissolve.Commands}
+		mmm.TextureDissolve = mmmtidi
+		mmmtib := types.MeshMaterialTextureImage{
+			Filename:   *gmom.TextureBump.Filename,
+			Image:      *gmom.TextureBump.Image,
+			Width:      *gmom.TextureBump.Width,
+			Height:     *gmom.TextureBump.Height,
+			UseTexture: *gmom.TextureBump.UseTexture,
+			Commands:   gmom.TextureBump.Commands}
+		mmm.TextureBump = mmmtib
+		mmmtids := types.MeshMaterialTextureImage{
+			Filename:   *gmom.TextureDisplacement.Filename,
+			Image:      *gmom.TextureDisplacement.Image,
+			Width:      *gmom.TextureDisplacement.Width,
+			Height:     *gmom.TextureDisplacement.Height,
+			UseTexture: *gmom.TextureDisplacement.UseTexture,
+			Commands:   gmom.TextureDisplacement.Commands}
+		mmm.TextureDisplacement = mmmtids
+		mm.ModelMaterial = mmm
+
+		mesh := meshes.NewModelFace(window, mm)
+		mesh.InitProperties()
+		mesh.InitBuffers()
+
+		mesh.ModelID = *gm.ModelID
+		mesh.ModelViewSkin = types.ViewModelSkin(*gm.Setting_ModelViewSkin)
+
+		mesh.DeferredRender = *gm.Settings_DeferredRender
+		mesh.CelShading = *gm.Setting_CelShading
+		mesh.Wireframe = *gm.Setting_Wireframe
+		mesh.UseTessellation = *gm.Setting_UseTessellation
+		mesh.UseCullFace = *gm.Setting_UseCullFace
+		mesh.ShowMaterialEditor = *gm.ShowMaterialEditor
+
+		mesh.Alpha = *gm.Setting_Alpha
+		mesh.TessellationSubdivision = *gm.Setting_TessellationSubdivision
+		mesh.PositionX = types.ObjectCoordinate{Animate: *gm.PositionX.Animate, Point: *gm.PositionX.Point}
+		mesh.PositionY = types.ObjectCoordinate{Animate: *gm.PositionY.Animate, Point: *gm.PositionY.Point}
+		mesh.PositionZ = types.ObjectCoordinate{Animate: *gm.PositionZ.Animate, Point: *gm.PositionZ.Point}
+		mesh.ScaleX = types.ObjectCoordinate{Animate: *gm.ScaleX.Animate, Point: *gm.ScaleX.Point}
+		mesh.ScaleY = types.ObjectCoordinate{Animate: *gm.ScaleY.Animate, Point: *gm.ScaleY.Point}
+		mesh.ScaleZ = types.ObjectCoordinate{Animate: *gm.ScaleZ.Animate, Point: *gm.ScaleZ.Point}
+		mesh.RotateX = types.ObjectCoordinate{Animate: *gm.RotateX.Animate, Point: *gm.RotateX.Point}
+		mesh.RotateY = types.ObjectCoordinate{Animate: *gm.RotateY.Animate, Point: *gm.RotateY.Point}
+		mesh.RotateZ = types.ObjectCoordinate{Animate: *gm.RotateZ.Animate, Point: *gm.RotateZ.Point}
+		mesh.DisplaceX = types.ObjectCoordinate{Animate: *gm.DisplaceX.Animate, Point: *gm.DisplaceX.Point}
+		mesh.DisplaceY = types.ObjectCoordinate{Animate: *gm.DisplaceY.Animate, Point: *gm.DisplaceY.Point}
+		mesh.DisplaceZ = types.ObjectCoordinate{Animate: *gm.DisplaceZ.Animate, Point: *gm.DisplaceZ.Point}
+
+		mesh.MaterialRefraction = types.ObjectCoordinate{Animate: *gm.Setting_MaterialRefraction.Animate, Point: *gm.Setting_MaterialRefraction.Point}
+		mesh.MaterialSpecularExp = types.ObjectCoordinate{Animate: *gm.Setting_MaterialSpecularExp.Animate, Point: *gm.Setting_MaterialSpecularExp.Point}
+
+		mesh.LightPosition = mgl32.Vec3{*gm.Setting_LightPosition.X, *gm.Setting_LightPosition.Y, *gm.Setting_LightPosition.Z}
+		mesh.LightDirection = mgl32.Vec3{*gm.Setting_LightDirection.X, *gm.Setting_LightDirection.Y, *gm.Setting_LightDirection.Z}
+		mesh.LightAmbient = mgl32.Vec3{*gm.Setting_LightAmbient.X, *gm.Setting_LightAmbient.Y, *gm.Setting_LightAmbient.Z}
+		mesh.LightDiffuse = mgl32.Vec3{*gm.Setting_LightDiffuse.X, *gm.Setting_LightDiffuse.Y, *gm.Setting_LightDiffuse.Z}
+		mesh.LightSpecular = mgl32.Vec3{*gm.Setting_LightSpecular.X, *gm.Setting_LightSpecular.Y, *gm.Setting_LightSpecular.Z}
+
+		mesh.LightStrengthAmbient = *gm.Setting_LightStrengthAmbient
+		mesh.LightStrengthDiffuse = *gm.Setting_LightStrengthDiffuse
+		mesh.LightStrengthSpecular = *gm.Setting_LightStrengthSpecular
+		mesh.LightingPassDrawMode = uint32(*gm.Setting_LightingPass_DrawMode)
+
+		mesh.MaterialIlluminationModel = uint32(*gm.MaterialIlluminationModel)
+		mesh.ParallaxMapping = *gm.Setting_ParallaxMapping
+
+		mesh.MaterialAmbient = types.MaterialColor{
+			ColorPickerOpen: *gm.MaterialAmbient.ColorPickerOpen,
+			Animate:         *gm.MaterialAmbient.Animate,
+			Strength:        *gm.MaterialAmbient.Strength,
+			Color:           mgl32.Vec3{*gm.MaterialAmbient.Color.X, *gm.MaterialAmbient.Color.Y, *gm.MaterialAmbient.Color.Z}}
+		mesh.MaterialDiffuse = types.MaterialColor{
+			ColorPickerOpen: *gm.MaterialDiffuse.ColorPickerOpen,
+			Animate:         *gm.MaterialDiffuse.Animate,
+			Strength:        *gm.MaterialDiffuse.Strength,
+			Color:           mgl32.Vec3{*gm.MaterialDiffuse.Color.X, *gm.MaterialDiffuse.Color.Y, *gm.MaterialDiffuse.Color.Z}}
+		mesh.MaterialSpecular = types.MaterialColor{
+			ColorPickerOpen: *gm.MaterialSpecular.ColorPickerOpen,
+			Animate:         *gm.MaterialSpecular.Animate,
+			Strength:        *gm.MaterialSpecular.Strength,
+			Color:           mgl32.Vec3{*gm.MaterialSpecular.Color.X, *gm.MaterialSpecular.Color.Y, *gm.MaterialSpecular.Color.Z}}
+		mesh.MaterialEmission = types.MaterialColor{
+			ColorPickerOpen: *gm.MaterialEmission.ColorPickerOpen,
+			Animate:         *gm.MaterialEmission.Animate,
+			Strength:        *gm.MaterialEmission.Strength,
+			Color:           mgl32.Vec3{*gm.MaterialEmission.Color.X, *gm.MaterialEmission.Color.Y, *gm.MaterialEmission.Color.Z}}
+
+		mesh.DisplacementHeightScale = types.ObjectCoordinate{Animate: *gm.DisplacementHeightScale.Animate, Point: *gm.DisplacementHeightScale.Point}
+
+		mesh.EffectGBlurMode = *gm.Effect_GBlur_Mode
+		mesh.EffectGBlurRadius = types.ObjectCoordinate{Animate: *gm.Effect_GBlur_Radius.Animate, Point: *gm.Effect_GBlur_Radius.Point}
+		mesh.EffectGBlurWidth = types.ObjectCoordinate{Animate: *gm.Effect_GBlur_Width.Animate, Point: *gm.Effect_GBlur_Width.Point}
+
+		mesh.EffectBloomDoBloom = *gm.Effect_Bloom_DoBloom
+		mesh.EffectBloomWeightA = *gm.Effect_Bloom_WeightA
+		mesh.EffectBloomWeightB = *gm.Effect_Bloom_WeightB
+		mesh.EffectBloomWeightC = *gm.Effect_Bloom_WeightC
+		mesh.EffectBloomWeightD = *gm.Effect_Bloom_WeightD
+		mesh.EffectBloomVignette = *gm.Effect_Bloom_Vignette
+		mesh.EffectBloomVignetteAtt = *gm.Effect_Bloom_VignetteAtt
+
+		// mesh.EffectToneMappingACESFilmRec2020
+		// mesh.EffectHDRTonemapping
+
+		// mesh.ShowShadows
+
+		// mesh.RenderingPBR
+		// mesh.RenderingPBRMetallic
+		// mesh.RenderingPBRRoughness
+		// mesh.RenderingPBRAO
+
+		// mesh.SolidLightSkinMaterialColor mgl32.Vec3
+		// mesh.SolidLightSkinAmbient       mgl32.Vec3
+		// mesh.SolidLightSkinDiffuse       mgl32.Vec3
+		// mesh.SolidLightSkinSpecular      mgl32.Vec3
+
+		mesh.SolidLightSkinAmbientStrength = *gm.SolidLightSkin_Ambient_Strength
+		mesh.SolidLightSkinDiffuseStrength = *gm.SolidLightSkin_Diffuse_Strength
+		mesh.SlidLightSkinSpecularStrength = *gm.SolidLightSkin_Specular_Strength
+
+		*faces = append(*faces, mesh)
+
+		sett.MemSettings.TotalVertices += mesh.MeshModel.CountVertices
+		sett.MemSettings.TotalIndices += mesh.MeshModel.CountIndices
+		sett.MemSettings.TotalTriangles += mesh.MeshModel.CountVertices / 3
+		sett.MemSettings.TotalFaces += mesh.MeshModel.CountVertices / 6
+		sett.MemSettings.TotalObjects++
+	}
 }
 
 func (pm *ProtoBufsSaveOpen) storeRenderingSettings(lights []*objects.Light, rprops types.RenderProperties, cam *objects.Camera, grid *objects.WorldGrid) {
@@ -240,11 +654,13 @@ func (pm *ProtoBufsSaveOpen) storeRenderingSettings(lights []*objects.Light, rpr
 	// Save
 	data, err := proto.Marshal(gs)
 	if err != nil {
-		settings.LogError("[SaveOpen-ProtoBufs] [storeRenderingSettings] Marshalling error: %v", err)
+		settings.LogWarn("[SaveOpen-ProtoBufs] [storeRenderingSettings] Marshalling error: %v", err)
+		return
 	}
 	err = ioutil.WriteFile(pm.fileNameSettings, data, 0644)
 	if err != nil {
-		settings.LogError("[SaveOpen-ProtoBufs] [storeRenderingSettings] Can't save byte data error: %v", err)
+		settings.LogWarn("[SaveOpen-ProtoBufs] [storeRenderingSettings] Can't save byte data error: %v", err)
+		return
 	}
 }
 
@@ -429,10 +845,12 @@ func (pm *ProtoBufsSaveOpen) storeObjects(meshModelFaces []*meshes.ModelFace) {
 	// Save
 	data, err := proto.Marshal(gs)
 	if err != nil {
-		settings.LogError("[SaveOpen-ProtoBufs] [storeObjects] Marshalling error: %v", err)
+		settings.LogWarn("[SaveOpen-ProtoBufs] [storeObjects] Marshalling error: %v", err)
+		return
 	}
 	err = ioutil.WriteFile(pm.fileNameScene, data, 0644)
 	if err != nil {
-		settings.LogError("[SaveOpen-ProtoBufs] [storeObjects] Can't save byte data error: %v", err)
+		settings.LogWarn("[SaveOpen-ProtoBufs] [storeObjects] Can't save byte data error: %v", err)
+		return
 	}
 }
