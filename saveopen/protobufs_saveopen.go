@@ -163,10 +163,7 @@ func (pm *ProtoBufsSaveOpen) openRenderingSettings(filename string, window inter
 	rprops.SolidLightSpecularColorPicker = *gs.SolidLightSpecularColorPicker
 
 	// Camera
-	c := &CameraSettings{}
-	if err := proto.Unmarshal(fSettingsHandle, c); err != nil {
-		settings.LogError("[SaveOpen-ProtoBufs] [Open] Can't decode camera settings: %v", err)
-	}
+	c := *gs.Camera
 	cam.CameraPosition = mgl32.Vec3{*c.CameraPosition.X, *c.CameraPosition.Y, *c.CameraPosition.Z}
 	cam.EyeSettings.ViewEye = mgl32.Vec3{*c.View_Eye.X, *c.View_Eye.Y, *c.View_Eye.Z}
 	cam.EyeSettings.ViewCenter = mgl32.Vec3{*c.View_Center.X, *c.View_Center.Y, *c.View_Center.Z}
@@ -182,10 +179,7 @@ func (pm *ProtoBufsSaveOpen) openRenderingSettings(filename string, window inter
 	cam.RotateCenterZ = types.ObjectCoordinate{Animate: *c.RotateCenterZ.Animate, Point: *c.RotateCenterZ.Point}
 
 	// Grid
-	g := &GridSettings{}
-	if err := proto.Unmarshal(fSettingsHandle, g); err != nil {
-		settings.LogError("[SaveOpen-ProtoBufs] [Open] Can't decode grid settings: %v", err)
-	}
+	g := *gs.Grid
 	grid.ActAsMirror = *g.ActAsMirror
 	grid.GridSize = *g.GridSize
 	grid.Transparency = *g.Transparency
@@ -200,7 +194,7 @@ func (pm *ProtoBufsSaveOpen) openRenderingSettings(filename string, window inter
 	grid.ScaleZ = types.ObjectCoordinate{Animate: *g.ScaleZ.Animate, Point: *g.ScaleZ.Point}
 
 	// Lights
-	lights = nil
+	*lights = []*objects.Light{}
 	for i := 0; i < len(gs.Lights); i++ {
 		l := gs.Lights[i]
 
@@ -247,7 +241,7 @@ func (pm *ProtoBufsSaveOpen) readObjects(filename string, window interfaces.Wind
 	}
 
 	sett := settings.GetSettings()
-	faces = nil
+	*faces = []*meshes.ModelFace{}
 	var i int32
 	for i = 0; i < int32(len(gs.Models)); i++ {
 		gm := gs.Models[i]
@@ -269,13 +263,13 @@ func (pm *ProtoBufsSaveOpen) readObjects(filename string, window interfaces.Wind
 		mm.CountIndices = *gmo.CountIndices
 
 		for j := 0; j < len(gmo.Vertices); j++ {
-			mm.Vertices = append(mm.Vertices, mgl32.Vec3{*gmo.Vertices[i].X, *gmo.Vertices[i].Y, *gmo.Vertices[i].Z})
+			mm.Vertices = append(mm.Vertices, mgl32.Vec3{*gmo.Vertices[j].X, *gmo.Vertices[j].Y, *gmo.Vertices[j].Z})
 		}
 		for j := 0; j < len(gmo.TextureCoordinates); j++ {
-			mm.TextureCoordinates = append(mm.TextureCoordinates, mgl32.Vec2{*gmo.TextureCoordinates[i].X, *gmo.TextureCoordinates[i].Y})
+			mm.TextureCoordinates = append(mm.TextureCoordinates, mgl32.Vec2{*gmo.TextureCoordinates[j].X, *gmo.TextureCoordinates[j].Y})
 		}
 		for j := 0; j < len(gmo.Normals); j++ {
-			mm.Normals = append(mm.Normals, mgl32.Vec3{*gmo.Normals[i].X, *gmo.Normals[i].Y, *gmo.Normals[i].Z})
+			mm.Normals = append(mm.Normals, mgl32.Vec3{*gmo.Normals[j].X, *gmo.Normals[j].Y, *gmo.Normals[j].Z})
 		}
 		mm.Indices = gmo.Indices
 
@@ -434,20 +428,20 @@ func (pm *ProtoBufsSaveOpen) readObjects(filename string, window interfaces.Wind
 		mesh.EffectBloomVignette = *gm.Effect_Bloom_Vignette
 		mesh.EffectBloomVignetteAtt = *gm.Effect_Bloom_VignetteAtt
 
-		// mesh.EffectToneMappingACESFilmRec2020
-		// mesh.EffectHDRTonemapping
+		mesh.EffectToneMappingACESFilmRec2020 = *gm.EffectToneMappingACESFilmRec2020
+		mesh.EffectHDRTonemapping = *gm.EffectHDRTonemapping
 
-		// mesh.ShowShadows
+		mesh.ShowShadows = *gm.ShowShadows
 
-		// mesh.RenderingPBR
-		// mesh.RenderingPBRMetallic
-		// mesh.RenderingPBRRoughness
-		// mesh.RenderingPBRAO
+		mesh.RenderingPBR = *gm.RenderingPBR
+		mesh.RenderingPBRMetallic = *gm.RenderingPBRMetallic
+		mesh.RenderingPBRRoughness = *gm.RenderingPBRRoughness
+		mesh.RenderingPBRAO = *gm.RenderingPBRAO
 
-		// mesh.SolidLightSkinMaterialColor mgl32.Vec3
-		// mesh.SolidLightSkinAmbient       mgl32.Vec3
-		// mesh.SolidLightSkinDiffuse       mgl32.Vec3
-		// mesh.SolidLightSkinSpecular      mgl32.Vec3
+		mesh.SolidLightSkinMaterialColor = mgl32.Vec3{*gm.SolidLightSkin_MaterialColor.X, *gm.SolidLightSkin_MaterialColor.Y, *gm.SolidLightSkin_MaterialColor.Z}
+		mesh.SolidLightSkinAmbient = mgl32.Vec3{*gm.SolidLightSkin_Ambient.X, *gm.SolidLightSkin_Ambient.Y, *gm.SolidLightSkin_Ambient.Z}
+		mesh.SolidLightSkinDiffuse = mgl32.Vec3{*gm.SolidLightSkin_Diffuse.X, *gm.SolidLightSkin_Diffuse.Y, *gm.SolidLightSkin_Diffuse.Z}
+		mesh.SolidLightSkinSpecular = mgl32.Vec3{*gm.SolidLightSkin_Specular.X, *gm.SolidLightSkin_Specular.Y, *gm.SolidLightSkin_Specular.Z}
 
 		mesh.SolidLightSkinAmbientStrength = *gm.SolidLightSkin_Ambient_Strength
 		mesh.SolidLightSkinDiffuseStrength = *gm.SolidLightSkin_Diffuse_Strength
@@ -740,6 +734,21 @@ func (pm *ProtoBufsSaveOpen) storeObjects(meshModelFaces []*meshes.ModelFace) {
 		mm.Effect_Bloom_VignetteAtt = proto.Float32(m.EffectBloomVignetteAtt)
 
 		mm.Setting_LightingPass_DrawMode = proto.Int32(int32(m.LightingPassDrawMode))
+
+		mm.EffectToneMappingACESFilmRec2020 = proto.Bool(m.EffectToneMappingACESFilmRec2020)
+		mm.EffectHDRTonemapping = proto.Bool(m.EffectHDRTonemapping)
+
+		mm.ShowShadows = proto.Bool(m.ShowShadows)
+
+		mm.RenderingPBR = proto.Bool(m.RenderingPBR)
+		mm.RenderingPBRMetallic = proto.Float32(m.RenderingPBRMetallic)
+		mm.RenderingPBRRoughness = proto.Float32(m.RenderingPBRRoughness)
+		mm.RenderingPBRAO = proto.Float32(m.RenderingPBRAO)
+
+		mm.SolidLightSkinMaterialColor = &Vec3{X: proto.Float32(m.SolidLightSkinMaterialColor.X()), Y: proto.Float32(m.SolidLightSkinMaterialColor.Y()), Z: proto.Float32(m.SolidLightSkinMaterialColor.Z())}
+		mm.SolidLightSkinAmbient = &Vec3{X: proto.Float32(m.SolidLightSkinAmbient.X()), Y: proto.Float32(m.SolidLightSkinAmbient.Y()), Z: proto.Float32(m.SolidLightSkinAmbient.Z())}
+		mm.SolidLightSkinDiffuse = &Vec3{X: proto.Float32(m.SolidLightSkinDiffuse.X()), Y: proto.Float32(m.SolidLightSkinDiffuse.Y()), Z: proto.Float32(m.SolidLightSkinDiffuse.Z())}
+		mm.SolidLightSkinSpecular = &Vec3{X: proto.Float32(m.SolidLightSkinSpecular.X()), Y: proto.Float32(m.SolidLightSkinSpecular.Y()), Z: proto.Float32(m.SolidLightSkinSpecular.Z())}
 
 		mo := &Mesh{}
 		mo.ID = proto.Int32(int32(m.MeshModel.ID))

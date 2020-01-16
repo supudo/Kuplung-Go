@@ -78,4 +78,19 @@ message MeshModel {
   required int32 Setting_LightingPass_DrawMode = 57;
 
   required Mesh meshObject = 58;
+
+	required bool EffectToneMappingACESFilmRec2020 = 59;
+	required bool EffectHDRTonemapping = 60;
+
+	required bool ShowShadows = 61;
+
+	required bool RenderingPBR = 62;
+	required float RenderingPBRMetallic = 63;
+	required float RenderingPBRRoughness = 64;
+	required float RenderingPBRAO = 65;
+
+	required Vec3 SolidLightSkinMaterialColor = 66;
+	required Vec3 SolidLightSkinAmbient = 67;
+	required Vec3 SolidLightSkinDiffuse = 68;
+	required Vec3 SolidLightSkinSpecular = 69;
 }
