@@ -1,5 +1,8 @@
 # Kuplung-Go
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/supudo/Kuplung-Go)](https://goreportcard.com/report/github.com/supudo/Kuplung-Go)
+[![GolangCI](https://golangci.com/badges/github.com/supudo/Kuplung-Go.svg)](https://golangci.com)
+
 Go port of https://github.com/supudo/kuplung
 
 #### Using/Including
