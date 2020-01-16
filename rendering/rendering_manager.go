@@ -148,13 +148,13 @@ func (rm *RenderManager) Render() {
 
 	switch sett.App.RendererType {
 	case types.InAppRendererTypeDeferred:
-		rm.rendererDefered.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
+		rm.rendererDefered.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources)
 	case types.InAppRendererTypeForward:
 		rm.rendererForward.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources)
 	case types.InAppRendererTypeForwardShadowMapping:
-		rm.rendererForwardShadowMapping.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
+		rm.rendererForwardShadowMapping.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources)
 	case types.InAppRendererTypeShadowMapping:
-		rm.rendererShadowMapping.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
+		rm.rendererShadowMapping.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources)
 	case types.InAppRendererTypeSimple:
 		rm.rendererSimple.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition)
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/meshes"
+	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/types"
 )
 
@@ -20,7 +21,7 @@ func NewRendererForwardShadowMapping(window interfaces.Window) *RendererForwardS
 }
 
 // Render ...
-func (rend *RendererForwardShadowMapping) Render(rp types.RenderProperties, meshModelFaces []*meshes.ModelFace, matrixGrid mgl32.Mat4, camPos mgl32.Vec3) {
+func (rend *RendererForwardShadowMapping) Render(rp types.RenderProperties, meshModelFaces []*meshes.ModelFace, matrixGrid mgl32.Mat4, camPos mgl32.Vec3, selectedModel int32, lightSources []*objects.Light) {
 }
 
 // Dispose ...
