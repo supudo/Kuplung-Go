@@ -40,6 +40,7 @@ func NewViewControls() *ViewControls {
 	trigger.On(types.ActionSelectedObject, view.setSelectedObject)
 	trigger.On(types.ActionSelectedObjectLight, view.setSelectedObjectLight)
 	trigger.On(types.ActionClearGuiControls, view.clearScene)
+
 	return view
 }
 
