@@ -354,6 +354,7 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 		mesh.boundingBox.Render(matrixBB, mesh.OutlineColor)
 	}
 
+	// TODO: fix vertex sphere
 	if mesh.VertexSphereVisible {
 		mesh.vertexSphere.IsSphere = rsett.General.VertexSphereIsSphere
 		mesh.vertexSphere.ShowWireframes = rsett.General.VertexSphereShowWireframes
