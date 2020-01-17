@@ -318,6 +318,12 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		mfd.OutlineColor = rsett.General.OutlineColor
 		mfd.OutlineThickness = rsett.General.OutlineThickness
 		mfd.IsModelSelected = i == selectedModel
+		mfd.VertexSphereVisible = rsett.General.VertexSphereVisible
+		mfd.VertexSphereRadius = rsett.General.VertexSphereRadius
+		mfd.VertexSphereSegments = rsett.General.VertexSphereSegments
+		mfd.VertexSphereColor = rsett.General.VertexSphereColor
+		mfd.VertexSphereIsSphere = rsett.General.VertexSphereIsSphere
+		mfd.VertexSphereShowWireframes = rsett.General.VertexSphereShowWireframes
 
 		mvpMatrix := rsett.MatrixProjection.Mul4(rsett.MatrixCamera.Mul4(matrixModel))
 		gl.GLUniformMatrix4fv(rend.glVS_MVPMatrix, 1, false, &mvpMatrix[0])
@@ -648,13 +654,6 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 		gl.Uniform1f(rend.glVS_IsBorder, 0.0)
 		mtxModel = matrixModel.Mul4(mgl32.Scale3D(1.0, 1.0, 1.0))
 		gl.GLUniformMatrix4fv(rend.glFS_MMatrix, 1, false, &mtxModel[0])
-
-		mfd.VertexSphereVisible = rsett.General.VertexSphereVisible
-		mfd.VertexSphereRadius = rsett.General.VertexSphereRadius
-		mfd.VertexSphereSegments = rsett.General.VertexSphereSegments
-		mfd.VertexSphereColor = rsett.General.VertexSphereColor
-		mfd.VertexSphereIsSphere = rsett.General.VertexSphereIsSphere
-		mfd.VertexSphereShowWireframes = rsett.General.VertexSphereShowWireframes
 
 		mfd.Render(true)
 	}

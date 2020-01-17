@@ -94,11 +94,7 @@ func (rend *RendererSimple) Render(rp types.RenderProperties, meshModelFaces []*
 		matrixModel = matrixModel.Mul4(mgl32.Translate3D(mfd.PositionX.Point, mfd.PositionY.Point, mfd.PositionZ.Point))
 
 		mfd.MatrixModel = matrixModel
-		// mfd->Setting_ModelViewSkin = rp.viewModelSkin;
-		// mfd->lightSources = rp.lightSources;
-		// mfd->setOptionsFOV(rp.Setting_FOV);
-		// mfd->setOptionsOutlineColor(rp.Setting_OutlineColor);
-		// mfd->setOptionsOutlineThickness(rp.Setting_OutlineThickness);
+		mfd.ModelViewSkin = rsett.General.SelectedViewModelSkin
 
 		mvpMatrix := rsett.MatrixProjection.Mul4(rsett.MatrixCamera.Mul4(matrixModel))
 		gl.GLUniformMatrix4fv(rend.glMVPMatrix, 1, false, &mvpMatrix[0])

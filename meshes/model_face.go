@@ -344,6 +344,7 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 		gl.PolygonMode(oglconsts.FRONT_AND_BACK, oglconsts.FILL)
 	}
 
+	// TODO: fix bounding box
 	matrixBB := rsett.MatrixProjection.Mul4(rsett.MatrixCamera).Mul4(mgl32.Ident4())
 	if rsett.General.ShowBoundingBox && mesh.IsModelSelected {
 		mesh.boundingBox.Render(matrixBB, mesh.OutlineColor)

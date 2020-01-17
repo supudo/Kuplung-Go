@@ -225,7 +225,7 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 					settings.SaveRenderingSettings()
 				}
 				helpers.AddControlColor4("Color", &rsett.General.OutlineColor, &rsett.General.OutlineColorPickerOpen)
-				helpers.AddControlsSlider("Thickness", 2, 1.01, 0.0, 2.0, false, nil, &rsett.General.OutlineThickness, true, isFrame)
+				helpers.AddControlsSlider("Thickness", 2, 0.1, 0.0, 5.0, false, nil, &rsett.General.OutlineThickness, true, isFrame)
 			}
 			imgui.TreePop()
 		}

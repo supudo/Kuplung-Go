@@ -81,7 +81,7 @@ func (bb *BoundingBox) InitBuffers(meshModel types.MeshModel) {
 	bb.dataVertices = []float32{-0.5, -0.5, -0.5, 1.0, 0.5, -0.5, -0.5, 1.0, 0.5, 0.5, -0.5, 1.0, -0.5, 0.5, -0.5, 1.0, -0.5, -0.5, 0.5, 1.0, 0.5, -0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 1.0, -0.5, 0.5, 0.5, 1.0}
 	vboVertices := gl.GenBuffers(1)[0]
 	gl.BindBuffer(oglconsts.ARRAY_BUFFER, vboVertices)
-	gl.BufferData(oglconsts.ARRAY_BUFFER, len(bb.meshModel.Vertices)*3*4, gl.Ptr(bb.meshModel.Vertices), oglconsts.STATIC_DRAW)
+	gl.BufferData(oglconsts.ARRAY_BUFFER, len(bb.dataVertices)*3*4, gl.Ptr(bb.dataVertices), oglconsts.STATIC_DRAW)
 	gl.EnableVertexAttribArray(0)
 	gl.VertexAttribPointer(0, 3, oglconsts.FLOAT, false, 3*4, gl.PtrOffset(0))
 
@@ -89,7 +89,7 @@ func (bb *BoundingBox) InitBuffers(meshModel types.MeshModel) {
 	bb.dataIndices = []uint32{0, 1, 2, 3, 4, 5, 6, 7, 0, 4, 1, 5, 2, 6, 3, 7}
 	vboIndices := gl.GenBuffers(1)[0]
 	gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, vboIndices)
-	gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, int(bb.meshModel.CountIndices)*4, gl.Ptr(bb.meshModel.Indices), oglconsts.STATIC_DRAW)
+	gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, len(bb.dataIndices)*4, gl.Ptr(bb.dataIndices), oglconsts.STATIC_DRAW)
 
 	bb.minx = 0.0
 	bb.maxx = 0.0
@@ -187,12 +187,13 @@ func (bb *BoundingBox) Render(mtxModel mgl32.Mat4, outlineColor mgl32.Vec4) {
 		gl.GLUniformMatrix4fv(bb.glUniformMVPMatrix, 1, false, &mvpMatrix[0])
 		gl.Uniform3f(bb.glUniformColor, outlineColor.X(), outlineColor.Y(), outlineColor.Z())
 
-		// gl.DrawElements(oglconsts.LINE_LOOP, 4, oglconsts.UNSIGNED_INT, 4)
-		// gl.DrawElements(oglconsts.LINE_LOOP, 4, oglconsts.UNSIGNED_INT, (4 * 4))
-		// gl.DrawElements(oglconsts.LINES, 8, oglconsts.UNSIGNED_INT, (8 * 4))
-		gl.DrawElements(oglconsts.TRIANGLES, int32(len(bb.dataIndices)), oglconsts.UNSIGNED_INT, 0)
+		gl.DrawElementsOffset(oglconsts.LINE_LOOP, 4, oglconsts.UNSIGNED_INT, 0)
+		gl.DrawElementsOffset(oglconsts.LINE_LOOP, 4, oglconsts.UNSIGNED_INT, 4*4)
+		gl.DrawElementsOffset(oglconsts.LINES, 8, oglconsts.UNSIGNED_INT, 8*4)
 		gl.BindVertexArray(0)
 		gl.UseProgram(0)
+
+		gl.CheckForOpenGLErrors("BoundingBox-Render")
 	}
 }
 

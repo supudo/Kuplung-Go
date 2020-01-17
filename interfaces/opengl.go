@@ -37,6 +37,7 @@ type OpenGL interface {
 
 	DrawArrays(mode uint32, first int32, count int32)
 	DrawElements(mode uint32, count int32, elementType uint32, indices uintptr)
+	DrawElementsOffset(mode uint32, count int32, elementType uint32, offset int)
 
 	Enable(cap uint32)
 	EnableVertexAttribArray(index uint32)

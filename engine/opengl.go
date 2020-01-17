@@ -174,6 +174,11 @@ func (native *OpenGL) DrawElements(mode uint32, count int32, elementType uint32,
 	gl.DrawElements(mode, count, elementType, unsafe.Pointer(indices)) // nolint: govet,gas
 }
 
+// DrawElementsOffset implements the interfaces.OpenGL interface.
+func (native *OpenGL) DrawElementsOffset(mode uint32, count int32, elementType uint32, offset int) {
+	gl.DrawElements(mode, count, elementType, gl.PtrOffset(offset))
+}
+
 // Enable implements the interfaces.OpenGL interface.
 func (native *OpenGL) Enable(capability uint32) {
 	gl.Enable(capability)
