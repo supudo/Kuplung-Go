@@ -17,6 +17,7 @@ type ApplicationSettings struct {
 		AppFolder          string `yaml:"appFolder"`
 		CurrentFolder      string `yaml:"currentFolder"`
 		RendererType       uint32 `yaml:"RendererType"`
+		ShowLog            bool   `yaml:"showLog"`
 	} `yaml:"App"`
 	AppWindow struct {
 		SDLWindowWidth    float32 `yaml:"SDL_Window_Width"`

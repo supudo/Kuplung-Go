@@ -669,6 +669,8 @@ func (rend *RendererForward) Render(rp types.RenderProperties, meshModelFaces []
 	currentQuery = (currentQuery + 1) % querycount
 
 	gl.UseProgram(0)
+
+	gl.CheckForOpenGLErrors("RenderingForward-Render")
 }
 
 // Dispose ...

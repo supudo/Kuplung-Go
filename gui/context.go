@@ -107,6 +107,7 @@ type WindowVariables struct {
 
 // NewContext initializes a new UI context based on the provided OpenGL window.
 func NewContext(window interfaces.Window) *Context {
+	sett := settings.GetSettings()
 	imgui.SetAssertHandler(nil)
 	context := &Context{
 		imguiContext: imgui.CreateContext(nil),
@@ -129,7 +130,7 @@ func NewContext(window interfaces.Window) *Context {
 	context.GuiVars.showControls = true
 	context.GuiVars.showOptions = false
 
-	context.GuiVars.showLog = false
+	context.GuiVars.showLog = sett.App.ShowLog
 
 	context.GuiVars.showOpenDialog = false
 	context.GuiVars.showSaveDialog = false

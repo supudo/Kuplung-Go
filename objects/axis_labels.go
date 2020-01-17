@@ -46,6 +46,8 @@ func InitAxisLabels(window interfaces.Window) *AxisLabels {
 
 	axisLabels.glUniformMVPMatrix = gl.GLGetUniformLocation(axisLabels.shaderProgram, gl.Str("u_MVPMatrix\x00"))
 
+	gl.CheckForOpenGLErrors("AxisLabels")
+
 	return axisLabels
 }
 

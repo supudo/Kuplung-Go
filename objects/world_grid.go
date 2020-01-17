@@ -65,6 +65,8 @@ func InitWorldGrid(window interfaces.Window) *WorldGrid {
 	grid.InitProperties()
 	grid.InitBuffers(grid.GridSize, 1)
 
+	gl.CheckForOpenGLErrors("WorldGrid")
+
 	return grid
 }
 
@@ -239,6 +241,8 @@ func (grid *WorldGrid) InitBuffers(gridSize int32, unitSize float32) {
 	}
 
 	gl.BindVertexArray(0)
+
+	gl.CheckForOpenGLErrors("WorldGrid-InitBuffers")
 }
 
 // Render ...

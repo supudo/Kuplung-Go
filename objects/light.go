@@ -223,6 +223,8 @@ func (l *Light) InitBuffers() {
 	gl.BindVertexArray(0)
 
 	gl.DeleteBuffers([]uint32{vboVertices, vboNormals, vboIndices})
+
+	gl.CheckForOpenGLErrors("Light")
 }
 
 // Render ...

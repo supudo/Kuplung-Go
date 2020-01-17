@@ -5,6 +5,7 @@ import (
 	"github.com/supudo/Kuplung-Go/engine"
 	"github.com/supudo/Kuplung-Go/engine/oglconsts"
 	"github.com/supudo/Kuplung-Go/interfaces"
+	"github.com/supudo/Kuplung-Go/objects"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
 	"github.com/supudo/Kuplung-Go/utilities"
@@ -118,14 +119,20 @@ type ModelFace struct {
 	SolidLightSkinAmbientStrength float32
 	SolidLightSkinDiffuseStrength float32
 	SlidLightSkinSpecularStrength float32
+
+	boundingBox *objects.BoundingBox
 }
 
 // NewModelFace ...
 func NewModelFace(window interfaces.Window, model types.MeshModel) *ModelFace {
-	mesh := &ModelFace{}
-	mesh.window = window
-	mesh.MeshModel = model
+	mesh := &ModelFace{
+		window:    window,
+		MeshModel: model,
+	}
 	mesh.InitProperties()
+	mesh.boundingBox = objects.InitBoundingBox(window)
+	mesh.boundingBox.InitShaderProgram()
+	mesh.boundingBox.InitBuffers(model)
 	return mesh
 }
 
@@ -300,6 +307,8 @@ func (mesh *ModelFace) InitBuffers() {
 	gl.BindVertexArray(0)
 
 	gl.DeleteBuffers([]uint32{vboVertices, vboNormals, vboIndices})
+
+	gl.CheckForOpenGLErrors("ModelFace")
 }
 
 // Render ...
@@ -335,10 +344,9 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 		gl.PolygonMode(oglconsts.FRONT_AND_BACK, oglconsts.FILL)
 	}
 
-	// matrixBB := rsett.MatrixProjection.Mul(rsett.MatrixCamera).Mul(mgl32.Ident4())
-
+	matrixBB := rsett.MatrixProjection.Mul4(rsett.MatrixCamera).Mul4(mgl32.Ident4())
 	if rsett.General.ShowBoundingBox && mesh.IsModelSelected {
-		// mesh.boundingBox.Render(matrixBB, mesh.SettingOutlineColor)
+		mesh.boundingBox.Render(matrixBB, mesh.OutlineColor)
 	}
 
 	// if (this->vertexSphereVisible) {
@@ -390,5 +398,6 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 // Dispose ...
 func (mesh *ModelFace) Dispose() {
 	gl := mesh.window.OpenGL()
+	mesh.boundingBox.Dispose()
 	gl.DeleteProgram(mesh.GLVAO)
 }

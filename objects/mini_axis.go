@@ -44,6 +44,8 @@ func InitMiniAxis(window interfaces.Window) *MiniAxis {
 
 	miniAxis.InitProperties()
 
+	gl.CheckForOpenGLErrors("MiniAxis")
+
 	return miniAxis
 }
 

@@ -94,6 +94,8 @@ func (sb *SkyBox) InitBuffers() {
 
 		gl.BindVertexArray(0)
 	}
+
+	gl.CheckForOpenGLErrors("SkyBox")
 }
 
 // Render ...

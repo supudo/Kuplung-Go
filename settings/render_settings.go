@@ -134,6 +134,16 @@ func InitRenderingSettings() RenderingSettings {
 	rSettings.General.SelectedViewModelSkin = types.ViewModelSkinRendered
 	rSettings.General.ShowAllVisualArtefacts = true
 
+	rSettings.General.OcclusionCulling = false
+
+	rSettings.General.OutlineColor = mgl32.Vec4{1.0, 0.0, 0.0, 0.0}
+	rSettings.General.OutlineColorPickerOpen = false
+	rSettings.General.OutlineThickness = 1.01
+	rSettings.General.ShowBoundingBox = true
+	rSettings.General.BoundingBoxRefresh = false
+	rSettings.General.BoundingBoxPadding = 0.01
+	rSettings.General.ShowAllVisualArtefacts = true
+
 	return rSettings
 }
 
@@ -184,10 +194,10 @@ func ResetRenderSettings() {
 
 	rSettings.General.OcclusionCulling = false
 
-	rSettings.General.OutlineColor = mgl32.Vec4{0.0, 0.0, 0.0, 0.0}
+	rSettings.General.OutlineColor = mgl32.Vec4{1.0, 0.0, 0.0, 0.0}
 	rSettings.General.OutlineColorPickerOpen = false
 	rSettings.General.OutlineThickness = 1.01
-	rSettings.General.ShowBoundingBox = false
+	rSettings.General.ShowBoundingBox = true
 	rSettings.General.BoundingBoxRefresh = false
 	rSettings.General.BoundingBoxPadding = 0.01
 	rSettings.General.ShowAllVisualArtefacts = true

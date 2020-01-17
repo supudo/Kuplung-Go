@@ -6,6 +6,7 @@ App:
   currentFolder: 
   appFolder: 
   RendererType: 1
+  showLog: true
 
 # SDL & Window Settings
 AppWindow:

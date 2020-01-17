@@ -113,6 +113,8 @@ func (cm *CameraModel) InitBuffers() {
 	gl.BindVertexArray(0)
 
 	gl.DeleteBuffers([]uint32{vboVertices, vboNormals, vboIndices})
+
+	gl.CheckForOpenGLErrors("CameraModel")
 }
 
 // Render ...

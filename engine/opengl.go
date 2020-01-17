@@ -32,7 +32,7 @@ func (native *OpenGL) CheckForOpenGLErrors(message string) {
 	if sett.Rendering.ShowGLErrors {
 		err := gl.GetError()
 		if err != oglconsts.NO_ERROR {
-			errMessage := "[GLError] [" + message + "] glError = " + string(err)
+			errMessage := fmt.Sprintf("[GLError] [%v] glError = %X!", message, err)
 			alreadyReported := false
 			for _, n := range native.reportedErrors {
 				if errMessage == n {

@@ -41,6 +41,8 @@ func NewLightRay(window interfaces.Window) *RayLine {
 
 	lrModel.glUniformMVPMatrix = gl.GLGetUniformLocation(lrModel.shaderProgram, gl.Str("u_MVPMatrix\x00"))
 
+	gl.CheckForOpenGLErrors("RayLine")
+
 	lrModel.x = 999
 	lrModel.y = 999
 	lrModel.z = 999

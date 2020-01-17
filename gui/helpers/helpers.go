@@ -56,8 +56,7 @@ func AddControlColor3(title string, vValue *mgl32.Vec3, bValue *bool) {
 // AddControlColor4 ...
 func AddControlColor4(title string, vValue *mgl32.Vec4, bValue *bool) {
 	ceid := fmt.Sprintf("##101%v", title)
-	iconid := "C"
-	imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: vValue.X(), Y: vValue.Y(), Z: vValue.Z(), W: vValue.W()})
+	imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: vValue.X(), Y: vValue.Y(), Z: vValue.Z(), W: 1.0})
 	imgui.Text(title)
 	imgui.PopStyleColorV(1)
 	vv := [4]float32{vValue.X(), vValue.Y(), vValue.Z(), vValue.W()}
@@ -66,13 +65,12 @@ func AddControlColor4(title string, vValue *mgl32.Vec4, bValue *bool) {
 	vValue[1] = vv[1]
 	vValue[2] = vv[2]
 	vValue[3] = vv[3]
-	imgui.Text(ceid + " CE")
 	imgui.SameLine()
 	imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
 	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
 	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
 	imgui.PushStyleColor(imgui.StyleColorBorder, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
-	if imgui.ButtonV(iconid, imgui.Vec2{X: 0, Y: 0}) {
+	if imgui.ButtonV(ceid, imgui.Vec2{X: 0, Y: 0}) {
 		*bValue = !*bValue
 	}
 	imgui.PopStyleColorV(4)

@@ -130,6 +130,8 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 	for i = 0; i < int32(len(rm.MeshModelFaces)); i++ {
 		if imgui.SelectableV(rm.MeshModelFaces[i].MeshModel.ModelTitle, view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
 			view.selectedObject = i
+			rm.MeshModelFaces[i].IsModelSelected = true
+			rm.SceneSelectedModelObject = i
 		}
 	}
 	imgui.EndChild()

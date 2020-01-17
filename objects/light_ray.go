@@ -102,6 +102,8 @@ func (lr *LightRay) InitBuffers(position, direction mgl32.Vec3, simple bool) {
 
 		gl.BindVertexArray(0)
 		gl.DeleteBuffers([]uint32{vboVertices, vboIndices})
+
+		gl.CheckForOpenGLErrors("LightRay")
 	}
 }
 
