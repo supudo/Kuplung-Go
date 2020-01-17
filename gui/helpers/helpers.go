@@ -98,7 +98,7 @@ func AddControlsSliderSameLine(title string, idx int32, step float32, min float3
 
 // AddControlsIntegerSlider ...
 func AddControlsIntegerSlider(title string, idx, min, limit int32, animatedValue *int32) {
-	if len(title) == 0 {
+	if len(title) > 0 {
 		imgui.Text(fmt.Sprintf("%s", title))
 	}
 	sid := "##10" + fmt.Sprint(idx)

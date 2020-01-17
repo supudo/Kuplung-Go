@@ -144,6 +144,8 @@ func InitRenderingSettings() RenderingSettings {
 	rSettings.General.BoundingBoxPadding = 0.01
 	rSettings.General.ShowAllVisualArtefacts = true
 
+	rSettings.General.VertexSphereColor = mgl32.Vec4{1.0, 0.0, 0.0, 1.0}
+
 	return rSettings
 }
 

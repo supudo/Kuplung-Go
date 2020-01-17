@@ -120,7 +120,8 @@ type ModelFace struct {
 	SolidLightSkinDiffuseStrength float32
 	SlidLightSkinSpecularStrength float32
 
-	boundingBox *objects.BoundingBox
+	boundingBox  *objects.BoundingBox
+	vertexSphere *objects.VertexSphere
 }
 
 // NewModelFace ...
@@ -133,6 +134,9 @@ func NewModelFace(window interfaces.Window, model types.MeshModel) *ModelFace {
 	mesh.boundingBox = objects.InitBoundingBox(window)
 	mesh.boundingBox.InitShaderProgram()
 	mesh.boundingBox.InitBuffers(model)
+	mesh.vertexSphere = objects.InitVertexSphere(window)
+	mesh.vertexSphere.InitShaderProgram()
+	mesh.vertexSphere.InitBuffers(model, 10, 10)
 	return mesh
 }
 
@@ -350,12 +354,12 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 		mesh.boundingBox.Render(matrixBB, mesh.OutlineColor)
 	}
 
-	// if (this->vertexSphereVisible) {
-	//   this->vertexSphere->isSphere = this->vertexSphereIsSphere;
-	//   this->vertexSphere->showWireframes = this->vertexSphereShowWireframes;
-	//   this->vertexSphere->initBuffers(this->meshModel, this->vertexSphereSegments, this->vertexSphereRadius);
-	//   this->vertexSphere->render(matrixBB, vertexSphereColor);
-	// }
+	if mesh.VertexSphereVisible {
+		mesh.vertexSphere.IsSphere = rsett.General.VertexSphereIsSphere
+		mesh.vertexSphere.ShowWireframes = rsett.General.VertexSphereShowWireframes
+		mesh.vertexSphere.InitBuffers(mesh.MeshModel, rsett.General.VertexSphereSegments, rsett.General.VertexSphereRadius)
+		mesh.vertexSphere.Render(matrixBB, rsett.General.VertexSphereColor)
+	}
 
 	// if (this->getOptionsSelected() && (this->Setting_Gizmo_Rotate || this->Setting_Gizmo_Translate || this->Setting_Gizmo_Scale)) {
 	//   ImGuizmo::Enable(true);
@@ -400,5 +404,6 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 func (mesh *ModelFace) Dispose() {
 	gl := mesh.window.OpenGL()
 	mesh.boundingBox.Dispose()
+	mesh.vertexSphere.Dispose()
 	gl.DeleteProgram(mesh.GLVAO)
 }

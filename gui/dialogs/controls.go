@@ -26,7 +26,7 @@ type ViewControls struct {
 // NewViewControls ...
 func NewViewControls() *ViewControls {
 	view := &ViewControls{
-		selectedObject:      -1,
+		selectedObject:      0,
 		selectedObjectLight: -1,
 
 		heightTopPanel: 160,
