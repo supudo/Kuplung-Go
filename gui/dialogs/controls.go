@@ -139,14 +139,14 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 	imgui.ButtonV("###splitterGUI", imgui.Vec2{X: -1, Y: 4})
 	imgui.PopStyleColorV(3)
 	// TODO: get mouse delta up/down
-	// if imgui.IsMouseDown(0) {
-	// 	view.heightTopPanel += 4
+	// if imgui.IsMouseDown(0) { // if imgui.IsItemActive() {
+	// 	view.heightTopPanel += 4//ImGui::GetIO().MouseDelta.y;
 	// }
-	if imgui.IsItemHovered() {
-		imgui.SetMouseCursor(imgui.MouseCursorResizeNS)
-	} else {
-		imgui.SetMouseCursor(imgui.MouseCursorNone)
-	}
+	// if imgui.IsItemHovered() {
+	// 	imgui.SetMouseCursor(imgui.MouseCursorResizeNS)
+	// } else {
+	// 	imgui.SetMouseCursor(imgui.MouseCursorNone)
+	// }
 
 	imgui.BeginChildV("Properties Pane", imgui.Vec2{X: 0, Y: 0}, false, 0)
 	imgui.PushItemWidth(imgui.WindowWidth() * .75)
