@@ -7,6 +7,7 @@ import (
 
 	"github.com/inkyblackness/imgui-go"
 	"github.com/sadlil/go-trigger"
+	"github.com/supudo/Kuplung-Go/gui/fonts"
 	"github.com/supudo/Kuplung-Go/settings"
 	"github.com/supudo/Kuplung-Go/types"
 	"github.com/supudo/Kuplung-Go/utilities"
@@ -22,18 +23,13 @@ func (context *Context) DrawMainMenu() {
 
 	if imgui.BeginMenu("File") {
 		// TODO: add FA icons
-		// lbl := ""
-		// lbl += fmt.Sprintf("%#U", fonts.FA_ICON_FILE_O) + " "
-		// lbl += fmt.Sprintf("%q", '\uf001') + " "
-		// lbl += fmt.Sprintf("%v", fonts.FA_ICON_FILE_O) + " "
-		// lbl += "New"
-		if imgui.MenuItem("New") { // fonts.FA_ICON_FILE_O
+		if imgui.MenuItem(fmt.Sprintf("%c New", fonts.FA_ICON_FILE_O)) {
 			_, _ = trigger.Fire(types.ActionGuiActionFileNew)
 		}
-		if imgui.MenuItem("Open ...") { // fonts.FA_ICON_FOLDER_OPEN_O
+		if imgui.MenuItem(fmt.Sprintf("%c Open ...", fonts.FA_ICON_FOLDER_OPEN_O)) {
 			context.GuiVars.showOpenDialog = true
 		}
-		if imgui.BeginMenu("Open Recent") { // fonts.FA_ICON_FILES_O
+		if imgui.BeginMenu(fmt.Sprintf("%c Open Recent", fonts.FA_ICON_FILES_O)) {
 			// if (this->recentFiles.size() == 0)
 			// 	imgui.MenuItem("No recent files", nil, false, false);
 			// else {
@@ -53,13 +49,13 @@ func (context *Context) DrawMainMenu() {
 			imgui.EndMenu()
 		}
 
-		if imgui.MenuItem("Save ...") { // fonts.FA_ICON_FLOPPY_O
+		if imgui.MenuItem(fmt.Sprintf("%c Save ...", fonts.FA_ICON_FLOPPY_O)) {
 			context.GuiVars.showSaveDialog = true
 		}
 
 		imgui.Separator()
 
-		if imgui.BeginMenu("Import") {
+		if imgui.BeginMenu("   Import") {
 			if imgui.MenuItemV("Wavefront (.OBJ)", "", context.GuiVars.showImporterFile, true) {
 				context.GuiVars.showImporterFile = true
 				context.GuiVars.dialogImportType = types.ImportExportFormatOBJ
@@ -88,7 +84,7 @@ func (context *Context) DrawMainMenu() {
 			imgui.EndMenu()
 		}
 
-		if imgui.BeginMenu("Import Recent") { // fonts.FA_ICON_FILES_O
+		if imgui.BeginMenu(fmt.Sprintf("%c Import Recent", fonts.FA_ICON_FILES_O)) {
 			if len(context.GuiVars.recentFilesImported) == 0 {
 				imgui.MenuItem("No recent files")
 			} else {
@@ -113,7 +109,7 @@ func (context *Context) DrawMainMenu() {
 			imgui.EndMenu()
 		}
 
-		if imgui.BeginMenu("Export") {
+		if imgui.BeginMenu("   Export") {
 			if imgui.MenuItemV("Wavefront (.OBJ)", "", context.GuiVars.showExporterFile, true) {
 				context.GuiVars.showExporterFile = true
 				context.GuiVars.dialogExportType = types.ImportExportFormatOBJ
@@ -150,14 +146,14 @@ func (context *Context) DrawMainMenu() {
 		} else if runtime.GOOS == "windows" {
 			quitShortcut = "Alt+F4"
 		}
-		if imgui.MenuItemV("Quit", quitShortcut, false, true) {
+		if imgui.MenuItemV(fmt.Sprintf("%c Quit", fonts.FA_ICON_POWER_OFF), quitShortcut, false, true) {
 			os.Exit(3)
 		}
 		imgui.EndMenu()
 	}
 
 	if imgui.BeginMenu("Scene") {
-		if imgui.BeginMenu("Add Light") {
+		if imgui.BeginMenu(fmt.Sprintf("%c Add Light", fonts.FA_ICON_LIGHTBULB_O)) {
 			if imgui.MenuItem("Directional (Sun)") {
 				_, _ = trigger.Fire(types.ActionGuiAddLight, types.LightSourceTypeDirectional)
 			}
@@ -170,7 +166,7 @@ func (context *Context) DrawMainMenu() {
 			imgui.EndMenu()
 		}
 		imgui.Separator()
-		if imgui.BeginMenu("Scene Rendering") {
+		if imgui.BeginMenu(fmt.Sprintf("%c Scene Rendering", fonts.FA_ICON_CERTIFICATE)) {
 			if imgui.MenuItemV("Solid", "", rsett.General.SelectedViewModelSkin == types.ViewModelSkinSolid, true) {
 				rsett.General.SelectedViewModelSkin = types.ViewModelSkinSolid
 			}
@@ -191,78 +187,84 @@ func (context *Context) DrawMainMenu() {
 			imgui.EndMenu()
 		}
 		imgui.Separator()
-		imgui.MenuItemV("Render Image", "", context.GuiVars.showImageSave, true)
-		imgui.MenuItemV("Renderer UI", "", context.GuiVars.showRendererUI, true)
+		imgui.MenuItemV(fmt.Sprintf("%c Render Image", fonts.FA_ICON_FILE_IMAGE_O), "", context.GuiVars.showImageSave, true)
+		imgui.MenuItemV(fmt.Sprintf("%c Renderer UI", fonts.FA_ICON_CUBES), "", context.GuiVars.showRendererUI, true)
 
 		imgui.EndMenu()
 	}
 
 	if imgui.BeginMenu("View") {
-		if imgui.MenuItem("Models") {
+		lbl := fmt.Sprintf("%c GUI Controls", fonts.FA_ICON_TOGGLE_ON)
+		if context.GuiVars.showModels {
+			lbl = fmt.Sprintf("%c GUI Controls", fonts.FA_ICON_TOGGLE_OFF)
+		}
+		if imgui.MenuItem(lbl) {
 			context.GuiVars.showModels = !context.GuiVars.showModels
 		}
-		if imgui.MenuItem("Controls") {
+		lbl = fmt.Sprintf("%c Controls", fonts.FA_ICON_TOGGLE_ON)
+		if context.GuiVars.showControls {
+			lbl = fmt.Sprintf("%c Controls", fonts.FA_ICON_TOGGLE_OFF)
+		}
+		if imgui.MenuItem(lbl) {
 			context.GuiVars.showControls = !context.GuiVars.showControls
 		}
-		lblVisualArtefacts := ""
+		lbl = fmt.Sprintf("%c Show Visual Artefacts", fonts.FA_ICON_TOGGLE_ON)
 		if rsett.General.ShowAllVisualArtefacts {
-			lblVisualArtefacts = "Hide Visual Artefacts"
-		} else {
-			lblVisualArtefacts = "Show Visual Artefacts"
+			lbl = fmt.Sprintf("%c Hide Visual Artefacts", fonts.FA_ICON_TOGGLE_OFF)
 		}
-		if imgui.MenuItem(lblVisualArtefacts) {
+		if imgui.MenuItem(lbl) {
 			rsett.General.ShowAllVisualArtefacts = !rsett.General.ShowAllVisualArtefacts
 		}
 		imgui.Separator()
-		if imgui.MenuItem("Show Log Window") { // fonts.FA_ICON_BUG
+		if imgui.MenuItem(fmt.Sprintf("%c Show Log Window", fonts.FA_ICON_BUG)) {
 			context.GuiVars.showLog = !context.GuiVars.showLog
 		}
 		if sett.App.RendererType == types.InAppRendererTypeForward {
-			if imgui.MenuItem("IDE") { // fonts.FA_ICON_PENCIL
+			if imgui.MenuItem(fmt.Sprintf("%c IDE", fonts.FA_ICON_PENCIL)) {
 				context.GuiVars.showKuplungIDE = !context.GuiVars.showKuplungIDE
 			}
 		}
-		if imgui.MenuItem("Screenshot") { // fonts.FA_ICON_DESKTOP
+		if imgui.MenuItem(fmt.Sprintf("%c Screenshot", fonts.FA_ICON_DESKTOP)) {
 			context.GuiVars.showScreenshotWindow = !context.GuiVars.showScreenshotWindow
 		}
-		if imgui.MenuItem("Scene Statistics") { // fonts.FA_ICON_TACHOMETER
+		if imgui.MenuItem(fmt.Sprintf("%c Scene Statistics", fonts.FA_ICON_TACHOMETER)) {
 			context.GuiVars.showSceneStats = !context.GuiVars.showSceneStats
 		}
-		if imgui.MenuItem("Structured Volumetric Sampling") { // fonts.FA_ICON_PAPER_PLANE_O
+		if imgui.MenuItem(fmt.Sprintf("%c Structured Volumetric Sampling", fonts.FA_ICON_PAPER_PLANE_O)) {
 			context.GuiVars.showSVS = !context.GuiVars.showSVS
 		}
-		if imgui.MenuItem("Shadertoy") { // fonts.FА_ICON_BICYCLE
+		if imgui.MenuItem(fmt.Sprintf("%c Shadertoy", fonts.FA_ICON_PAPER_PLANE_O)) {
 			context.GuiVars.showShadertoy = !context.GuiVars.showShadertoy
 		}
 		imgui.Separator()
-		if imgui.MenuItem("Options") {
+		if imgui.MenuItem(fmt.Sprintf("%c Options", fonts.FA_ICON_COG)) {
 			context.GuiVars.showOptions = !context.GuiVars.showOptions
 		}
 		imgui.Separator()
-		if imgui.MenuItem("Cube") {
+		if imgui.MenuItem(fmt.Sprintf("%c Cube", fonts.FA_ICON_CUBE)) {
 			rsett.General.ShowCube = !rsett.General.ShowCube
 		}
 		imgui.EndMenu()
 	}
 
 	if imgui.BeginMenu("Help") {
-		if imgui.MenuItem("Metrics") {
+		if imgui.MenuItem(fmt.Sprintf("%c Metrics", fonts.FA_ICON_INFO)) {
 			context.GuiVars.showMetrics = !context.GuiVars.showMetrics
 		}
-		if imgui.MenuItem("About ImGui") {
+		if imgui.MenuItem(fmt.Sprintf("%c About ImGui", fonts.FA_ICON_INFO_CIRCLE)) {
 			context.GuiVars.showAboutImGui = !context.GuiVars.showAboutImGui
 		}
-		if imgui.MenuItem("About Kuplung") {
+		if imgui.MenuItem(fmt.Sprintf("%c About Kuplung", fonts.FA_ICON_INFO_CIRCLE)) {
 			context.GuiVars.showAboutKuplung = !context.GuiVars.showAboutKuplung
 		}
 		imgui.Separator()
-		if imgui.MenuItem("ImGui Demo Window") {
+		if imgui.MenuItem("   ImGui Demo Window") {
 			context.GuiVars.showDemoWindow = !context.GuiVars.showDemoWindow
 		}
 		imgui.EndMenu()
 	}
 
-	imgui.Text(fmt.Sprintf("  | [%.4f ms/frame] %d objs, %d verts, %d indices (%d tris, %d faces) | %v", sett.MemSettings.NbResult, sett.MemSettings.TotalObjects, sett.MemSettings.TotalVertices, sett.MemSettings.TotalIndices, sett.MemSettings.TotalTriangles, sett.MemSettings.TotalFaces, utilities.GetUsage()))
+	imgui.Text(fmt.Sprintf(" | [%.4f ms/frame] %d objs, %d verts, %d indices (%d tris, %d faces) | %v", sett.MemSettings.NbResult, sett.MemSettings.TotalObjects, sett.MemSettings.TotalVertices, sett.MemSettings.TotalIndices, sett.MemSettings.TotalTriangles, sett.MemSettings.TotalFaces, utilities.GetUsage()))
 
 	imgui.EndMainMenuBar()
 }

@@ -416,8 +416,6 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL) error {
 	sett := settings.GetSettings()
 	fileFA := sett.App.AppFolder + "fonts/fontawesome-webfont.ttf"
 	fontConfigFA := imgui.NewFontConfig()
-	fontConfigFA.SetGlyphMinAdvanceX(float32(fonts.FA_ICON_MIN))
-	fontConfigFA.SetGlyphMaxAdvanceX(float32(fonts.FA_ICON_MAX))
 	fontConfigFA.SetMergeMode(true)
 	fontConfigFA.SetPixelSnapH(true)
 	var builderFA imgui.GlyphRangesBuilder
@@ -428,8 +426,6 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL) error {
 
 	fileMD := sett.App.AppFolder + "fonts/material-icons-regular.ttf"
 	fontConfigMD := imgui.NewFontConfig()
-	fontConfigMD.SetGlyphMinAdvanceX(float32(fonts.MD_ICON_MIN))
-	fontConfigMD.SetGlyphMaxAdvanceX(float32(fonts.MD_ICON_MAX))
 	fontConfigMD.SetMergeMode(true)
 	fontConfigMD.SetPixelSnapH(true)
 	var builderMD imgui.GlyphRangesBuilder
