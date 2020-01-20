@@ -40,7 +40,7 @@ func (comp *ComponentIDE) Render(open *bool) {
 			for i = 0; i < int32(len(comp.items)); i++ {
 				sksel := (i == comp.selectedItem)
 				if imgui.SelectableV(comp.items[i], sksel, 0, imgui.Vec2{X: 0, Y: 0}) {
-					comp.selectedItem = i - 1
+					comp.selectedItem = i
 				}
 				if sksel {
 					imgui.SetItemDefaultFocus()
@@ -56,15 +56,15 @@ func (comp *ComponentIDE) Render(open *bool) {
 
 		if imgui.ButtonV("Compile Shaders", imgui.Vec2{X: -1.0, Y: 40.0}) {
 			if sett.App.RendererType == types.InAppRendererTypeForward {
-				if comp.selectedItem == 0 {
+				if comp.selectedItem == 1 {
 					sett.Components.ShaderSourceVertex = comp.selectedContent
-				} else if comp.selectedItem == 1 {
-					sett.Components.ShaderSourceGeometry = comp.selectedContent
 				} else if comp.selectedItem == 2 {
-					sett.Components.ShaderSourceTCS = comp.selectedContent
+					sett.Components.ShaderSourceGeometry = comp.selectedContent
 				} else if comp.selectedItem == 3 {
-					sett.Components.ShaderSourceTES = comp.selectedContent
+					sett.Components.ShaderSourceTCS = comp.selectedContent
 				} else if comp.selectedItem == 4 {
+					sett.Components.ShaderSourceTES = comp.selectedContent
+				} else if comp.selectedItem == 5 {
 					sett.Components.ShaderSourceFragment = comp.selectedContent
 				}
 				sett.Components.ShouldRecompileShaders = true
@@ -83,15 +83,15 @@ func (comp *ComponentIDE) loadSelectedItem() {
 	sett := settings.GetSettings()
 
 	if sett.App.RendererType == types.InAppRendererTypeForward {
-		if comp.selectedItem == 0 {
+		if comp.selectedItem == 1 {
 			comp.selectedContent = sett.Components.ShaderSourceVertex
-		} else if comp.selectedItem == 1 {
-			comp.selectedContent = sett.Components.ShaderSourceGeometry
 		} else if comp.selectedItem == 2 {
-			comp.selectedContent = sett.Components.ShaderSourceTCS
+			comp.selectedContent = sett.Components.ShaderSourceGeometry
 		} else if comp.selectedItem == 3 {
-			comp.selectedContent = sett.Components.ShaderSourceTES
+			comp.selectedContent = sett.Components.ShaderSourceTCS
 		} else if comp.selectedItem == 4 {
+			comp.selectedContent = sett.Components.ShaderSourceTES
+		} else if comp.selectedItem == 5 {
 			comp.selectedContent = sett.Components.ShaderSourceFragment
 		}
 	}
