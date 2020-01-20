@@ -1,9 +1,12 @@
 package dialogs
 
 import (
+	"fmt"
+
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/inkyblackness/imgui-go"
 	"github.com/sadlil/go-trigger"
+	"github.com/supudo/Kuplung-Go/gui/fonts"
 	"github.com/supudo/Kuplung-Go/gui/helpers"
 	"github.com/supudo/Kuplung-Go/rendering"
 	"github.com/supudo/Kuplung-Go/settings"
@@ -70,44 +73,44 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 	for i := 0; i < 7; i++ {
 		switch i {
 		case 0:
-			if imgui.SelectableV("General", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
+			if imgui.SelectableV(fmt.Sprintf("%c General", fonts.FA_ICON_ASTERISK), view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
 				view.selectedObject = i
 				view.selectedObjectLight = -1
 				imgui.Text("...")
 			}
 		case 1:
-			if imgui.SelectableV("Camera", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
+			if imgui.SelectableV(fmt.Sprintf("%c Camera", fonts.FA_ICON_EYE), view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
 				view.selectedObject = i
 				view.selectedObjectLight = -1
 			}
 		case 2:
-			if imgui.SelectableV("Camera Model", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
+			if imgui.SelectableV(fmt.Sprintf("%c Camera Model", fonts.FA_ICON_VIDEO_CAMERA), view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
 				view.selectedObject = i
 				view.selectedObjectLight = -1
 			}
 		case 3:
-			if imgui.SelectableV("Grid", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
+			if imgui.SelectableV(fmt.Sprintf("%c Grid", fonts.FA_ICON_BARS), view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
 				view.selectedObject = i
 				view.selectedObjectLight = -1
 			}
 		case 4:
-			if imgui.SelectableV("Scene Lights", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
+			if imgui.SelectableV(fmt.Sprintf("%c Scene Lights", fonts.FA_ICON_SUN_O), view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
 				view.selectedObject = i
 				view.selectedObjectLight = -1
 			}
 		case 5:
-			if imgui.SelectableV("Skybox", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
+			if imgui.SelectableV(fmt.Sprintf("%c Skybox", fonts.FA_ICON_TREE), view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
 				view.selectedObject = i
 				view.selectedObjectLight = -1
 			}
 		case 6:
 			if len(rm.LightSources) == 0 {
-				if imgui.SelectableV("Lights", view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
+				if imgui.SelectableV(fmt.Sprintf("%c Lights", fonts.FA_ICON_LIGHTBULB_O), view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
 					view.selectedObject = i
 					view.selectedObjectLight = -1
 				}
 			} else {
-				if imgui.TreeNodeV("Lights", imgui.TreeNodeFlagsCollapsingHeader) {
+				if imgui.TreeNodeV(fmt.Sprintf("%c Lights", fonts.FA_ICON_LIGHTBULB_O), imgui.TreeNodeFlagsCollapsingHeader) {
 					var j int
 					for j = 0; j < len(rm.LightSources); j++ {
 						lsopen := false
@@ -147,6 +150,9 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 
 	imgui.BeginChildV("Properties Pane", imgui.Vec2{X: 0, Y: 0}, false, 0)
 	imgui.PushItemWidth(imgui.WindowWidth() * .75)
+	imgui.PushStyleColor(imgui.StyleColorTab, imgui.Vec4{X: 153 / 255.0, Y: 61 / 255.0, Z: 61 / 255.0, W: 1.0})
+	imgui.PushStyleColor(imgui.StyleColorTabHovered, imgui.Vec4{X: 179 / 255.0, Y: 54 / 255.0, Z: 54 / 255.0, W: 1.0})
+	imgui.PushStyleColor(imgui.StyleColorTabActive, imgui.Vec4{X: 204 / 255.0, Y: 41 / 255.0, Z: 41 / 255.0, W: 1.0})
 	switch view.selectedObject {
 	case 0:
 		if imgui.TreeNodeV("View Options", imgui.TreeNodeFlagsCollapsingHeader) {
@@ -240,6 +246,16 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 			}
 		}
 	case 1:
+		// imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 153 / 255.0, Y: 61 / 255.0, Z: 61 / 255.0, W: 1.0})
+		// imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 179 / 255.0, Y: 54 / 255.0, Z: 54 / 255.0, W: 1.0})
+		// imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: 204 / 255.0, Y: 41 / 255.0, Z: 41 / 255.0, W: 1.0})
+		// imgui.ButtonV(fmt.Sprintf(" %c ", fonts.MD_ICON_REMOVE_RED_EYE), imgui.Vec2{X: 60, Y: 30})
+		// imgui.SameLine()
+		// imgui.ButtonV(fmt.Sprintf(" %c ", fonts.MD_ICON_3D_ROTATION), imgui.Vec2{X: 60, Y: 30})
+		// imgui.SameLine()
+		// imgui.ButtonV(fmt.Sprintf(" %c ", fonts.MD_ICON_OPEN_WITH), imgui.Vec2{X: 60, Y: 30})
+		// imgui.PopStyleColorV(3)
+
 		if imgui.BeginTabBarV("cameraTabs", imgui.TabBarFlagsNoCloseWithMiddleMouseButton|imgui.TabBarFlagsNoTooltip) {
 			if imgui.BeginTabItem("Look At") {
 				imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: .6, Y: .2, Z: .2, W: 1})
@@ -487,6 +503,7 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 			imgui.EndTabBar()
 		}
 	}
+	imgui.PopStyleColorV(3)
 	imgui.PopItemWidth()
 	imgui.EndChild()
 

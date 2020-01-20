@@ -82,6 +82,10 @@ func (view *ViewModels) Render(open, isFrame *bool, rm *rendering.RenderManager)
 	imgui.SetNextWindowSizeV(imgui.Vec2{X: 300, Y: float32(sett.AppWindow.SDLWindowHeight - 40)}, imgui.ConditionFirstUseEver)
 	imgui.SetNextWindowPosV(imgui.Vec2{X: 10, Y: 28}, imgui.ConditionFirstUseEver, imgui.Vec2{X: 0, Y: 0})
 
+	imgui.PushStyleColor(imgui.StyleColorTab, imgui.Vec4{X: 153 / 255.0, Y: 61 / 255.0, Z: 61 / 255.0, W: 1.0})
+	imgui.PushStyleColor(imgui.StyleColorTabHovered, imgui.Vec4{X: 179 / 255.0, Y: 54 / 255.0, Z: 54 / 255.0, W: 1.0})
+	imgui.PushStyleColor(imgui.StyleColorTabActive, imgui.Vec4{X: 204 / 255.0, Y: 41 / 255.0, Z: 41 / 255.0, W: 1.0})
+
 	if imgui.BeginV("Models", open, imgui.WindowFlagsResizeFromAnySide) {
 		if imgui.BeginTabBarV("cameraTabs", imgui.TabBarFlagsNoCloseWithMiddleMouseButton|imgui.TabBarFlagsNoTooltip) {
 			if imgui.BeginTabItem("Create") {
@@ -104,6 +108,8 @@ func (view *ViewModels) Render(open, isFrame *bool, rm *rendering.RenderManager)
 		}
 		imgui.End()
 	}
+
+	imgui.PopStyleColorV(3)
 }
 
 func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
@@ -227,7 +233,7 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 			view.showTextureImage(mmf, types.MaterialTextureTypeSpecularExp, "SpecularExp", &view.showTextureWindowSpecularExp, &view.showTextureSpecularExp, &view.vboTextureSpecularExp, &view.textureSpecularExpWidth, &view.textureSpecularExpHeight, rm)
 		}
 
-		K_DCM_ReadOnly := false
+		KDCMReadOnly := false
 
 		imgui.Separator()
 		if imgui.BeginTabBarV("Model Properties", imgui.TabBarFlagsNoCloseWithMiddleMouseButton|imgui.TabBarFlagsNoTooltip) {
@@ -256,17 +262,17 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 				// TODO: Gizmo
 				imgui.Checkbox("Scale all", &rm.MeshModelFaces[view.selectedObject].Scale0)
 				if rm.MeshModelFaces[view.selectedObject].Scale0 {
-					imgui.Checkbox("", &K_DCM_ReadOnly)
+					imgui.Checkbox("", &KDCMReadOnly)
 					imgui.SameLine()
 					imgui.SliderFloat("##001", &rm.MeshModelFaces[view.selectedObject].ScaleX.Point, 0.05, halfGridSize)
 					imgui.SameLine()
 					imgui.Text("X")
-					imgui.Checkbox("", &K_DCM_ReadOnly)
+					imgui.Checkbox("", &KDCMReadOnly)
 					imgui.SameLine()
 					imgui.SliderFloat("##001", &rm.MeshModelFaces[view.selectedObject].ScaleY.Point, 0.05, halfGridSize)
 					imgui.SameLine()
 					imgui.Text("Y")
-					imgui.Checkbox("", &K_DCM_ReadOnly)
+					imgui.Checkbox("", &KDCMReadOnly)
 					imgui.SameLine()
 					imgui.SliderFloat("##001", &rm.MeshModelFaces[view.selectedObject].ScaleZ.Point, 0.05, halfGridSize)
 					imgui.SameLine()

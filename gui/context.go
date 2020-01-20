@@ -431,7 +431,7 @@ func (context *Context) createFontsTexture(gl interfaces.OpenGL) error {
 	var builderMD imgui.GlyphRangesBuilder
 	builderMD.Add(rune(fonts.MD_ICON_MIN), rune(fonts.MD_ICON_MAX))
 	rangesMD := builderMD.Build()
-	context.fontMD = fontAtlas.AddFontFromFileTTFV(fileMD, 14, fontConfigMD, rangesMD.GlyphRanges)
+	context.fontMD = fontAtlas.AddFontFromFileTTFV(fileMD, 20, fontConfigMD, rangesMD.GlyphRanges)
 	fontConfigMD.Delete()
 
 	image := fontAtlas.TextureDataAlpha8()
