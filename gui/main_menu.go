@@ -22,7 +22,6 @@ func (context *Context) DrawMainMenu() {
 	imgui.BeginMainMenuBar()
 
 	if imgui.BeginMenu("File") {
-		// TODO: add FA icons
 		if imgui.MenuItem(fmt.Sprintf("%c New", fonts.FA_ICON_FILE_O)) {
 			_, _ = trigger.Fire(types.ActionGuiActionFileNew)
 		}

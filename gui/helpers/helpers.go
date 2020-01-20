@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/inkyblackness/imgui-go"
+	"github.com/supudo/Kuplung-Go/gui/fonts"
 )
 
 // AddControlsSlider ...
@@ -31,6 +32,7 @@ func AddControlsSlider(title string, idx int32, step float32, min float32, limit
 // AddControlColor3 ...
 func AddControlColor3(title string, vValue *mgl32.Vec3, bValue *bool) {
 	ceid := fmt.Sprintf("##101%v", title)
+	iconid := fmt.Sprintf("%c %v", fonts.MD_ICON_COLORIZE, ceid)
 	imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: vValue.X(), Y: vValue.Y(), Z: vValue.Z(), W: 1})
 	imgui.Text(title)
 	imgui.PopStyleColor()
@@ -44,7 +46,7 @@ func AddControlColor3(title string, vValue *mgl32.Vec3, bValue *bool) {
 	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
 	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
 	imgui.PushStyleColor(imgui.StyleColorBorder, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
-	if imgui.ButtonV(ceid, imgui.Vec2{X: 0, Y: 0}) {
+	if imgui.ButtonV(iconid, imgui.Vec2{X: 0, Y: 0}) {
 		*bValue = !*bValue
 	}
 	imgui.PopStyleColorV(4)
@@ -56,6 +58,7 @@ func AddControlColor3(title string, vValue *mgl32.Vec3, bValue *bool) {
 // AddControlColor4 ...
 func AddControlColor4(title string, vValue *mgl32.Vec4, bValue *bool) {
 	ceid := fmt.Sprintf("##101%v", title)
+	iconid := fmt.Sprintf("%c %v", fonts.MD_ICON_COLORIZE, ceid)
 	imgui.PushStyleColor(imgui.StyleColorText, imgui.Vec4{X: vValue.X(), Y: vValue.Y(), Z: vValue.Z(), W: 1.0})
 	imgui.Text(title)
 	imgui.PopStyleColorV(1)
@@ -70,7 +73,7 @@ func AddControlColor4(title string, vValue *mgl32.Vec4, bValue *bool) {
 	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
 	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
 	imgui.PushStyleColor(imgui.StyleColorBorder, imgui.Vec4{X: 0, Y: 0, Z: 0, W: 0})
-	if imgui.ButtonV(ceid, imgui.Vec2{X: 0, Y: 0}) {
+	if imgui.ButtonV(iconid, imgui.Vec2{X: 0, Y: 0}) {
 		*bValue = !*bValue
 	}
 	imgui.PopStyleColorV(4)
