@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/inkyblackness/imgui-go"
@@ -18,11 +19,9 @@ func (context *Context) dialogSceneStats(open *bool) {
 	imgui.Text("GLSL version: 4.10 (" + gl.GetShadingLanguageVersion() + ")")
 	imgui.Text("Vendor: " + gl.GetVendorName())
 	imgui.Text("Renderer: " + gl.GetRendererName())
-	// imgui.Separator()
-	// imgui.Text("Mouse Position: (%.1f, %.1f)", imgui.GetIO().MousePos.x, imgui.GetIO().MousePos.y);
-	// imgui.Separator()
-	// imgui.Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / imgui.GetIO().Framerate, imgui.GetIO().Framerate);
-	// imgui.Text("%d vertices, %d indices (%d triangles)", sett. imgui.GetIO().MetricsRenderVertices, imgui.GetIO().MetricsRenderIndices, imgui.GetIO().MetricsRenderIndices / 3);
+	imgui.Separator()
+	imgui.Text(fmt.Sprintf("Application average %.3f ms/frame (%.1f FPS)", 1000.0/imgui.CurrentIO().Framerate(), imgui.CurrentIO().Framerate()))
+	imgui.Text(fmt.Sprintf("%d vertices, %d indices (%d triangles)", imgui.CurrentIO().MetricsRenderVertices(), imgui.CurrentIO().MetricsRenderIndices(), imgui.CurrentIO().MetricsRenderIndices()/3))
 }
 
 func (context *Context) popupRecentFileImportedDoesntExists(open *bool) {

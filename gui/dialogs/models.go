@@ -22,7 +22,7 @@ type ViewModels struct {
 	selectedObject   int32
 	selectedTabScene int32
 
-	heightTopPanel float32
+	heightPanel float32
 
 	showTextureWindowAmbient      bool
 	showTextureWindowDiffuse      bool
@@ -71,7 +71,7 @@ func NewViewModels() *ViewModels {
 	return &ViewModels{
 		selectedObject:   -1,
 		selectedTabScene: -1,
-		heightTopPanel:   170,
+		heightPanel:      170,
 	}
 }
 
@@ -123,6 +123,7 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 	if imgui.ButtonV("Reset values to default", imgui.Vec2{X: -1, Y: 0}) {
 		for i := 0; i < len(rm.MeshModelFaces); i++ {
 			rm.MeshModelFaces[i].InitProperties()
+			view.heightPanel = 170
 		}
 	}
 	imgui.PopStyleColorV(3)
@@ -131,7 +132,7 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 	imgui.PushStyleVarVec2(imgui.StyleVarWindowPadding, imgui.Vec2{X: 20, Y: 0})
 	imgui.PushStyleColor(imgui.StyleColorFrameBg, imgui.Vec4{X: 1.0, Y: 0.0, Z: 0.0, W: 1.0})
 	imgui.PushItemWidth(imgui.WindowWidth() * .95)
-	imgui.BeginChildV("Scene Items", imgui.Vec2{X: 0, Y: view.heightTopPanel}, true, 0)
+	imgui.BeginChildV("Scene Items", imgui.Vec2{X: 0, Y: view.heightPanel}, true, 0)
 	var i int32
 	for i = 0; i < int32(len(rm.MeshModelFaces)); i++ {
 		if imgui.SelectableV(rm.MeshModelFaces[i].MeshModel.ModelTitle, view.selectedObject == i, 0, imgui.Vec2{X: 0, Y: 0}) {
@@ -145,16 +146,14 @@ func (view *ViewModels) drawModels(isFrame *bool, rm *rendering.RenderManager) {
 	imgui.PopStyleColor()
 	imgui.PopStyleVarV(2)
 
-	sc := float32(1.0 / 255.0)
-	imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 89.0 * sc, Y: 91.0 * sc, Z: 94 * sc, W: 1})
-	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 119.0 * sc, Y: 122.0 * sc, Z: 124.0 * sc, W: 1})
+	imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 89.0 / 255.0, Y: 91.0 / 255.0, Z: 94 / 255.0, W: 1})
+	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 119.0 / 255.0, Y: 122.0 / 255.0, Z: 124.0 / 255.0, W: 1})
 	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: .0, Y: .0, Z: .0, W: 1})
 	imgui.ButtonV("###splitterGUI", imgui.Vec2{X: -1, Y: 4})
 	imgui.PopStyleColorV(3)
-	// TODO: get mouse delta up/down
-	// if imgui.IsMouseDown(0) {
-	// 	view.heightTopPanel += 4
-	// }
+	if imgui.IsItemActive() {
+		view.heightPanel += imgui.CurrentIO().MouseDelta().Y
+	}
 	if imgui.IsItemHovered() {
 		imgui.SetMouseCursor(imgui.MouseCursorResizeNS)
 	} else {

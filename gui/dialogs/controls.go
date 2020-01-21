@@ -18,7 +18,7 @@ type ViewControls struct {
 	selectedObject      int
 	selectedObjectLight int
 
-	heightTopPanel float32
+	heightPanel float32
 
 	fovAnimated bool
 
@@ -32,7 +32,7 @@ func NewViewControls() *ViewControls {
 		selectedObject:      0,
 		selectedObjectLight: -1,
 
-		heightTopPanel: 160,
+		heightPanel: 160,
 
 		fovAnimated: false,
 
@@ -62,6 +62,7 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: .9, Y: .2, Z: .2, W: 1})
 	if imgui.ButtonV("Reset values to default", imgui.Vec2{X: -1, Y: 0}) {
 		rm.ResetSettings()
+		view.heightPanel = 160
 	}
 	imgui.PopStyleColorV(3)
 
@@ -69,7 +70,7 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 	imgui.PushStyleVarVec2(imgui.StyleVarWindowPadding, imgui.Vec2{X: 20, Y: 0})
 	imgui.PushStyleColor(imgui.StyleColorFrameBg, imgui.Vec4{X: 1.0, Y: 0.0, Z: 0.0, W: 1.0})
 	imgui.PushItemWidth(imgui.WindowWidth() * .95)
-	imgui.BeginChildV("Global Items", imgui.Vec2{X: 0, Y: view.heightTopPanel}, true, 0)
+	imgui.BeginChildV("Global Items", imgui.Vec2{X: 0, Y: view.heightPanel}, true, 0)
 	for i := 0; i < 7; i++ {
 		switch i {
 		case 0:
@@ -132,21 +133,19 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 	imgui.PopStyleColor()
 	imgui.PopStyleVarV(2)
 
-	sc := float32(1.0 / 255.0)
-	imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 89.0 * sc, Y: 91.0 * sc, Z: 94 * sc, W: 1})
-	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 119.0 * sc, Y: 122.0 * sc, Z: 124.0 * sc, W: 1})
+	imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 89.0 / 255.0, Y: 91.0 / 255.0, Z: 94 / 255.0, W: 1})
+	imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 119.0 / 255.0, Y: 122.0 / 255.0, Z: 124.0 / 255.0, W: 1})
 	imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: .0, Y: .0, Z: .0, W: 1})
 	imgui.ButtonV("###splitterGUI", imgui.Vec2{X: -1, Y: 4})
 	imgui.PopStyleColorV(3)
-	// TODO: get mouse delta up/down
-	// if imgui.IsMouseDown(0) { // if imgui.IsItemActive() {
-	// 	view.heightTopPanel += 4//ImGui::GetIO().MouseDelta.y;
-	// }
-	// if imgui.IsItemHovered() {
-	// 	imgui.SetMouseCursor(imgui.MouseCursorResizeNS)
-	// } else {
-	// 	imgui.SetMouseCursor(imgui.MouseCursorNone)
-	// }
+	if imgui.IsItemActive() {
+		view.heightPanel += imgui.CurrentIO().MouseDelta().Y
+	}
+	if imgui.IsItemHovered() {
+		imgui.SetMouseCursor(imgui.MouseCursorResizeNS)
+	} else {
+		imgui.SetMouseCursor(imgui.MouseCursorNone)
+	}
 
 	imgui.BeginChildV("Properties Pane", imgui.Vec2{X: 0, Y: 0}, false, 0)
 	imgui.PushItemWidth(imgui.WindowWidth() * .75)

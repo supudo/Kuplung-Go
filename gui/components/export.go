@@ -167,24 +167,25 @@ func (comp *ComponentExport) Render(open *bool, dialogExportType *types.ImportEx
 
 		imgui.SameLine()
 
-		// sc := float32(1.0 / 255.0)
-		// imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 89.0 * sc, Y: 91.0 * sc, Z: 94 * sc, W: 1})
-		// imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 119.0 * sc, Y: 122.0 * sc, Z: 124.0 * sc, W: 1})
-		// imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: .0, Y: .0, Z: .0, W: 1})
-		// imgui.ButtonV("###splitterOptionsExport", imgui.Vec2{X: -1, Y: 4})
-		// imgui.PopStyleColorV(3)
-		// // TODO: get mouse delta up/down
-		// // 	this->panelWidth_Options += imgui.GetIO().MouseDelta.x;
-		// // 	if (this->panelWidth_Options < this->panelWidth_OptionsMin)
-		// // 		this->panelWidth_Options = this->panelWidth_OptionsMin;
-		// // }
-		// if imgui.IsItemHovered() {
-		// 	imgui.SetMouseCursor(imgui.MouseCursorResizeNS)
-		// } else {
-		// 	imgui.SetMouseCursor(imgui.MouseCursorNone)
-		// }
+		sc := float32(1.0 / 255.0)
+		imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 89.0 * sc, Y: 91.0 * sc, Z: 94 * sc, W: 1})
+		imgui.PushStyleColor(imgui.StyleColorButtonHovered, imgui.Vec4{X: 119.0 * sc, Y: 122.0 * sc, Z: 124.0 * sc, W: 1})
+		imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: .0, Y: .0, Z: .0, W: 1})
+		imgui.ButtonV("###splitterOptionsExport", imgui.Vec2{X: 8.0, Y: -1})
+		imgui.PopStyleColorV(3)
+		if imgui.IsItemActive() {
+			comp.panelWidthOptions += imgui.CurrentIO().MouseDelta().X
+			if comp.panelWidthOptions < comp.panelWidthOptionsMin {
+				comp.panelWidthOptions = comp.panelWidthOptionsMin
+			}
+		}
+		if imgui.IsItemHovered() {
+			imgui.SetMouseCursor(imgui.MouseCursorResizeNS)
+		} else {
+			imgui.SetMouseCursor(imgui.MouseCursorNone)
+		}
 
-		// imgui.SameLine()
+		imgui.SameLine()
 
 		// folder browser
 		imgui.BeginChild("scrolling")
