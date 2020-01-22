@@ -139,6 +139,15 @@ func (pm *ProtoBufsSaveOpen) openRenderingSettings(filename string, window inter
 
 	rsett.SkyBox.SkyboxSelectedItem = *gs.SkyboxSelectedItem
 
+	rsett.Defered.DeferredTestMode = *gs.DeferredTestMode
+	rsett.Defered.DeferredTestLights = *gs.DeferredTestLights
+	rsett.Defered.DeferredRandomizeLightPositions = *gs.DeferredRandomizeLightPositions
+	rsett.Defered.LightingPassDrawMode = *gs.LightingPassDrawMode
+	rsett.Defered.DeferredTestLightsNumber = *gs.DeferredTestLightsNumber
+	rsett.Defered.DeferredAmbientStrength = *gs.DeferredAmbientStrength
+
+	rsett.General.DebugShadowTexture = *gs.DebugShadowTexture
+
 	// Render Properties
 	rprops.UIAmbientLightX = *gs.UIAmbientLightX
 	rprops.UIAmbientLightY = *gs.UIAmbientLightY
@@ -525,6 +534,15 @@ func (pm *ProtoBufsSaveOpen) storeRenderingSettings(lights []*objects.Light, rpr
 	gs.ActAsMirror = proto.Bool(rsett.Grid.ActAsMirror)
 
 	gs.SkyboxSelectedItem = proto.Int32(rsett.SkyBox.SkyboxSelectedItem)
+
+	gs.DeferredTestMode = proto.Bool(rsett.Defered.DeferredTestMode)
+	gs.DeferredTestLights = proto.Bool(rsett.Defered.DeferredTestLights)
+	gs.DeferredRandomizeLightPositions = proto.Bool(rsett.Defered.DeferredRandomizeLightPositions)
+	gs.LightingPassDrawMode = proto.Int32(rsett.Defered.LightingPassDrawMode)
+	gs.DeferredTestLightsNumber = proto.Int32(rsett.Defered.DeferredTestLightsNumber)
+	gs.DeferredAmbientStrength = proto.Float32(rsett.Defered.DeferredAmbientStrength)
+
+	gs.DebugShadowTexture = proto.Bool(rsett.General.DebugShadowTexture)
 
 	// Render Properties
 	gs.UIAmbientLightX = proto.Float32(rprops.UIAmbientLightX)

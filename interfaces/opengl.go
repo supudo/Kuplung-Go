@@ -14,10 +14,13 @@ type OpenGL interface {
 	BindSampler(unit uint32, sampler uint32)
 	BindTexture(target uint32, texture uint32)
 	BindVertexArray(array uint32)
+	BindFramebuffer(target, buffer uint32)
+	BindRenderbuffer(target uint32, renderbuffer uint32)
 	BlendEquation(mode uint32)
 	BlendEquationSeparate(modeRGB uint32, modeAlpha uint32)
 	BlendFunc(sfactor uint32, dfactor uint32)
 	BlendFuncSeparate(srcRGB uint32, dstRGB uint32, srcAlpha uint32, dstAlpha uint32)
+	BlitFramebuffer(srcX0 int32, srcY0 int32, srcX1 int32, srcY1 int32, dstX0 int32, dstY0 int32, dstX1 int32, dstY1 int32, mask uint32, filter uint32)
 	BufferData(target uint32, size int, data interface{}, usage uint32)
 
 	Clear(mask uint32)
@@ -38,6 +41,7 @@ type OpenGL interface {
 	DrawArrays(mode uint32, first int32, count int32)
 	DrawElements(mode uint32, count int32, elementType uint32, indices uintptr)
 	DrawElementsOffset(mode uint32, count int32, elementType uint32, offset int)
+	DrawBuffers(n int32, bufs *uint32)
 
 	Enable(cap uint32)
 	EnableVertexAttribArray(index uint32)
@@ -46,6 +50,8 @@ type OpenGL interface {
 	GenBuffers(n int32) []uint32
 	GenTextures(n int32) []uint32
 	GenVertexArrays(n int32) []uint32
+	GenFramebuffers(n int32) []uint32
+	GenRenderbuffers(n int32) []uint32
 	GenQueries(n int32) []uint32
 	BeginQuery(target uint32, id uint32)
 	EndQuery(target uint32)
@@ -75,10 +81,12 @@ type OpenGL interface {
 
 	TexImage2D(target uint32, level int32, internalFormat uint32, width int32, height int32, border int32, format uint32, xtype uint32, pixels interface{})
 	TexParameteri(target uint32, pname uint32, param int32)
+	FramebufferTexture2D(target uint32, attachment uint32, textarget uint32, texture uint32, level int32)
 
 	Uniform1i(location int32, value int32)
 	Uniform1f(location int32, value1 float32)
 	Uniform3f(location int32, value1 float32, value2 float32, value3 float32)
+	Uniform3fv(location int32, count int32, value *float32)
 	Uniform4fv(location int32, value *[4]float32)
 	UniformMatrix4fv(location int32, transpose bool, value *[16]float32)
 	UniformMatrix3fv(location int32, count int32, transpose bool, value *float32)
@@ -122,4 +130,8 @@ type OpenGL interface {
 
 	PatchParameteri(pname uint32, value int32)
 	GetQueryObjectui64v(id uint32, pname uint32, params *uint64)
+
+	RenderbufferStorage(target uint32, internalformat uint32, width int32, height int32)
+	FramebufferRenderbuffer(target uint32, attachment uint32, renderbuffertarget uint32, renderbuffer uint32)
+	CheckFramebufferStatus(target uint32) uint32
 }

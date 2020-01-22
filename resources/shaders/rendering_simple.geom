@@ -22,17 +22,17 @@ out vec3 fs_bitangent0;
 out vec3 fs_bitangent;
 
 void main() {
-    for (int i=0; i<gl_in.length(); i++) {
-        gl_Position = gl_in[i].gl_Position;
-        fs_vertexPosition = gs_vertexPosition[i];
-        fs_textureCoord = gs_textureCoord[i];
-        fs_vertexNormal0 = gs_vertexNormal0[i];
-        fs_vertexNormal = gs_vertexNormal[i];
-        fs_tangent0 = gs_tangent0[i];
-        fs_tangent = gs_tangent[i];
-        fs_bitangent0 = gs_bitangent0[i];
-        fs_bitangent = gs_bitangent[i];
-        EmitVertex();
-    }
-    EndPrimitive();
+  for (int i=0; i<gl_in.length(); i++) {
+    gl_Position = gl_in[i].gl_Position;
+    fs_vertexPosition = gs_vertexPosition[i];
+    fs_textureCoord = gs_textureCoord[i];
+    fs_vertexNormal0 = gs_vertexNormal0[i];
+    fs_vertexNormal = gs_vertexNormal[i];
+    fs_tangent0 = gs_tangent0[i];
+    fs_tangent = gs_tangent[i];
+    fs_bitangent0 = gs_bitangent0[i];
+    fs_bitangent = gs_bitangent[i];
+    EmitVertex();
+  }
+  EndPrimitive();
 }

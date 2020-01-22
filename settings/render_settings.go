@@ -62,6 +62,8 @@ type RenderingSettings struct {
 		VertexSphereColor           mgl32.Vec4
 
 		ShowAllVisualArtefacts bool
+
+		DebugShadowTexture bool
 	} `yaml:"General"`
 
 	Axis struct {
@@ -78,6 +80,15 @@ type RenderingSettings struct {
 
 	SkyBox struct {
 		SkyboxSelectedItem int32
+	}
+
+	Defered struct {
+		DeferredTestMode                bool
+		DeferredTestLights              bool
+		DeferredRandomizeLightPositions bool
+		LightingPassDrawMode            int32
+		DeferredTestLightsNumber        int32
+		DeferredAmbientStrength         float32
 	}
 }
 
@@ -146,6 +157,15 @@ func InitRenderingSettings() RenderingSettings {
 
 	rSettings.General.VertexSphereColor = mgl32.Vec4{1.0, 0.0, 0.0, 1.0}
 
+	rSettings.Defered.DeferredTestMode = false
+	rSettings.Defered.DeferredTestLights = false
+	rSettings.Defered.DeferredRandomizeLightPositions = false
+	rSettings.Defered.LightingPassDrawMode = 0
+	rSettings.Defered.DeferredAmbientStrength = 0.1
+	rSettings.Defered.DeferredTestLightsNumber = 32
+
+	rSettings.General.DebugShadowTexture = false
+
 	return rSettings
 }
 
@@ -203,6 +223,15 @@ func ResetRenderSettings() {
 	rSettings.General.BoundingBoxRefresh = false
 	rSettings.General.BoundingBoxPadding = 0.01
 	rSettings.General.ShowAllVisualArtefacts = true
+
+	rSettings.Defered.DeferredTestMode = false
+	rSettings.Defered.DeferredTestLights = false
+	rSettings.Defered.DeferredRandomizeLightPositions = false
+	rSettings.Defered.LightingPassDrawMode = 0
+	rSettings.Defered.DeferredAmbientStrength = 0.1
+	rSettings.Defered.DeferredTestLightsNumber = 32
+
+	rSettings.General.DebugShadowTexture = false
 }
 
 // SaveRenderingSettings will save the settings back to yaml file

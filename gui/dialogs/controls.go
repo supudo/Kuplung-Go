@@ -243,6 +243,68 @@ func (view *ViewControls) Render(open, isFrame *bool, rm *rendering.RenderManage
 				helpers.AddControlsSlider("Radius", 1.0, 0.5, 0.0, 2.0, false, nil, &rsett.General.VertexSphereRadius, true, isFrame)
 				helpers.AddControlColor4("Color", &rsett.General.VertexSphereColor, &rsett.General.VertexSphereColorPickerOpen)
 			}
+			imgui.TreePop()
+		}
+		if imgui.TreeNodeV("Render Buffer", imgui.TreeNodeFlagsCollapsingHeader) {
+			imgui.Text("Rendering View Options")
+			if imgui.ButtonV("Depth Colors", imgui.Vec2{X: -1, Y: 0}) {
+				rsett.General.RenderingDepth = !rsett.General.RenderingDepth
+			}
+			if imgui.ButtonV("Shadow Texture", imgui.Vec2{X: -1, Y: 0}) {
+				rsett.General.DebugShadowTexture = !rsett.General.DebugShadowTexture
+			}
+			imgui.TreePop()
+		}
+
+		if sett.App.RendererType == types.InAppRendererTypeDeferred {
+			if imgui.TreeNodeV("Deferred Rendering", imgui.TreeNodeFlagsCollapsingHeader) {
+				imgui.Text("Deferred Rendering")
+				gbtitle := "No Blur"
+				switch rsett.Defered.LightingPassDrawMode {
+				case 0:
+					gbtitle = "Lighting"
+				case 1:
+					gbtitle = "Position"
+				case 2:
+					gbtitle = "Normal"
+				case 3:
+					gbtitle = "Diffuse"
+				case 4:
+					gbtitle = "Specular"
+				}
+				if imgui.BeginCombo("##110", gbtitle) {
+					if imgui.SelectableV("Lighting", rsett.Defered.LightingPassDrawMode == 0, 0, imgui.Vec2{X: 0, Y: 0}) {
+						rsett.Defered.LightingPassDrawMode = 0
+					}
+					if imgui.SelectableV("Position", rsett.Defered.LightingPassDrawMode == 1, 0, imgui.Vec2{X: 0, Y: 0}) {
+						rsett.Defered.LightingPassDrawMode = 1
+					}
+					if imgui.SelectableV("Normal", rsett.Defered.LightingPassDrawMode == 2, 0, imgui.Vec2{X: 0, Y: 0}) {
+						rsett.Defered.LightingPassDrawMode = 2
+					}
+					if imgui.SelectableV("Diffuse", rsett.Defered.LightingPassDrawMode == 3, 0, imgui.Vec2{X: 0, Y: 0}) {
+						rsett.Defered.LightingPassDrawMode = 3
+					}
+					if imgui.SelectableV("Specular", rsett.Defered.LightingPassDrawMode == 4, 0, imgui.Vec2{X: 0, Y: 0}) {
+						rsett.Defered.LightingPassDrawMode = 4
+					}
+					imgui.EndCombo()
+				}
+
+				imgui.Text("Ambient Strength")
+				imgui.SliderFloat("##210", &rsett.Defered.DeferredAmbientStrength, 0.0, 1.0)
+
+				imgui.Checkbox("Test Mode", &rsett.Defered.DeferredTestMode)
+				imgui.Checkbox("Test Lights", &rsett.Defered.DeferredTestLights)
+				if imgui.ButtonV("Randomize Light Positions", imgui.Vec2{X: -1, Y: 0}) {
+					rsett.Defered.DeferredRandomizeLightPositions = true
+				}
+				imgui.Separator()
+
+				imgui.Text("Number of Test Lights")
+				imgui.SliderInt("##209", &rsett.Defered.DeferredTestLightsNumber, 0, 32)
+				imgui.TreePop()
+			}
 		}
 	case 1:
 		// imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 153 / 255.0, Y: 61 / 255.0, Z: 61 / 255.0, W: 1.0})

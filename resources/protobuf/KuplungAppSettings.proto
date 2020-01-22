@@ -86,6 +86,15 @@ message GUISettings {
   required bool SolidLightAmbientColorPicker = 64;
   required bool SolidLightDiffuseColorPicker = 65;
   required bool SolidLightSpecularColorPicker = 66;
+
+  required bool DeferredTestMode = 67;
+  required bool DeferredTestLights = 68;
+  required bool DeferredRandomizeLightPositions = 69;
+  required int32 LightingPassDrawMode = 70;
+  required int32 DeferredTestLightsNumber = 71;
+  required float DeferredAmbientStrength = 72;
+
+  required bool DebugShadowTexture = 73;
 }
 
 message CameraSettings {

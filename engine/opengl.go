@@ -79,6 +79,16 @@ func (native *OpenGL) BindVertexArray(array uint32) {
 	gl.BindVertexArray(array)
 }
 
+// BindFramebuffer implements the interfaces.OpenGL interface.
+func (native *OpenGL) BindFramebuffer(target, buffer uint32) {
+	gl.BindFramebuffer(target, buffer)
+}
+
+// BindRenderbuffer implements the interfaces.OpenGL interface.
+func (native *OpenGL) BindRenderbuffer(target uint32, renderbuffer uint32) {
+	gl.BindRenderbuffer(target, renderbuffer)
+}
+
 // BlendEquation implements the interfaces.OpenGL interface.
 func (native *OpenGL) BlendEquation(mode uint32) {
 	gl.BlendEquation(mode)
@@ -97,6 +107,11 @@ func (native *OpenGL) BlendFunc(sfactor uint32, dfactor uint32) {
 // BlendFuncSeparate implements the interfaces.OpenGL interface.
 func (native *OpenGL) BlendFuncSeparate(srcRGB uint32, dstRGB uint32, srcAlpha uint32, dstAlpha uint32) {
 	gl.BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha)
+}
+
+// BlitFramebuffer implements the interfaces.OpenGL interface.
+func (native *OpenGL) BlitFramebuffer(srcX0 int32, srcY0 int32, srcX1 int32, srcY1 int32, dstX0 int32, dstY0 int32, dstX1 int32, dstY1 int32, mask uint32, filter uint32) {
+	gl.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter)
 }
 
 // BufferData implements the interfaces.OpenGL interface.
@@ -179,6 +194,11 @@ func (native *OpenGL) DrawElementsOffset(mode uint32, count int32, elementType u
 	gl.DrawElements(mode, count, elementType, gl.PtrOffset(offset))
 }
 
+// DrawBuffers implements the interfaces.OpenGL interface.
+func (native *OpenGL) DrawBuffers(n int32, bufs *uint32) {
+	gl.DrawBuffers(n, bufs)
+}
+
 // Enable implements the interfaces.OpenGL interface.
 func (native *OpenGL) Enable(capability uint32) {
 	gl.Enable(capability)
@@ -215,10 +235,24 @@ func (native *OpenGL) GenVertexArrays(n int32) []uint32 {
 	return ids
 }
 
+// GenFramebuffers implements the interfaces.OpenGL interface.
+func (native *OpenGL) GenFramebuffers(n int32) []uint32 {
+	ids := make([]uint32, n)
+	gl.GenFramebuffers(n, &ids[0])
+	return ids
+}
+
 // GenQueries implements the interfaces.OpenGL interface.
 func (native *OpenGL) GenQueries(n int32) []uint32 {
 	ids := make([]uint32, n)
 	gl.GenQueries(n, &ids[0])
+	return ids
+}
+
+// GenRenderbuffers implements the interfaces.OpenGL interface.
+func (native *OpenGL) GenRenderbuffers(n int32) []uint32 {
+	ids := make([]uint32, n)
+	gl.GenRenderbuffers(n, &ids[0])
 	return ids
 }
 
@@ -346,6 +380,11 @@ func (native *OpenGL) TexParameteri(target uint32, pname uint32, param int32) {
 	gl.TexParameteri(target, pname, param)
 }
 
+// FramebufferTexture2D implements the interfaces.OpenGL interface.
+func (native *OpenGL) FramebufferTexture2D(target uint32, attachment uint32, textarget uint32, texture uint32, level int32) {
+	gl.FramebufferTexture2D(target, attachment, textarget, texture, level)
+}
+
 // Uniform1i implements the interfaces.OpenGL interface.
 func (native *OpenGL) Uniform1i(location int32, value int32) {
 	gl.Uniform1i(location, value)
@@ -359,6 +398,11 @@ func (native *OpenGL) Uniform1f(location int32, value1 float32) {
 // Uniform3f implements the interfaces.OpenGL interface.
 func (native *OpenGL) Uniform3f(location int32, value1 float32, value2 float32, value3 float32) {
 	gl.Uniform3f(location, value1, value2, value3)
+}
+
+// Uniform3fv implements the interfaces.OpenGL interface.
+func (native *OpenGL) Uniform3fv(location int32, count int32, value *float32) {
+	gl.Uniform3fv(location, count, value)
 }
 
 // Uniform4fv implements the interfaces.OpenGL interface.
@@ -545,4 +589,19 @@ func (native *OpenGL) PatchParameteri(pname uint32, value int32) {
 // GetQueryObjectui64v specifies the parameters for patch primitives
 func (native *OpenGL) GetQueryObjectui64v(id uint32, pname uint32, params *uint64) {
 	gl.GetQueryObjectui64v(id, pname, params)
+}
+
+// RenderbufferStorage implements the interfaces.OpenGL interface.
+func (native *OpenGL) RenderbufferStorage(target uint32, internalformat uint32, width int32, height int32) {
+	gl.RenderbufferStorage(target, internalformat, width, height)
+}
+
+// FramebufferRenderbuffer implements the interfaces.OpenGL interface.
+func (native *OpenGL) FramebufferRenderbuffer(target uint32, attachment uint32, renderbuffertarget uint32, renderbuffer uint32) {
+	gl.FramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
+}
+
+// CheckFramebufferStatus implements the interfaces.OpenGL interface.
+func (native *OpenGL) CheckFramebufferStatus(target uint32) uint32 {
+	return gl.CheckFramebufferStatus(target)
 }

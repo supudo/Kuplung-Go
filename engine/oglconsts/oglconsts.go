@@ -13,7 +13,29 @@ const (
 	DEPTH_BUFFER_BIT     uint32 = 0x00000100
 	STENCIL_BUFFER_BIT          = 0x00000400
 	COLOR_BUFFER_BIT            = 0x00004000
+	FRAMEBUFFER                 = 0x8D40
+	RENDERBUFFER                = 0x8D41
+	READ_FRAMEBUFFER            = 0x8CA8
+	DRAW_FRAMEBUFFER            = 0x8CA9
 	QUERY_BY_REGION_WAIT        = 0x8E15
+	COLOR_ATTACHMENT0           = 0x8CE0
+	COLOR_ATTACHMENT1           = 0x8CE1
+	COLOR_ATTACHMENT2           = 0x8CE2
+	COLOR_ATTACHMENT3           = 0x8CE3
+	COLOR_ATTACHMENT4           = 0x8CE4
+	COLOR_ATTACHMENT5           = 0x8CE5
+	COLOR_ATTACHMENT6           = 0x8CE6
+	COLOR_ATTACHMENT7           = 0x8CE7
+	COLOR_ATTACHMENT8           = 0x8CE8
+	COLOR_ATTACHMENT9           = 0x8CE9
+	COLOR_ATTACHMENT10          = 0x8CEA
+	COLOR_ATTACHMENT11          = 0x8CEB
+	COLOR_ATTACHMENT12          = 0x8CEC
+	COLOR_ATTACHMENT13          = 0x8CED
+	COLOR_ATTACHMENT14          = 0x8CEE
+	COLOR_ATTACHMENT15          = 0x8CEF
+	DEPTH_ATTACHMENT            = 0x8D00
+	FRAMEBUFFER_COMPLETE        = 0x8CD5
 )
 
 // Draw Types
@@ -78,13 +100,14 @@ const (
 // Features
 // nolint: golint,megacheck
 const (
-	BLEND        uint32 = 0x0BE2
-	DEPTH_TEST          = 0x0B71
-	CULL_FACE           = 0x0B44
-	SCISSOR_TEST        = 0x0C11
-	LESS                = 0x0201
-	LEQUAL              = 0x0203
-	DEPTH_FUNC          = 0x0B74
+	BLEND           uint32 = 0x0BE2
+	DEPTH_TEST             = 0x0B71
+	CULL_FACE              = 0x0B44
+	SCISSOR_TEST           = 0x0C11
+	LESS                   = 0x0201
+	LEQUAL                 = 0x0203
+	DEPTH_FUNC             = 0x0B74
+	DEPTH_COMPONENT        = 0x1902
 
 	ACTIVE_TEXTURE               = 0x84E0
 	CURRENT_PROGRAM              = 0x8B8D
@@ -166,6 +189,13 @@ const (
 	LINEAR = 0x2601
 )
 
+// Texture Floats Constants
+// nolint: golint,megacheck
+const (
+	RGB16F_ARB uint32 = 0x881B
+	RGB16F            = 0x881B
+)
+
 // Errors
 // nolint: golint,megacheck
 const (
@@ -183,6 +213,7 @@ const (
 // nolint: golint,megacheck
 const (
 	ALPHA uint32 = 0x1906
+	RGB          = 0x1907
 	RGBA         = 0x1908
 	RED          = 0x1903
 	R8           = 0x8229
