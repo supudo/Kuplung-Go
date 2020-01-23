@@ -90,6 +90,22 @@ type RenderingSettings struct {
 		DeferredTestLightsNumber        int32
 		DeferredAmbientStrength         float32
 	}
+
+	Rays struct {
+		Draw       bool
+		Animate    bool
+		OriginX    float32
+		OriginY    float32
+		OriginZ    float32
+		DirectionX float32
+		DirectionY float32
+		DirectionZ float32
+	}
+
+	Controls struct {
+		MouseX int32
+		MouseY int32
+	}
 }
 
 var instantiatedRendering *RenderingSettings
@@ -166,6 +182,15 @@ func InitRenderingSettings() RenderingSettings {
 
 	rSettings.General.DebugShadowTexture = false
 
+	rSettings.Rays.Draw = false
+	rSettings.Rays.Animate = false
+	rSettings.Rays.OriginX = 0.0
+	rSettings.Rays.OriginY = 0.0
+	rSettings.Rays.OriginZ = 0.0
+	rSettings.Rays.DirectionX = 0.0
+	rSettings.Rays.DirectionY = 0.0
+	rSettings.Rays.DirectionZ = 0.0
+
 	return rSettings
 }
 
@@ -232,6 +257,15 @@ func ResetRenderSettings() {
 	rSettings.Defered.DeferredTestLightsNumber = 32
 
 	rSettings.General.DebugShadowTexture = false
+
+	rSettings.Rays.Draw = false
+	rSettings.Rays.Animate = false
+	rSettings.Rays.OriginX = 0.0
+	rSettings.Rays.OriginY = 0.0
+	rSettings.Rays.OriginZ = 0.0
+	rSettings.Rays.DirectionX = 0.0
+	rSettings.Rays.DirectionY = 0.0
+	rSettings.Rays.DirectionZ = 0.0
 }
 
 // SaveRenderingSettings will save the settings back to yaml file

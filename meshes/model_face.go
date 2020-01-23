@@ -120,7 +120,7 @@ type ModelFace struct {
 	SolidLightSkinDiffuseStrength float32
 	SlidLightSkinSpecularStrength float32
 
-	boundingBox  *objects.BoundingBox
+	BoundingBox  *objects.BoundingBox
 	vertexSphere *objects.VertexSphere
 }
 
@@ -131,9 +131,9 @@ func NewModelFace(window interfaces.Window, model types.MeshModel) *ModelFace {
 		MeshModel: model,
 	}
 	mesh.InitProperties()
-	mesh.boundingBox = objects.InitBoundingBox(window)
-	mesh.boundingBox.InitShaderProgram()
-	mesh.boundingBox.InitBuffers(model)
+	mesh.BoundingBox = objects.InitBoundingBox(window)
+	mesh.BoundingBox.InitShaderProgram()
+	mesh.BoundingBox.InitBuffers(model)
 	mesh.vertexSphere = objects.InitVertexSphere(window)
 	mesh.vertexSphere.InitShaderProgram()
 	mesh.vertexSphere.InitBuffers(model, 10, 10)
@@ -351,7 +351,7 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 	// TODO: fix bounding box
 	matrixBB := rsett.MatrixProjection.Mul4(rsett.MatrixCamera).Mul4(mgl32.Ident4())
 	if rsett.General.ShowBoundingBox && mesh.IsModelSelected {
-		mesh.boundingBox.Render(matrixBB, mesh.OutlineColor)
+		mesh.BoundingBox.Render(matrixBB, mesh.OutlineColor)
 	}
 
 	// TODO: fix vertex sphere
@@ -404,7 +404,7 @@ func (mesh *ModelFace) Render(useTessellation bool) {
 // Dispose ...
 func (mesh *ModelFace) Dispose() {
 	gl := mesh.window.OpenGL()
-	mesh.boundingBox.Dispose()
+	mesh.BoundingBox.Dispose()
 	mesh.vertexSphere.Dispose()
 	gl.DeleteProgram(mesh.GLVAO)
 }

@@ -84,13 +84,14 @@ func (rl *RayLine) InitBuffers(vecFrom, vecTo mgl32.Vec3) {
 }
 
 // Render ...
-func (rl *RayLine) Render(matrixModel mgl32.Mat4) {
+func (rl *RayLine) Render() {
 	gl := rl.window.OpenGL()
 	rsett := settings.GetRenderingSettings()
 
 	gl.UseProgram(rl.shaderProgram)
 	gl.BindVertexArray(rl.glVAO)
 
+	matrixModel := mgl32.Ident4()
 	mvpMatrix := rsett.MatrixProjection.Mul4(rsett.MatrixCamera.Mul4(matrixModel))
 	gl.GLUniformMatrix4fv(rl.glUniformMVPMatrix, 1, false, &mvpMatrix[0])
 

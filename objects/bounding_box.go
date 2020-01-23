@@ -17,9 +17,9 @@ type BoundingBox struct {
 
 	matrixTransform mgl32.Mat4
 
-	minx, maxx   float32
-	miny, maxy   float32
-	minz, maxz   float32
+	MinX, MaxX   float32
+	MinY, MaxY   float32
+	MinZ, MaxZ   float32
 	size, center mgl32.Vec3
 
 	dataVertices []float32
@@ -37,12 +37,12 @@ type BoundingBox struct {
 func InitBoundingBox(window interfaces.Window) *BoundingBox {
 	bb := &BoundingBox{
 		window: window,
-		minx:   0,
-		maxx:   0,
-		miny:   0,
-		maxy:   0,
-		minz:   0,
-		maxz:   0,
+		MinX:   0,
+		MaxX:   0,
+		MinY:   0,
+		MaxY:   0,
+		MinZ:   0,
+		MaxZ:   0,
 	}
 	return bb
 }
@@ -91,75 +91,75 @@ func (bb *BoundingBox) InitBuffers(meshModel types.MeshModel) {
 	gl.BindBuffer(oglconsts.ELEMENT_ARRAY_BUFFER, vboIndices)
 	gl.BufferData(oglconsts.ELEMENT_ARRAY_BUFFER, len(bb.dataIndices)*4, gl.Ptr(bb.dataIndices), oglconsts.STATIC_DRAW)
 
-	bb.minx = 0.0
-	bb.maxx = 0.0
-	bb.miny = 0.0
-	bb.maxy = 0.0
-	bb.minz = 0.0
-	bb.maxz = 0.0
+	bb.MinX = 0.0
+	bb.MaxX = 0.0
+	bb.MinY = 0.0
+	bb.MaxY = 0.0
+	bb.MinZ = 0.0
+	bb.MaxZ = 0.0
 	if len(bb.meshModel.Vertices) > 0 {
-		bb.minx = bb.meshModel.Vertices[0].X()
-		bb.maxx = bb.meshModel.Vertices[0].X()
-		bb.miny = bb.meshModel.Vertices[0].Y()
-		bb.maxy = bb.meshModel.Vertices[0].Y()
-		bb.minz = bb.meshModel.Vertices[0].Z()
-		bb.maxz = bb.meshModel.Vertices[0].Z()
+		bb.MinX = bb.meshModel.Vertices[0].X()
+		bb.MaxX = bb.meshModel.Vertices[0].X()
+		bb.MinY = bb.meshModel.Vertices[0].Y()
+		bb.MaxY = bb.meshModel.Vertices[0].Y()
+		bb.MinZ = bb.meshModel.Vertices[0].Z()
+		bb.MaxZ = bb.meshModel.Vertices[0].Z()
 	}
 	for i := 0; i < len(bb.meshModel.Vertices); i++ {
-		if bb.meshModel.Vertices[i].X() < bb.minx {
-			bb.minx = bb.meshModel.Vertices[i].X()
+		if bb.meshModel.Vertices[i].X() < bb.MinX {
+			bb.MinX = bb.meshModel.Vertices[i].X()
 		}
-		if bb.meshModel.Vertices[i].X() > bb.maxx {
-			bb.maxx = bb.meshModel.Vertices[i].X()
+		if bb.meshModel.Vertices[i].X() > bb.MaxX {
+			bb.MaxX = bb.meshModel.Vertices[i].X()
 		}
-		if bb.meshModel.Vertices[i].Y() < bb.miny {
-			bb.miny = bb.meshModel.Vertices[i].Y()
+		if bb.meshModel.Vertices[i].Y() < bb.MinY {
+			bb.MinY = bb.meshModel.Vertices[i].Y()
 		}
-		if bb.meshModel.Vertices[i].Y() > bb.maxy {
-			bb.maxy = bb.meshModel.Vertices[i].Y()
+		if bb.meshModel.Vertices[i].Y() > bb.MaxY {
+			bb.MaxY = bb.meshModel.Vertices[i].Y()
 		}
-		if bb.meshModel.Vertices[i].Z() < bb.minz {
-			bb.minz = bb.meshModel.Vertices[i].Z()
+		if bb.meshModel.Vertices[i].Z() < bb.MinZ {
+			bb.MinZ = bb.meshModel.Vertices[i].Z()
 		}
-		if bb.meshModel.Vertices[i].Z() > bb.maxz {
-			bb.maxz = bb.meshModel.Vertices[i].Z()
+		if bb.meshModel.Vertices[i].Z() > bb.MaxZ {
+			bb.MaxZ = bb.meshModel.Vertices[i].Z()
 		}
 	}
 
 	padding := rsett.General.BoundingBoxPadding
-	if bb.minx > 0 {
-		bb.minx = bb.minx + padding
+	if bb.MinX > 0 {
+		bb.MinX = bb.MinX + padding
 	} else {
-		bb.minx = bb.minx - padding
+		bb.MinX = bb.MinX - padding
 	}
-	if bb.maxx > 0 {
-		bb.maxx = bb.maxx + padding
+	if bb.MaxX > 0 {
+		bb.MaxX = bb.MaxX + padding
 	} else {
-		bb.maxx = bb.maxx - padding
+		bb.MaxX = bb.MaxX - padding
 	}
-	if bb.miny > 0 {
-		bb.miny = bb.miny + padding
+	if bb.MinY > 0 {
+		bb.MinY = bb.MinY + padding
 	} else {
-		bb.miny = bb.miny - padding
+		bb.MinY = bb.MinY - padding
 	}
-	if bb.maxy > 0 {
-		bb.maxy = bb.maxy + padding
+	if bb.MaxY > 0 {
+		bb.MaxY = bb.MaxY + padding
 	} else {
-		bb.maxy = bb.maxy - padding
+		bb.MaxY = bb.MaxY - padding
 	}
-	if bb.minz > 0 {
-		bb.minz = bb.minz + padding
+	if bb.MinZ > 0 {
+		bb.MinZ = bb.MinZ + padding
 	} else {
-		bb.minz = bb.minz - padding
+		bb.MinZ = bb.MinZ - padding
 	}
-	if bb.maxz > 0 {
-		bb.maxz = bb.maxz + padding
+	if bb.MaxZ > 0 {
+		bb.MaxZ = bb.MaxZ + padding
 	} else {
-		bb.maxz = bb.maxz - padding
+		bb.MaxZ = bb.MaxZ - padding
 	}
 
-	bb.size = mgl32.Vec3{bb.maxx - bb.minx, bb.maxy - bb.miny, bb.maxz - bb.minz}
-	bb.center = mgl32.Vec3{((bb.minx + bb.maxx) / 2) * 0.5, ((bb.miny + bb.maxy) / 2) * 0.5, ((bb.minz + bb.maxz) / 2) * 0.5}
+	bb.size = mgl32.Vec3{bb.MaxX - bb.MinX, bb.MaxY - bb.MinY, bb.MaxZ - bb.MinZ}
+	bb.center = mgl32.Vec3{((bb.MinX + bb.MaxX) / 2) * 0.5, ((bb.MinY + bb.MaxY) / 2) * 0.5, ((bb.MinZ + bb.MaxZ) / 2) * 0.5}
 	mtxs := mgl32.Ident4().Mul4(mgl32.Scale3D(bb.size.X(), bb.size.Y(), bb.size.Z()))
 	mtxt := mgl32.Ident4().Mul4(mgl32.Translate3D(bb.center.X(), bb.center.Y(), bb.center.Z()))
 	bb.matrixTransform = mtxs.Mul4(mtxt)

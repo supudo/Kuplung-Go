@@ -26,4 +26,6 @@ const (
 
 	ActionSelectedObject      = "Selected_Object"
 	ActionSelectedObjectLight = "Selected_Object_Light"
+
+	ActionEventMouseLeftDown = "Event_Mouse_Left_Down"
 )

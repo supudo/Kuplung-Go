@@ -284,7 +284,7 @@ func (l *Light) Render() {
 		if l.lightDirectionRay != nil {
 			l.lightDirectionRay.MatrixModel = l.MatrixModel
 			if l.ShowLampDirection {
-				l.lightDirectionRay.Render(l.MatrixModel)
+				l.lightDirectionRay.Render()
 			}
 		}
 	}

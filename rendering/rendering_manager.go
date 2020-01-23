@@ -45,10 +45,13 @@ type RenderManager struct {
 
 	MeshModelFaces []*meshes.ModelFace
 	LightSources   []*objects.Light
+	rayLines       []*objects.RayLine
 
 	RenderProps types.RenderProperties
 
 	SceneSelectedModelObject int32
+
+	rayPicker *RayPicking
 }
 
 // NewRenderManager will return an instance of the rendering manager
@@ -75,6 +78,8 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	rm.initRenderers()
 	rm.initSaveOpen()
 
+	rm.rayPicker = InitRayPicking(window)
+
 	trigger.On(types.ActionGuiAddShape, rm.addShape)
 	trigger.On(types.ActionGuiAddLight, rm.addLight)
 	trigger.On(types.ActionGuiActionFileNew, rm.clearScene)
@@ -82,6 +87,7 @@ func NewRenderManager(window interfaces.Window, doProgress func(float32)) *Rende
 	trigger.On(types.ActionFileExport, rm.fileExport)
 	trigger.On(types.ActionFileSaverSaveScene, rm.saveScene)
 	trigger.On(types.ActionFileSaverOpenScene, rm.openScene)
+	trigger.On(types.ActionEventMouseLeftDown, rm.rayPickerAction)
 
 	return rm
 }
@@ -106,15 +112,16 @@ func (rm *RenderManager) Render() {
 		w, h := rm.Window.Size()
 		rm.Window.OpenGL().Viewport(0, 0, int32(w), int32(h))
 		rm.rendererDefered.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources, w, h)
-		rm.RenderElements()
+		rm.renderElements()
 	} else {
-		rm.RenderElements()
-		rm.RenderScene()
+		rm.renderElements()
+		rm.renderScene()
 	}
+
+	rm.renderRays()
 }
 
-// RenderElements ...
-func (rm *RenderManager) RenderElements() {
+func (rm *RenderManager) renderElements() {
 	rsett := settings.GetRenderingSettings()
 
 	w, h := rm.Window.Size()
@@ -157,8 +164,7 @@ func (rm *RenderManager) RenderElements() {
 	}
 }
 
-// RenderScene ...
-func (rm *RenderManager) RenderScene() {
+func (rm *RenderManager) renderScene() {
 	sett := settings.GetSettings()
 	if sett.Components.ShouldRecompileShaders && sett.App.RendererType == types.InAppRendererTypeForward {
 		rm.rendererForward.CompileShaders()
@@ -176,6 +182,46 @@ func (rm *RenderManager) RenderScene() {
 	}
 }
 
+func (rm *RenderManager) renderRays() {
+	rsett := settings.GetRenderingSettings()
+	rFrom := mgl32.Vec3{rsett.Rays.OriginX, rsett.Rays.OriginY, rsett.Rays.OriginZ}
+	rDirection := mgl32.Vec3{rsett.Rays.DirectionX, rsett.Rays.DirectionY, rsett.Rays.DirectionZ}
+	if rsett.Rays.Animate {
+		var rl *objects.RayLine
+		if len(rm.rayLines) > 0 {
+			rl = rm.rayLines[0]
+		} else {
+			rl = objects.NewLightRay(rm.Window)
+		}
+		rl.InitBuffers(rFrom, rDirection.Mul(rsett.General.PlaneFar))
+		if len(rm.rayLines) <= 0 {
+			rm.rayLines = append(rm.rayLines, rl)
+		}
+	} else if rsett.Rays.Draw {
+		rsett.Rays.Draw = false
+		rl := objects.NewLightRay(rm.Window)
+		rl.InitBuffers(rFrom, rDirection.Mul(rsett.General.PlaneFar))
+		if rsett.General.ShowPickRaysSingle {
+			for i := 0; i < len(rm.rayLines); i++ {
+				rm.rayLines[i].Dispose()
+			}
+		}
+		rm.rayLines = append(rm.rayLines, rl)
+	}
+
+	for i := 0; i < len(rm.rayLines); i++ {
+		rm.rayLines[i].Render()
+	}
+}
+
+func (rm *RenderManager) rayPickerAction() {
+	// picking
+	// TODO: vertex selection for modifier key
+	//rm.rayPicker.SelectVertex(rm.MeshModelFaces, rm.rayLines, rm.SceneSelectedModelObject)
+	rm.rayLines = rm.rayPicker.SelectModel(rm.MeshModelFaces, &rm.SceneSelectedModelObject)
+	// TODO: set selected model in the GUI models browser
+}
+
 // Dispose will cleanup everything
 func (rm *RenderManager) Dispose() {
 	rm.cube.Dispose()
@@ -191,7 +237,14 @@ func (rm *RenderManager) Dispose() {
 	for i := 0; i < len(rm.LightSources); i++ {
 		rm.LightSources[i].Dispose()
 	}
+	for i := 0; i < len(rm.rayLines); i++ {
+		rm.rayLines[i].Dispose()
+	}
 	rm.rendererSimple.Dispose()
+	rm.rendererDefered.Dispose()
+	rm.rendererForward.Dispose()
+	rm.rendererForwardShadowMapping.Dispose()
+	rm.rendererShadowMapping.Dispose()
 }
 
 func (rm *RenderManager) initSettings() {
@@ -382,8 +435,12 @@ func (rm *RenderManager) clearScene() {
 	for i := 0; i < len(rm.LightSources); i++ {
 		rm.LightSources[i].Dispose()
 	}
+	for i := 0; i < len(rm.rayLines); i++ {
+		rm.rayLines[i].Dispose()
+	}
 	rm.MeshModelFaces = nil
 	rm.LightSources = nil
+	rm.rayLines = nil
 	sett := settings.GetSettings()
 	sett.MemSettings.TotalVertices = 0
 	sett.MemSettings.TotalIndices = 0

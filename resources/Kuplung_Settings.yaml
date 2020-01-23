@@ -5,7 +5,7 @@ App:
   appVersion: 1.0 d
   currentFolder: 
   appFolder: 
-  RendererType: 4
+  RendererType: 1
   showLog: true
 
 # SDL & Window Settings

@@ -4,9 +4,11 @@ import (
 	"time"
 
 	"github.com/inkyblackness/imgui-go"
+	"github.com/sadlil/go-trigger"
 	"github.com/supudo/Kuplung-Go/engine/input"
 	"github.com/supudo/Kuplung-Go/interfaces"
 	"github.com/supudo/Kuplung-Go/settings"
+	"github.com/supudo/Kuplung-Go/types"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -113,6 +115,13 @@ func (window *KuplungWindow) processEvent(event sdl.Event) {
 	case *sdl.QuitEvent:
 		sett.MemSettings.QuitApplication = true
 		window.CallClosed()
+	case *sdl.MouseButtonEvent:
+		if ev.Type == sdl.MOUSEBUTTONDOWN && ev.Button == sdl.BUTTON_LEFT {
+			_, _ = trigger.Fire(types.ActionEventMouseLeftDown)
+		}
+	case *sdl.MouseMotionEvent:
+		rsett.Controls.MouseX = ev.X
+		rsett.Controls.MouseY = ev.Y
 	case *sdl.MouseWheelEvent:
 		var deltaX, deltaY float32
 		if ev.X > 0 {
