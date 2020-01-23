@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"time"
 
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/supudo/Kuplung-Go/engine"
@@ -47,6 +48,8 @@ type RendererDefered struct {
 	quadVBO uint32
 	cubeVAO uint32
 	cubeVBO uint32
+
+	fbWidth, fbHeight int
 }
 
 // NewRendererDefered ...
@@ -75,6 +78,11 @@ func (rend *RendererDefered) Init() {
 func (rend *RendererDefered) initGeometryPass() {
 	sett := settings.GetSettings()
 	gl := rend.window.OpenGL()
+
+	w, h := rend.window.Size()
+	rend.fbWidth = w
+	rend.fbHeight = h
+	rend.window.OpenGL().Viewport(0, 0, int32(w), int32(h))
 
 	sVertex := engine.GetShaderSource(sett.App.AppFolder + "shaders/deferred_g_buffer.vert")
 	sFragment := engine.GetShaderSource(sett.App.AppFolder + "shaders/deferred_g_buffer.frag")
@@ -157,15 +165,16 @@ func (rend *RendererDefered) initProps() {
 
 	rend.lightPositions = []mgl32.Vec3{}
 	rend.lightColors = []mgl32.Vec3{}
+	rand.Seed(time.Now().UnixNano())
 	for i := uint16(0); i < rend.NRLIGHTS; i++ {
-		xPos := float32(((math.Mod(rand.Float64(), 100))/100.0)*6.0 - 3.0)
-		yPos := float32(((math.Mod(rand.Float64(), 100))/100.0)*6.0 - 0.0)
-		zPos := float32(((math.Mod(rand.Float64(), 100))/100.0)*6.0 - 3.0)
+		xPos := float32(rand.Float64()*6.0 - 3.0)
+		yPos := float32(rand.Float64() * 6.0)
+		zPos := float32(rand.Float64()*6.0 - 3.0)
 		rend.lightPositions = append(rend.lightPositions, mgl32.Vec3{xPos, yPos, zPos})
 
-		rColor := float32((math.Mod(rand.Float64(), 100) / 200.0) + 0.5)
-		gColor := float32((math.Mod(rand.Float64(), 100) / 200.0) + 0.5)
-		bColor := float32((math.Mod(rand.Float64(), 100) / 200.0) + 0.5)
+		rColor := float32(rand.Intn(255)) / 255.0
+		gColor := float32(rand.Intn(255)) / 255.0
+		bColor := float32(rand.Intn(255)) / 255.0
 		rend.lightColors = append(rend.lightColors, mgl32.Vec3{rColor, gColor, bColor})
 	}
 
@@ -174,7 +183,6 @@ func (rend *RendererDefered) initProps() {
 }
 
 func (rend *RendererDefered) initGBuffer() {
-	sett := settings.GetSettings()
 	gl := rend.window.OpenGL()
 
 	rend.gBuffer = gl.GenFramebuffers(1)[0]
@@ -183,7 +191,7 @@ func (rend *RendererDefered) initGBuffer() {
 	// - Position color buffer
 	rend.gPosition = gl.GenTextures(1)[0]
 	gl.BindTexture(oglconsts.TEXTURE_2D, rend.gPosition)
-	gl.TexImage2D(oglconsts.TEXTURE_2D, 0, oglconsts.RGB16F, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), 0, oglconsts.RGB, oglconsts.FLOAT, nil)
+	gl.TexImage2D(oglconsts.TEXTURE_2D, 0, oglconsts.RGB16F, int32(rend.fbWidth), int32(rend.fbHeight), 0, oglconsts.RGB, oglconsts.FLOAT, nil)
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MIN_FILTER, oglconsts.NEAREST)
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.NEAREST)
 	gl.FramebufferTexture2D(oglconsts.FRAMEBUFFER, oglconsts.COLOR_ATTACHMENT0, oglconsts.TEXTURE_2D, rend.gPosition, 0)
@@ -191,7 +199,7 @@ func (rend *RendererDefered) initGBuffer() {
 	// - Normal color buffer
 	rend.gNormal = gl.GenTextures(1)[0]
 	gl.BindTexture(oglconsts.TEXTURE_2D, rend.gNormal)
-	gl.TexImage2D(oglconsts.TEXTURE_2D, 0, oglconsts.RGB16F, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), 0, oglconsts.RGB, oglconsts.FLOAT, nil)
+	gl.TexImage2D(oglconsts.TEXTURE_2D, 0, oglconsts.RGB16F, int32(rend.fbWidth), int32(rend.fbHeight), 0, oglconsts.RGB, oglconsts.FLOAT, nil)
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MIN_FILTER, oglconsts.NEAREST)
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.NEAREST)
 	gl.FramebufferTexture2D(oglconsts.FRAMEBUFFER, oglconsts.COLOR_ATTACHMENT1, oglconsts.TEXTURE_2D, rend.gNormal, 0)
@@ -199,7 +207,7 @@ func (rend *RendererDefered) initGBuffer() {
 	// - Color + Specular color buffer
 	rend.gAlbedoSpec = gl.GenTextures(1)[0]
 	gl.BindTexture(oglconsts.TEXTURE_2D, rend.gAlbedoSpec)
-	gl.TexImage2D(oglconsts.TEXTURE_2D, 0, oglconsts.RGBA, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), 0, oglconsts.RGBA, oglconsts.UNSIGNED_BYTE, nil)
+	gl.TexImage2D(oglconsts.TEXTURE_2D, 0, oglconsts.RGBA, int32(rend.fbWidth), int32(rend.fbHeight), 0, oglconsts.RGBA, oglconsts.UNSIGNED_BYTE, nil)
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MIN_FILTER, oglconsts.NEAREST)
 	gl.TexParameteri(oglconsts.TEXTURE_2D, oglconsts.TEXTURE_MAG_FILTER, oglconsts.NEAREST)
 	gl.FramebufferTexture2D(oglconsts.FRAMEBUFFER, oglconsts.COLOR_ATTACHMENT2, oglconsts.TEXTURE_2D, rend.gAlbedoSpec, 0)
@@ -211,7 +219,7 @@ func (rend *RendererDefered) initGBuffer() {
 	// - Create and attach depth buffer (renderbuffer)
 	rboDepth := gl.GenRenderbuffers(1)[0]
 	gl.BindRenderbuffer(oglconsts.RENDERBUFFER, rboDepth)
-	gl.RenderbufferStorage(oglconsts.RENDERBUFFER, oglconsts.DEPTH_COMPONENT, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight))
+	gl.RenderbufferStorage(oglconsts.RENDERBUFFER, oglconsts.DEPTH_COMPONENT, int32(rend.fbWidth), int32(rend.fbHeight))
 	gl.FramebufferRenderbuffer(oglconsts.FRAMEBUFFER, oglconsts.DEPTH_ATTACHMENT, oglconsts.RENDERBUFFER, rboDepth)
 	// - Finally check if framebuffer is complete
 	if gl.CheckFramebufferStatus(oglconsts.FRAMEBUFFER) != oglconsts.FRAMEBUFFER_COMPLETE {
@@ -299,10 +307,12 @@ func (rend *RendererDefered) initLights() {
 }
 
 // Render ...
-func (rend *RendererDefered) Render(rp types.RenderProperties, meshModelFaces []*meshes.ModelFace, matrixGrid mgl32.Mat4, camPos mgl32.Vec3, selectedModel int32, lightSources []*objects.Light) {
-	sett := settings.GetSettings()
+func (rend *RendererDefered) Render(rp types.RenderProperties, meshModelFaces []*meshes.ModelFace, matrixGrid mgl32.Mat4, camPos mgl32.Vec3, selectedModel int32, lightSources []*objects.Light, w, h int) {
 	rsett := settings.GetRenderingSettings()
 	gl := rend.window.OpenGL()
+
+	rend.fbWidth = w
+	rend.fbHeight = h
 
 	if rsett.Defered.DeferredRandomizeLightPositions {
 		rend.Init()
@@ -310,13 +320,13 @@ func (rend *RendererDefered) Render(rp types.RenderProperties, meshModelFaces []
 	}
 
 	rend.renderGBuffer(meshModelFaces, selectedModel)
-	rend.renderLightingPass(lightSources)
+	rend.renderLightingPass(camPos, lightSources)
 	if rsett.Defered.DeferredTestLights {
 		rend.renderLightObjects()
 	} else {
 		gl.BindFramebuffer(oglconsts.READ_FRAMEBUFFER, rend.gBuffer)
 		gl.BindFramebuffer(oglconsts.DRAW_FRAMEBUFFER, 0)
-		gl.BlitFramebuffer(0, 0, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), 0, 0, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), oglconsts.DEPTH_BUFFER_BIT, oglconsts.NEAREST)
+		gl.BlitFramebuffer(0, 0, int32(rend.fbWidth), int32(rend.fbHeight), 0, 0, int32(rend.fbWidth), int32(rend.fbHeight), oglconsts.DEPTH_BUFFER_BIT, oglconsts.NEAREST)
 		gl.BindFramebuffer(oglconsts.FRAMEBUFFER, 0)
 	}
 
@@ -404,7 +414,7 @@ func (rend *RendererDefered) renderGBuffer(meshModelFaces []*meshes.ModelFace, s
 	gl.CheckForOpenGLErrors("DeferedRenderer - renderGBuffer")
 }
 
-func (rend *RendererDefered) renderLightingPass(lightSources []*objects.Light) {
+func (rend *RendererDefered) renderLightingPass(camPos mgl32.Vec3, lightSources []*objects.Light) {
 	gl := rend.window.OpenGL()
 
 	gl.Clear(oglconsts.COLOR_BUFFER_BIT | oglconsts.DEPTH_BUFFER_BIT)
@@ -506,20 +516,71 @@ func (rend *RendererDefered) renderLightingPass(lightSources []*objects.Light) {
 		}
 	}
 
+	for j := lightsCountDirectional; j < rend.GLSLLightSourceNumberDirectional; j++ {
+		gl.Uniform1i(rend.mfLightsDirectional[j].InUse, 0)
+	}
+
+	for j := lightsCountPoint; j < rend.GLSLLightSourceNumberPoint; j++ {
+		gl.Uniform1i(rend.mfLightsPoint[j].InUse, 0)
+	}
+
+	for j := lightsCountSpot; j < rend.GLSLLightSourceNumberSpot; j++ {
+		gl.Uniform1i(rend.mfLightsSpot[j].InUse, 0)
+	}
+
+	rsett := settings.GetRenderingSettings()
+	if rsett.Defered.DeferredTestLights {
+		var ic int32
+		for i := int32(0); i < rsett.Defered.DeferredTestLightsNumber; i++ {
+			gl.Uniform3fv(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Position\x00")), 1, &rend.lightPositions[i][0])
+			gl.Uniform3fv(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Color\x00")), 1, &rend.lightColors[i][0])
+
+			constant := float64(1.0)
+			linear := float64(0.7)
+			quadratic := float64(1.8)
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Linear\x00")), float32(linear))
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Quadratic\x00")), float32(quadratic))
+
+			lightThreshold := 5.0
+			maxBrightness := math.Max(math.Max(float64(rend.lightColors[i].X()), float64(rend.lightColors[i].Y())), float64(rend.lightColors[i].Z()))
+			radius := (-linear + math.Sqrt(linear*linear-4*quadratic*(constant-(256/lightThreshold))*maxBrightness)) / (2 * quadratic)
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Radius\x00")), float32(radius))
+			ic = i
+		}
+		for i := ic; i < int32(len(rend.lightPositions)); i++ {
+			gl.Uniform3fv(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Position\x00")), 1, &rend.lightPositions[i][0])
+			gl.Uniform3fv(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Color\x00")), 1, &rend.lightColors[i][0])
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Linear\x00")), 0.0)
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Quadratic\x00")), 0.0)
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Radius\x00")), 0.0)
+		}
+	} else {
+		for i := 0; i < len(rend.lightPositions); i++ {
+			gl.Uniform3fv(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Position\x00")), 1, &rend.lightPositions[i][0])
+			gl.Uniform3fv(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Color\x00")), 1, &rend.lightColors[i][0])
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Linear\x00")), 0.0)
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Quadratic\x00")), 0.0)
+			gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("lights["+fmt.Sprint(i)+"].Radius\x00")), 0.0)
+		}
+	}
+	gl.Uniform3fv(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("viewPos\x00")), 1, &camPos[0])
+	gl.Uniform1i(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("draw_mode\x00")), rsett.Defered.LightingPassDrawMode+1)
+	gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("ambientStrength\x00")), rsett.Defered.DeferredAmbientStrength)
+	gl.Uniform1f(gl.GLGetUniformLocation(rend.shaderProgramLightingPass, gl.Str("gammaCoeficient\x00")), rsett.General.GammaCoeficient)
+	rend.renderQuad()
+
 	gl.CheckForOpenGLErrors("DeferedRenderer - renderLightingPass")
 }
 
 func (rend *RendererDefered) renderLightObjects() {
-	sett := settings.GetSettings()
 	rsett := settings.GetRenderingSettings()
 	gl := rend.window.OpenGL()
 
 	gl.BindFramebuffer(oglconsts.READ_FRAMEBUFFER, rend.gBuffer)
 	gl.BindFramebuffer(oglconsts.DRAW_FRAMEBUFFER, 0)
-	gl.BlitFramebuffer(0, 0, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), 0, 0, int32(sett.AppWindow.SDLWindowWidth), int32(sett.AppWindow.SDLWindowHeight), oglconsts.DEPTH_BUFFER_BIT, oglconsts.NEAREST)
+	gl.BlitFramebuffer(0, 0, int32(rend.fbWidth), int32(rend.fbHeight), 0, 0, int32(rend.fbWidth), int32(rend.fbHeight), oglconsts.DEPTH_BUFFER_BIT, oglconsts.NEAREST)
 	gl.BindFramebuffer(oglconsts.FRAMEBUFFER, 0)
 
-	// 3. Render lights on top of scene, by blitting
 	gl.UseProgram(rend.shaderProgramLightBox)
 	gl.GLUniformMatrix4fv(gl.GLGetUniformLocation(rend.shaderProgramLightBox, gl.Str("projection\x00")), 1, false, &rsett.MatrixProjection[0])
 	gl.GLUniformMatrix4fv(gl.GLGetUniformLocation(rend.shaderProgramLightBox, gl.Str("view\x00")), 1, false, &rsett.MatrixCamera[0])
@@ -544,8 +605,6 @@ func (rend *RendererDefered) renderQuad() {
 			-1.0, 1.0, 0.0,
 			// Texture Coords
 			0.0, 1.0, -1.0, -1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, -1.0, 0.0, 1.0, 0.0}
-		// Setup plane VAO
-
 		rend.quadVAO = gl.GenVertexArrays(1)[0]
 		rend.quadVBO = gl.GenBuffers(1)[0]
 		gl.BindVertexArray(rend.quadVAO)
@@ -612,10 +671,8 @@ func (rend *RendererDefered) renderCube() {
 			-0.5, 0.5, 0.5, 0.0, 1.0, 0.0, 0.0, 0.0} // bottom-left
 		rend.cubeVAO = gl.GenVertexArrays(1)[0]
 		rend.cubeVBO = gl.GenBuffers(1)[0]
-		// Fill buffer
 		gl.BindBuffer(oglconsts.ARRAY_BUFFER, rend.cubeVBO)
 		gl.BufferData(oglconsts.ARRAY_BUFFER, len(vertices)*4, gl.Ptr(vertices), oglconsts.STATIC_DRAW)
-		// Link vertex attributes
 		gl.BindVertexArray(rend.cubeVAO)
 		gl.EnableVertexAttribArray(0)
 		gl.VertexAttribPointer(0, 3, oglconsts.FLOAT, false, 8*4, gl.PtrOffset(0))

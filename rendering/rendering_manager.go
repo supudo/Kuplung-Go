@@ -101,6 +101,20 @@ func (rm *RenderManager) ResetSettings() {
 // Render handles rendering of all scene objects
 func (rm *RenderManager) Render() {
 	sett := settings.GetSettings()
+
+	if sett.App.RendererType == types.InAppRendererTypeDeferred {
+		w, h := rm.Window.Size()
+		rm.Window.OpenGL().Viewport(0, 0, int32(w), int32(h))
+		rm.rendererDefered.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources, w, h)
+		rm.RenderElements()
+	} else {
+		rm.RenderElements()
+		rm.RenderScene()
+	}
+}
+
+// RenderElements ...
+func (rm *RenderManager) RenderElements() {
 	rsett := settings.GetRenderingSettings()
 
 	w, h := rm.Window.Size()
@@ -141,14 +155,16 @@ func (rm *RenderManager) Render() {
 			rm.LightSources[i].Render()
 		}
 	}
+}
 
+// RenderScene ...
+func (rm *RenderManager) RenderScene() {
+	sett := settings.GetSettings()
 	if sett.Components.ShouldRecompileShaders && sett.App.RendererType == types.InAppRendererTypeForward {
 		rm.rendererForward.CompileShaders()
 	}
 
 	switch sett.App.RendererType {
-	case types.InAppRendererTypeDeferred:
-		rm.rendererDefered.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources)
 	case types.InAppRendererTypeForward:
 		rm.rendererForward.Render(rm.RenderProps, rm.MeshModelFaces, rm.wgrid.MatrixModel, rm.Camera.CameraPosition, rm.SceneSelectedModelObject, rm.LightSources)
 	case types.InAppRendererTypeForwardShadowMapping:
