@@ -57,10 +57,6 @@ func (rp *RayPicking) pickModel(meshModelFaces []*meshes.ModelFace) {
 	vTo := mgl32.Vec3{rayWorld.X(), rayWorld.Y(), rayWorld.Z()}
 	vTo = vTo.Mul(rsett.General.PlaneFar)
 
-	settings.LogWarn("-- %f, %f, %f", vFrom.X(), vFrom.Y(), vFrom.Z())
-	settings.LogWarn("-- %f, %f, %f", vTo.X(), vTo.Y(), vTo.Z())
-	settings.LogWarn("----------------------------------------")
-
 	if rsett.General.ShowPickRays {
 		rl := objects.NewLightRay(rp.window)
 		rl.InitBuffers(vFrom, vTo)

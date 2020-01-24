@@ -35,6 +35,7 @@ type Context struct {
 	window       interfaces.Window
 
 	lastRenderTime time.Time
+	DeltaTime      float32
 	isFrame        bool
 
 	fontTexture            uint32
@@ -60,6 +61,7 @@ type Context struct {
 	componentImport    *components.ComponentImport
 	componentExport    *components.ComponentExport
 	componentFileSaver *components.ComponentFileSaver
+	componentShadertoy *components.ComponentShadertoy
 
 	fontFA imgui.Font
 	fontMD imgui.Font
@@ -124,6 +126,7 @@ func NewContext(window interfaces.Window) *Context {
 		componentImport:    components.NewComponentImport(),
 		componentExport:    components.NewComponentExport(),
 		componentFileSaver: components.NewComponentFileSaver(),
+		componentShadertoy: components.NewComponentShadertoy(window),
 	}
 
 	context.GuiVars.showModels = true
@@ -232,6 +235,7 @@ func (context *Context) NewFrame() {
 	if !context.lastRenderTime.IsZero() {
 		elapsed := now.Sub(context.lastRenderTime)
 		io.SetDeltaTime(float32(elapsed.Seconds()))
+		context.DeltaTime = float32(elapsed.Seconds())
 	}
 	context.lastRenderTime = now
 
@@ -310,6 +314,10 @@ func (context *Context) DrawGUI(isFrame bool, rm *rendering.RenderManager) {
 
 	if context.GuiVars.showOpenDialog {
 		context.componentFileSaver.Render(types.FileSaverOperationOpenScene, &context.GuiVars.showOpenDialog)
+	}
+
+	if context.GuiVars.showShadertoy {
+		context.componentShadertoy.Render(&context.GuiVars.showShadertoy, context.DeltaTime)
 	}
 }
 

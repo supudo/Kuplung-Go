@@ -380,6 +380,11 @@ func (native *OpenGL) TexParameteri(target uint32, pname uint32, param int32) {
 	gl.TexParameteri(target, pname, param)
 }
 
+// TexParameterf implements the interfaces.OpenGL interface.
+func (native *OpenGL) TexParameterf(target uint32, pname uint32, param float32) {
+	gl.TexParameterf(target, pname, param)
+}
+
 // FramebufferTexture2D implements the interfaces.OpenGL interface.
 func (native *OpenGL) FramebufferTexture2D(target uint32, attachment uint32, textarget uint32, texture uint32, level int32) {
 	gl.FramebufferTexture2D(target, attachment, textarget, texture, level)
@@ -388,6 +393,16 @@ func (native *OpenGL) FramebufferTexture2D(target uint32, attachment uint32, tex
 // Uniform1i implements the interfaces.OpenGL interface.
 func (native *OpenGL) Uniform1i(location int32, value int32) {
 	gl.Uniform1i(location, value)
+}
+
+// Uniform2i implements the interfaces.OpenGL interface.
+func (native *OpenGL) Uniform2i(location int32, v0 int32, v1 int32) {
+	gl.Uniform2i(location, v0, v1)
+}
+
+// Uniform3i implements the interfaces.OpenGL interface.
+func (native *OpenGL) Uniform3i(location int32, v0 int32, v1 int32, v2 int32) {
+	gl.Uniform3i(location, v0, v1, v2)
 }
 
 // Uniform1f implements the interfaces.OpenGL interface.
@@ -403,6 +418,11 @@ func (native *OpenGL) Uniform3f(location int32, value1 float32, value2 float32, 
 // Uniform3fv implements the interfaces.OpenGL interface.
 func (native *OpenGL) Uniform3fv(location int32, count int32, value *float32) {
 	gl.Uniform3fv(location, count, value)
+}
+
+// Uniform4f implements the interfaces.OpenGL interface.
+func (native *OpenGL) Uniform4f(location int32, v0 float32, v1 float32, v2 float32, v3 float32) {
+	gl.Uniform4f(location, v0, v1, v2, v3)
 }
 
 // Uniform4fv implements the interfaces.OpenGL interface.

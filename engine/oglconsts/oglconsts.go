@@ -186,7 +186,10 @@ const (
 
 	UNPACK_ROW_LENGTH = 0x0CF2
 
-	LINEAR = 0x2601
+	LINEAR                = 0x2601
+	LINEAR_MIPMAP_NEAREST = 0x2701
+	LINEAR_MIPMAP_LINEAR  = 0x2703
+	GENERATE_MIPMAP       = 0x8191
 )
 
 // Texture Floats Constants
@@ -194,6 +197,7 @@ const (
 const (
 	RGB16F_ARB uint32 = 0x881B
 	RGB16F            = 0x881B
+	RGBA8             = 0x8058
 )
 
 // Errors

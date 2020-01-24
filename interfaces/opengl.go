@@ -81,12 +81,16 @@ type OpenGL interface {
 
 	TexImage2D(target uint32, level int32, internalFormat uint32, width int32, height int32, border int32, format uint32, xtype uint32, pixels interface{})
 	TexParameteri(target uint32, pname uint32, param int32)
+	TexParameterf(target uint32, pname uint32, param float32)
 	FramebufferTexture2D(target uint32, attachment uint32, textarget uint32, texture uint32, level int32)
 
 	Uniform1i(location int32, value int32)
+	Uniform2i(location int32, v0 int32, v1 int32)
+	Uniform3i(location int32, v0 int32, v1 int32, v2 int32)
 	Uniform1f(location int32, value1 float32)
 	Uniform3f(location int32, value1 float32, value2 float32, value3 float32)
 	Uniform3fv(location int32, count int32, value *float32)
+	Uniform4f(location int32, v0 float32, v1 float32, v2 float32, v3 float32)
 	Uniform4fv(location int32, value *[4]float32)
 	UniformMatrix4fv(location int32, transpose bool, value *[16]float32)
 	UniformMatrix3fv(location int32, count int32, transpose bool, value *float32)
