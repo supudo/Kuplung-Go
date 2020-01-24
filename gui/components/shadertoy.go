@@ -64,17 +64,15 @@ func NewComponentShadertoy(window interfaces.Window) *ComponentShadertoy {
 	comp.texImage2 = -1
 	comp.texImage3 = -1
 
-	funcMain := `
+	comp.shadertoyEditorText = `
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 	vec2 uv = fragCoord.xy / iResolution.xy;
 	fragColor = vec4(uv, 0.5 + 0.5 * sin(iGlobalTime), 1.0);
 }
 `
-	comp.shadertoyEditorText = funcMain
-
 	w, h := window.Size()
 	comp.engineShadertoy = objects.InitShadertoy(window)
-	comp.engineShadertoy.InitShaderProgram(funcMain)
+	comp.engineShadertoy.InitShaderProgram(comp.shadertoyEditorText)
 	comp.engineShadertoy.InitBuffers()
 	comp.engineShadertoy.InitFBO(int32(w), int32(h), &comp.vboTexture)
 
@@ -111,8 +109,18 @@ func (comp *ComponentShadertoy) Render(open *bool, deltaTime float32) {
 		// bbmin := offset
 		// bbmax := imgui.Vec2{X: float32(comp.textureWidth) + offset.X, Y: float32(comp.textureHeight) + offset.Y}
 		// // drawlist.AddImage(ImTextureID(intptr_t(comp.vboTexture)), bbmin, bbmax)
-		// imgui.Image(imgui.TextureID(comp.vboTexture), imgui.Vec2{X: float32(*width), Y: float32(*height)})
+		imgui.Image(imgui.TextureID(comp.vboTexture), imgui.Vec2{X: float32(comp.windowWidth), Y: float32(comp.heightTopPanel)})
 		// drawlist.ChannelsMerge()
+
+		/*
+			ImDrawList* draw_list = ImGui::GetWindowDrawList();
+			ImVec2 offset = ImGui::GetCursorScreenPos() - this->scrolling;
+			draw_list->ChannelsSetCurrent(0);
+			ImVec2 bb_min = offset;
+			ImVec2 bb_max = ImVec2(this->textureWidth, this->textureHeight) + offset;
+			draw_list->AddImage(ImTextureID(intptr_t(this->vboTexture)), bb_min, bb_max);
+			draw_list->ChannelsMerge();
+		*/
 
 		imgui.EndChild()
 

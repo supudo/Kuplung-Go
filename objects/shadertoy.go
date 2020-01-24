@@ -95,7 +95,8 @@ uniform vec3 iChannelResolution[4];
 uniform vec4 iMouse;
 uniform vec4 iDate;
 uniform float iSampleRate;
-` + "\x00"
+
+`
 
 	if len(st.IChannel0Image) > 0 {
 		fragmentShader += `uniform sampler2D iChannel0;`
@@ -132,7 +133,7 @@ uniform float iSampleRate;
 
 	fragmentShader += `
 
-void main() {
+void main(void) {
 	vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 	mainImage(color, gl_FragCoord.xy);
 	outFragmentColor = color;
